@@ -1092,15 +1092,43 @@ document.addEventListener("DOMContentLoaded", async () => {
   }), { threshold: 0.08 });
   document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
 
-  // Mobile bottom nav active scroll spy
-  const mobileTabs = [...document.querySelectorAll(".mobile-nav [data-mobile-tab]")];
-  const setActiveMobileTab = (tabName) => {
-    mobileTabs.forEach((item) => item.classList.toggle("is-active", item.dataset.mobileTab === tabName));
-  };
-  mobileTabs.forEach((item) => {
-    if (item.tagName === "A") {
-      item.addEventListener("click", () => setActiveMobileTab(item.dataset.mobileTab));
+  // Dynamic View Routing (Home vs Dedicated Fosters, Alerts, Donors)
+  function updateViewFromHash() {
+    const rawHash = (window.location.hash || "").replace(/^#/, "");
+    const dedicatedViews = ["foster-care", "lost-found", "blood-donors", "adoption", "find-care"];
+    const view = dedicatedViews.includes(rawHash) ? rawHash : "home";
+    document.body.dataset.view = view;
+
+    // Desktop header active nav styling
+    document.querySelectorAll(".main-nav a").forEach((link) => {
+      const href = (link.getAttribute("href") || "").replace(/^#/, "");
+      link.classList.toggle("is-active", href === view);
+    });
+
+    // Mobile bottom navigation active tab
+    document.querySelectorAll(".mobile-nav [data-mobile-tab]").forEach((item) => {
+      const tab = item.dataset.mobileTab;
+      const isTarget = (view === "home" && tab === "home") || (tab === view);
+      item.classList.toggle("is-active", isTarget);
+    });
+
+    // Scroll smoothly to top on view change
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  window.addEventListener("hashchange", updateViewFromHash);
+  updateViewFromHash();
+
+  // Homepage Foster Teaser "Add Foster" trigger
+  document.getElementById("home-add-foster-btn")?.addEventListener("click", (event) => {
+    if (!localStorage.getItem("pawnir_token")) {
+      showAuthStep("credentials");
+      document.getElementById("auth-status").textContent = "Sign in first to list a local foster or shelter on Google Maps.";
+      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
+      return;
     }
+    document.getElementById("add-foster-status").textContent = "";
+    openDialog(document.getElementById("add-foster-dialog"), event.currentTarget);
   });
 
   // How it works carousel

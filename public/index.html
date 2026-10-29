@@ -135,6 +135,10 @@
       </section>
 
       <section class="lost-found-section shell" id="lost-found" aria-labelledby="lost-found-title">
+        <div class="view-back-bar">
+          <a href="#main" class="view-back-link"><span aria-hidden="true">←</span> <span>Back to Home</span></a>
+          <span class="view-badge-pill">Lost &amp; Found Alerts</span>
+        </div>
         <div class="section-heading">
           <div>
             <p class="eyebrow" data-i18n="lost.eyebrow">Help that reaches nearby</p>
@@ -160,6 +164,10 @@
       </section>
 
       <section class="donor-section shell" id="blood-donors" aria-labelledby="donor-title">
+        <div class="view-back-bar">
+          <a href="#main" class="view-back-link"><span aria-hidden="true">←</span> <span>Back to Home</span></a>
+          <span class="view-badge-pill">Animal Blood Donor Network</span>
+        </div>
         <div class="section-heading">
           <div>
             <p class="eyebrow" data-i18n="donor.eyebrow">Help in urgent moments</p>
@@ -201,7 +209,44 @@
         </div>
       </section>
 
+      <!-- Compact Foster Care Teaser on Homepage -->
+      <section class="foster-teaser-section shell" id="home-foster-teaser" aria-labelledby="foster-teaser-title">
+        <div class="foster-teaser-card">
+          <div class="foster-teaser-body">
+            <span class="teaser-eyebrow"><span class="live-pulse" aria-hidden="true"></span> Google Maps Local Care</span>
+            <h2 id="foster-teaser-title">Looking for trusted local foster care or shelters?</h2>
+            <p>Explore verified pet foster homes and rescue shelters on Google Maps across Dhaka and Chattogram, read community reviews, and request care safely.</p>
+            <div class="foster-teaser-actions">
+              <a class="btn btn-primary" href="#foster-care" id="teaser-foster-link">
+                <span>Explore all fosters on Google Maps</span>
+                <span aria-hidden="true">↗</span>
+              </a>
+              <button class="btn btn-outline btn-small" id="home-add-foster-btn" type="button">+ Add foster on Map</button>
+            </div>
+          </div>
+          <div class="foster-teaser-stats">
+            <div class="teaser-stat-pill">
+              <strong>6+</strong>
+              <small>Verified centers</small>
+            </div>
+            <div class="teaser-stat-pill">
+              <strong>★ 4.9</strong>
+              <small>Community rating</small>
+            </div>
+            <div class="teaser-stat-pill">
+              <strong>📍 Live</strong>
+              <small>Google Maps pins</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dedicated Foster Care View (Shown when clicked Fosters navigation) -->
       <section class="foster-section shell" id="foster-care" aria-labelledby="foster-title">
+        <div class="view-back-bar">
+          <a href="#main" class="view-back-link"><span aria-hidden="true">←</span> <span>Back to Home</span></a>
+          <span class="view-badge-pill">Showing all verified fosters on Google Maps</span>
+        </div>
         <div class="section-heading foster-heading-wrap">
           <div>
             <p class="eyebrow" data-i18n="foster.eyebrow">Google Maps local care &amp; verified reviews</p>
@@ -261,11 +306,19 @@
       </section>
 
       <section class="adoption-section shell" id="adoption" aria-labelledby="adoption-title">
+        <div class="view-back-bar">
+          <a href="#main" class="view-back-link"><span aria-hidden="true">←</span> <span>Back to Home</span></a>
+          <span class="view-badge-pill">Safe Pet Adoption</span>
+        </div>
         <div class="section-heading"><div><p class="eyebrow" data-i18n="adopt.eyebrow">A safer next home</p><h2 id="adoption-title" data-i18n="adopt.title">Adopt responsibly</h2></div></div>
         <div class="adoption-grid" id="adoption-grid"><p class="inline-state">Loading verified adoption listings…</p></div>
       </section>
 
       <section class="vet-coming-soon shell" id="find-care" aria-labelledby="find-care-title">
+        <div class="view-back-bar">
+          <a href="#main" class="view-back-link"><span aria-hidden="true">←</span> <span>Back to Home</span></a>
+          <span class="view-badge-pill">Emergency &amp; Clinic Vet Care</span>
+        </div>
         <div class="vet-coming-copy">
           <p class="eyebrow" data-i18n="vet.eyebrow">A better care experience is coming</p>
           <h2 id="find-care-title" data-i18n-html="vet.title">Paid vet consultations,<br /><em>made for PawNir.</em></h2>
