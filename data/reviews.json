@@ -1,0 +1,80 @@
+[
+  {
+    "id": "rev-dhanmondi-1",
+    "fosterId": "foster-paws-dhanmondi",
+    "userId": "seed-reviewer-1",
+    "authorName": "Anika Tabassum",
+    "rating": 5,
+    "petSpecies": "cat",
+    "badge": "Verified Stay",
+    "helpfulCount": 7,
+    "comment": "Kept our rescued kitten here for 6 days after her spay surgery. They sent WhatsApp video updates twice a day and kept the room spotless.",
+    "status": "published",
+    "createdAt": "2026-10-20T14:30:00.000Z"
+  },
+  {
+    "id": "rev-dhanmondi-2",
+    "fosterId": "foster-paws-dhanmondi",
+    "userId": "seed-reviewer-2",
+    "authorName": "Mahmudul Hasan",
+    "rating": 5,
+    "petSpecies": "dog",
+    "badge": "Verified Stay",
+    "helpfulCount": 4,
+    "comment": "Super caring hosts in Dhanmondi 10. Very easy to locate on Google Maps and they genuinely love animals.",
+    "status": "published",
+    "createdAt": "2026-10-24T09:15:00.000Z"
+  },
+  {
+    "id": "rev-uttara-1",
+    "fosterId": "foster-tails-uttara",
+    "userId": "seed-reviewer-3",
+    "authorName": "Samia Rahman",
+    "rating": 5,
+    "petSpecies": "cat",
+    "badge": "Verified Stay",
+    "helpfulCount": 6,
+    "comment": "Best foster in Uttara Sector 7! Fully netted windows, clean litter stations, and separate isolation room for new rescues.",
+    "status": "published",
+    "createdAt": "2026-10-22T17:40:00.000Z"
+  },
+  {
+    "id": "rev-mohammadpur-1",
+    "fosterId": "foster-obhoyaronno-mohammadpur",
+    "userId": "seed-reviewer-4",
+    "authorName": "Zahin Karim",
+    "rating": 5,
+    "petSpecies": "dog",
+    "badge": "Verified Member",
+    "helpfulCount": 9,
+    "comment": "Helped us take in an injured street dog from Mohammadpur at 11 PM when we had nowhere else to go. True lifesavers.",
+    "status": "published",
+    "createdAt": "2026-10-25T20:00:00.000Z"
+  },
+  {
+    "id": "rev-mirpur-1",
+    "fosterId": "foster-purrfect-mirpur",
+    "userId": "seed-reviewer-5",
+    "authorName": "Farzana Mimi",
+    "rating": 4,
+    "petSpecies": "cat",
+    "badge": "Verified Stay",
+    "helpfulCount": 3,
+    "comment": "Very calm home environment in Mirpur DOHS. My two cats settled in within hours without any cage stress.",
+    "status": "published",
+    "createdAt": "2026-10-26T12:10:00.000Z"
+  },
+  {
+    "id": "rev-ctg-1",
+    "fosterId": "foster-rescue-chattogram",
+    "userId": "seed-reviewer-6",
+    "authorName": "Sabbir Chowdhury",
+    "rating": 5,
+    "petSpecies": "cat",
+    "badge": "Verified Stay",
+    "helpfulCount": 5,
+    "comment": "So grateful to have a verified foster network in Chattogram. Safe Paws took wonderful care of our rescued ginger tom.",
+    "status": "published",
+    "createdAt": "2026-10-27T16:25:00.000Z"
+  }
+]

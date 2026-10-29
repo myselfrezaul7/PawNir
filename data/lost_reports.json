@@ -1,0 +1,82 @@
+[
+  {
+    "id": "lost-dhaka-ginger-cat",
+    "ownerId": "seed-owner-1",
+    "ownerName": "Nusrat Jahan",
+    "type": "lost",
+    "species": "cat",
+    "title": "Ginger Persian mix cat 'Milo' missing near Lake Road",
+    "description": "Wearing a soft teal breakaway collar with a bell. Very gentle but shy around loud rickshaw horns. Last seen near Dhanmondi Road 10A gate.",
+    "area": "Dhanmondi 10",
+    "areaKey": "dhanmondi-10",
+    "city": "Dhaka",
+    "photoUrl": null,
+    "photoData": null,
+    "status": "open",
+    "sightings": [
+      {
+        "id": "sight-1",
+        "reporterName": "Tanvir Ahmed",
+        "location": "Near Dhanmondi Lake bridge (Road 8 side)",
+        "note": "Saw an orange fluffy cat with a green/teal collar under a parked car around 6:30 PM.",
+        "createdAt": "2026-10-29T18:30:00.000Z"
+      }
+    ],
+    "createdAt": "2026-10-29T14:20:00.000Z",
+    "expiresAt": "2026-12-29T14:20:00.000Z"
+  },
+  {
+    "id": "found-uttara-indie-dog",
+    "ownerId": "seed-owner-2",
+    "ownerName": "Farhan Rahman",
+    "type": "found",
+    "species": "dog",
+    "title": "Friendly brown Indie puppy found with blue nylon collar",
+    "description": "Found safe near Sector 7 Park mosque. Well-fed and clearly someone's beloved pet. Currently kept safely in our garage with water and food.",
+    "area": "Uttara Sector 7",
+    "areaKey": "uttara-sector-7",
+    "city": "Dhaka",
+    "photoUrl": null,
+    "photoData": null,
+    "status": "open",
+    "sightings": [],
+    "createdAt": "2026-10-29T16:10:00.000Z",
+    "expiresAt": "2026-12-29T16:10:00.000Z"
+  },
+  {
+    "id": "lost-mirpur-cockatiel",
+    "ownerId": "seed-owner-3",
+    "ownerName": "Sadia Islam",
+    "type": "lost",
+    "species": "bird",
+    "title": "Tame yellow & grey Cockatiel 'Koko' flew out from balcony",
+    "description": "Responds to whistling and his name 'Koko'. Has bright orange cheek patches. Flew towards Avenue 3 trees.",
+    "area": "Mirpur DOHS",
+    "areaKey": "mirpur-dohs",
+    "city": "Dhaka",
+    "photoUrl": null,
+    "photoData": null,
+    "status": "open",
+    "sightings": [],
+    "createdAt": "2026-10-29T19:05:00.000Z",
+    "expiresAt": "2026-12-29T19:05:00.000Z"
+  },
+  {
+    "id": "found-ctg-calico-cat",
+    "ownerId": "seed-owner-4",
+    "ownerName": "Arif Chowdhury",
+    "type": "found",
+    "species": "cat",
+    "title": "Calico adult cat rescued near Panchlaish residential lane",
+    "description": "Spotted meowing near the gate, litter-trained and wearing a pink collar without a tag. Looking for her family.",
+    "area": "Panchlaish",
+    "areaKey": "panchlaish",
+    "city": "Chattogram",
+    "photoUrl": null,
+    "photoData": null,
+    "status": "open",
+    "sightings": [],
+    "createdAt": "2026-10-29T20:15:00.000Z",
+    "expiresAt": "2026-12-29T20:15:00.000Z"
+  }
+]

@@ -58,6 +58,66 @@ function issueToken(user, secret, tenantId, ttlSeconds = 60 * 60 * 12) {
   return `${payload}.${signature}`;
 }
 
+function issuePending2faToken(user, secret, tenantId, ttlSeconds = 300) {
+  const payloadObj = {
+    sub: user.id,
+    email: user.email,
+    role: user.role,
+    name: user.name,
+    tenantId,
+    stage: "2fa_pending",
+    exp: Math.floor(Date.now() / 1000) + ttlSeconds
+  };
+  const payload = base64Url(JSON.stringify(payloadObj));
+  const signature = sign(payload, secret);
+  return `${payload}.${signature}`;
+}
+
+function createMathChallenge(secret, ttlSeconds = 300) {
+  const isPlus = crypto.randomInt(0, 2) === 0;
+  let a;
+  let b;
+  let answer;
+  let operator;
+  if (isPlus) {
+    a = crypto.randomInt(3, 19);
+    b = crypto.randomInt(2, 15);
+    answer = a + b;
+    operator = "+";
+  } else {
+    a = crypto.randomInt(9, 25);
+    b = crypto.randomInt(2, a - 1);
+    answer = a - b;
+    operator = "−";
+  }
+  const nonce = crypto.randomBytes(8).toString("hex");
+  const answerHash = sign(`${nonce}:${answer}`, secret);
+  const payloadObj = {
+    type: "math_2fa",
+    nonce,
+    answerHash,
+    exp: Math.floor(Date.now() / 1000) + ttlSeconds
+  };
+  const payload = base64Url(JSON.stringify(payloadObj));
+  const signature = sign(payload, secret);
+  return {
+    question: `${a} ${operator} ${b}`,
+    operator: isPlus ? "plus" : "minus",
+    challengeToken: `${payload}.${signature}`
+  };
+}
+
+function verifyMathChallenge(challengeToken, answer, secret) {
+  const parsed = verifyToken(challengeToken, secret);
+  if (!parsed || parsed.type !== "math_2fa" || !parsed.nonce || !parsed.answerHash) return false;
+  const cleaned = String(answer == null ? "" : answer).trim();
+  if (!/^-?\d+$/.test(cleaned)) return false;
+  const numeric = Number(cleaned);
+  const expected = Buffer.from(parsed.answerHash);
+  const actual = Buffer.from(sign(`${parsed.nonce}:${numeric}`, secret));
+  return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+}
+
 function verifyToken(token, secret) {
   if (!token || !token.includes(".")) return null;
   const [payload, signature] = token.split(".");
@@ -137,6 +197,9 @@ function hasRole(user, requiredRoles) {
 module.exports = {
   ensureDefaultUsers,
   issueToken,
+  issuePending2faToken,
+  createMathChallenge,
+  verifyMathChallenge,
   verifyToken,
   authenticate,
   registerUser,

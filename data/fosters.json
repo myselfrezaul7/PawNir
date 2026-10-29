@@ -2,28 +2,72 @@
   {
     "id": "foster-paws-dhanmondi",
     "name": "Paws & Care Dhanmondi",
-    "area": "Dhanmondi",
+    "area": "Dhanmondi Road 10",
     "city": "Dhaka",
     "species": ["cat", "dog"],
-    "capacity": "Small emergency foster",
-    "description": "A registered home-style foster space for short-term recovery and safe reunification.",
+    "capacity": "Small emergency & boarding foster",
+    "hours": "Open daily · 9:00 AM – 9:00 PM",
+    "description": "A registered home-style foster space in Dhanmondi for short-term recovery, post-surgery monitoring, and safe reunification.",
     "verified": true,
     "lat": 23.7465,
     "lng": 90.3760,
-    "mapQuery": "Paws and Care Dhanmondi Dhaka"
+    "mapQuery": "Dhanmondi 10A Dhaka Bangladesh"
   },
   {
     "id": "foster-tails-uttara",
-    "name": "Tails Home Uttara",
+    "name": "Tails Home & Rescue Uttara",
     "area": "Uttara Sector 7",
     "city": "Dhaka",
     "species": ["cat", "dog", "bird"],
-    "capacity": "Temporary foster beds",
-    "description": "Verified foster support for rescued animals while a permanent home is arranged.",
+    "capacity": "Temporary foster suites & isolation room",
+    "hours": "Open daily · 8:30 AM – 10:00 PM",
+    "description": "Verified foster support and quarantine-safe rooms for rescued animals and travelling pet parents in Uttara.",
     "verified": true,
     "lat": 23.8759,
     "lng": 90.3795,
-    "mapQuery": "Tails Home Uttara Dhaka"
+    "mapQuery": "Uttara Sector 7 Park Dhaka Bangladesh"
+  },
+  {
+    "id": "foster-obhoyaronno-mohammadpur",
+    "name": "RobinHood & Community Shelter Care",
+    "area": "Mohammadpur / Bosila",
+    "city": "Dhaka",
+    "species": ["dog", "cat"],
+    "capacity": "Emergency rescue & rehabilitation",
+    "hours": "24/7 Emergency Intake Support",
+    "description": "Dedicated rescue shelter and rehabilitation care for injured street animals and urgent foster placements in Dhaka.",
+    "verified": true,
+    "lat": 23.7542,
+    "lng": 90.3514,
+    "mapQuery": "Mohammadpur Dhaka Bangladesh"
+  },
+  {
+    "id": "foster-purrfect-mirpur",
+    "name": "Purrfect Haven Mirpur DOHS",
+    "area": "Mirpur DOHS",
+    "city": "Dhaka",
+    "species": ["cat", "rabbit", "bird"],
+    "capacity": "Indoor cage-free cat foster",
+    "hours": "Open daily · 10:00 AM – 8:00 PM",
+    "description": "Quiet, netted balcony and indoor playroom foster home tailored for cats, kittens, and small companions.",
+    "verified": true,
+    "lat": 23.8365,
+    "lng": 90.3695,
+    "mapQuery": "Mirpur DOHS Dhaka Bangladesh"
+  },
+  {
+    "id": "foster-gulshan-petcare",
+    "name": "PawHaven Gulshan & Banani",
+    "area": "Gulshan 2",
+    "city": "Dhaka",
+    "species": ["cat", "dog"],
+    "capacity": "Climate-controlled foster & daycare",
+    "hours": "Open daily · 9:00 AM – 9:30 PM",
+    "description": "Supervised foster boarding with daily photo/video updates and on-call veterinary clinic proximity.",
+    "verified": true,
+    "lat": 23.7925,
+    "lng": 90.4078,
+    "mapQuery": "Gulshan 2 Circle Dhaka Bangladesh"
   },
   {
     "id": "foster-rescue-chattogram",
@@ -31,11 +75,12 @@
     "area": "Panchlaish",
     "city": "Chattogram",
     "species": ["cat", "dog"],
-    "capacity": "Rescue intake by availability",
-    "description": "A registered local rescue partner offering temporary shelter and recovery coordination.",
+    "capacity": "Rescue intake & foster care",
+    "hours": "Open daily · 9:00 AM – 8:30 PM",
+    "description": "A registered local rescue partner in Chattogram offering temporary shelter, vaccination prep, and recovery coordination.",
     "verified": true,
     "lat": 22.3636,
     "lng": 91.8220,
-    "mapQuery": "Safe Paws Chattogram"
+    "mapQuery": "Panchlaish Chattogram Bangladesh"
   }
 ]

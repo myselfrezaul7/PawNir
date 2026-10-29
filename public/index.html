@@ -2,13 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="PawNir is Bangladesh's local animal safety and care network for nearby lost-pet alerts, adoption, blood donors, communities, emergency vets, and trusted pet care." />
     <meta name="keywords" content="lost pet alert Bangladesh, animal rescue Bangladesh, pet adoption Dhaka, animal blood donor Bangladesh, emergency vet Bangladesh, pet community, PawNir" />
     <meta name="author" content="PawNir" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="googlebot" content="index, follow, max-image-preview:large" />
-    <meta name="theme-color" content="#245b46" />
+    <meta name="theme-color" content="#087f62" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="PawNir" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/og-image.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/og-image.svg" />
     <link rel="canonical" href="https://pawnir.com/" />
     <link rel="alternate" hreflang="en-bd" href="https://pawnir.com/" />
     <link rel="alternate" hreflang="bn-bd" href="https://pawnir.com/?lang=bn" />
@@ -38,29 +45,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261029-6" />
+    <link rel="stylesheet" href="/styles.css?v=20261030-2" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="shell nav-wrap">
-        <a class="brand" href="/" aria-label="PawNir home">
+        <a class="brand" href="#main" aria-label="PawNir home">
           <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 25.5c-1.6-1.2-9.2-5.8-9.2-11.4a4.7 4.7 0 0 1 8.2-3.1 4.7 4.7 0 0 1 8.2 3.1c0 5.6-7.6 10.2-9.2 11.4Z"></path><circle cx="10.2" cy="7.5" r="2.2"></circle><circle cx="16" cy="5.5" r="2.2"></circle><circle cx="21.8" cy="7.5" r="2.2"></circle></svg></span>
           <span>Paw<span>Nir</span></span>
         </a>
         <nav class="main-nav" aria-label="Main navigation">
+          <a href="#lost-found" data-i18n="nav.lost">Lost &amp; found</a>
+          <a href="#blood-donors" data-i18n="nav.donors">Blood donors</a>
+          <a href="#foster-care" data-i18n="nav.foster">Fosters &amp; Map</a>
+          <a href="#adoption" data-i18n="nav.adopt">Adopt</a>
           <a href="#find-care" data-i18n="nav.find">Find a vet</a>
-          <a href="#how-it-works" data-i18n="nav.how">How it works</a>
-          <a href="#for-vets" data-i18n="nav.vets">For vets</a>
         </nav>
         <div class="nav-actions">
           <button class="language-switch" id="language-toggle" type="button" aria-label="Switch language">বাংলা</button>
+          <button class="icon-action-btn" id="notifications-button" type="button" aria-label="Nearby alert notifications">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span class="notif-badge" id="notifications-badge" hidden>0</span>
+          </button>
           <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
             <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg>
             <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"></path></svg>
           </button>
-          <button class="btn btn-small btn-outline" type="button" data-open-dashboard><span class="icon icon-heart" aria-hidden="true"></span><span data-i18n="nav.care">My care</span></button>
-          <button class="btn btn-small btn-outline" type="button" data-open-auth><span data-i18n="nav.signin">Sign in</span></button>
+          <button class="btn btn-small btn-outline hide-mobile-xs" type="button" data-open-dashboard><span class="icon icon-heart" aria-hidden="true"></span><span data-i18n="nav.care">My care</span></button>
+          <button class="btn btn-small btn-outline" id="auth-nav-button" type="button" data-open-auth><span id="auth-nav-avatar" class="user-chip-avatar" hidden></span><span id="auth-nav-label" data-i18n="nav.signin">Sign in</span></button>
         </div>
       </div>
     </header>
@@ -68,21 +81,21 @@
     <main id="main">
       <section class="hero shell">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status-dot"></span> Help for animals, close to home</p>
-          <h1>When animals need help,<br /><em>your area shows up.</em></h1>
-          <p class="hero-text">PawNir connects animal lovers with nearby lost-pet alerts, adoption, blood donors, communities, and trusted veterinary care across Bangladesh.</p>
+          <p class="eyebrow"><span class="status-dot"></span> <span data-i18n="hero.eyebrow">Help for animals, close to home</span></p>
+          <h1 data-i18n-html="hero.title">When animals need help,<br /><em>your area shows up.</em></h1>
+          <p class="hero-text" data-i18n="hero.subtitle">PawNir connects animal lovers with nearby lost-pet alerts, adoption, blood donors, Google Maps foster care, and trusted veterinary support across Bangladesh.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#pawnir-services">See what PawNir does <span aria-hidden="true">↗</span></a>
-            <a class="text-link" href="#find-care">Find a veterinarian <span aria-hidden="true">→</span></a>
+            <a class="btn btn-primary" href="#lost-found"><span data-i18n="hero.cta">Explore live network</span> <span aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#foster-care"><span data-i18n="hero.vetLink">Foster map &amp; reviews</span> <span aria-hidden="true">→</span></a>
           </div>
           <div class="hero-trust">
             <div class="avatar-stack" aria-hidden="true"><span>🐶</span><span>🐱</span><span>🐰</span></div>
-            <p><strong>10,000+</strong> pet parents<br />already trust PawNir</p>
+            <p data-i18n-html="hero.trust"><strong>10,000+</strong> pet parents<br />already trust PawNir</p>
           </div>
         </div>
         <div class="hero-art" aria-label="Happy dog illustration">
           <div class="sun-shape"></div>
-          <div class="hero-card hero-card-top"><span class="card-icon">✓</span><span><strong>Verified vets</strong><small>Credentials checked</small></span></div>
+          <div class="hero-card hero-card-top"><span class="card-icon">✓</span><span><strong data-i18n="hero.badge1Title">Verified network</strong><small data-i18n="hero.badge1Sub">Community checked</small></span></div>
           <div class="pet-illustration">
             <svg class="hero-pet-svg" viewBox="0 0 320 280" role="img" aria-label="Illustration of a happy dog receiving gentle care">
               <path class="illustration-shadow" d="M64 246c27-18 159-22 193 0-35 18-158 18-193 0Z"></path>
@@ -97,70 +110,176 @@
               <path class="illustration-leaf" d="M248 70c27-22 45-3 17 20-16 13-27 4-17-20Z"></path><path class="illustration-leaf-stem" d="M233 111c10-18 19-29 31-41"></path>
             </svg>
           </div>
-          <div class="hero-card hero-card-bottom"><span class="rating">★</span><span><strong>4.9 / 5</strong><small>Loved by pet parents</small></span></div>
+          <div class="hero-card hero-card-bottom"><span class="rating">★</span><span><strong>4.9 / 5</strong><small data-i18n="hero.badge2Sub">Loved by pet parents</small></span></div>
         </div>
       </section>
 
       <section class="mission-section shell" id="pawnir-services" aria-labelledby="mission-title">
-        <div class="section-heading"><div><p class="eyebrow">One home for animal help</p><h2 id="mission-title">Not another group post.<br /><em>Nearby help that reaches the right people.</em></h2></div><span class="mission-badge">Built for Bangladesh</span></div>
+        <div class="section-heading"><div><p class="eyebrow" data-i18n="mission.eyebrow">One home for animal help</p><h2 id="mission-title" data-i18n-html="mission.title">Not another group post.<br /><em>Nearby help that reaches the right people.</em></h2></div><span class="mission-badge" data-i18n="mission.badge">Built for Bangladesh</span></div>
         <div class="mission-example">
-          <div class="example-copy"><span class="example-label">A simple example</span><h3>Your cat is missing from Dhanmondi 10.</h3><p>Instead of posting across unrelated groups, PawNir can notify opted-in animal lovers around that area: <strong>“Lost pet near you.”</strong> The alert stays local, useful, and privacy-conscious.</p><span class="example-note">Approximate area only · Contact shared with consent</span></div>
-          <div class="alert-preview" aria-label="Example PawNir nearby alert"><span class="alert-icon">!</span><div><strong>Lost pet near you</strong><p>Cat reported near Dhanmondi 10</p><small>89 PawNir members in this area notified</small></div><span class="alert-arrow">↗</span></div>
+          <div class="example-copy"><span class="example-label" data-i18n="mission.exampleLabel">A simple example</span><h3 data-i18n="mission.exampleTitle">Your cat is missing from Dhanmondi 10.</h3><p data-i18n-html="mission.exampleText">Instead of posting across unrelated groups, PawNir can notify opted-in animal lovers around that area: <strong>“Lost pet near you.”</strong> The alert stays local, useful, and privacy-conscious.</p><span class="example-note" data-i18n="mission.exampleNote">Approximate area only · Contact shared with consent</span></div>
+          <div class="alert-preview" aria-label="Example PawNir nearby alert"><span class="alert-icon">!</span><div><strong data-i18n="mission.alertTitle">Lost pet near you</strong><p data-i18n="mission.alertSub">Cat reported near Dhanmondi 10</p><small data-i18n="mission.alertMeta">89 PawNir members in this area notified</small></div><span class="alert-arrow">↗</span></div>
         </div>
         <div class="service-grid" aria-label="PawNir services">
-          <a class="service-card service-lost" href="#lost-found"><span class="service-icon">⌖</span><div><h3>Lost & found alerts</h3><p>Reach animal lovers around the right area.</p></div><span class="service-status">Live now ↗</span></a>
-          <a class="service-card service-adopt" href="#adoption"><span class="service-icon">♡</span><div><h3>Safe adoption</h3><p>Adopt or rehome with screening and follow-up.</p></div><span class="service-status">Live now ↗</span></a>
-          <a class="service-card service-blood" href="#blood-donors"><span class="service-icon">+</span><div><h3>Blood donor network</h3><p>Find registered donors near your pet.</p></div><span class="service-status">Live now ↗</span></a>
-          <article class="service-card service-community"><span class="service-icon">◌</span><div><h3>Local circles</h3><p>Connect with animal lovers in your area.</p></div><span class="service-status">Coming soon</span></article>
-          <article class="service-card service-emergency"><span class="service-icon">✚</span><div><h3>Emergency vet care</h3><p>Find urgent veterinary support when needed.</p></div><span class="service-status">Available now</span></article>
-          <article class="service-card service-foster"><span class="service-icon">⌂</span><div><h3>Foster & shelters</h3><p>Discover registered local care and safe foster support.</p></div><span class="service-status">Available now</span></article>
-          <a class="service-card service-petbhai" href="https://www.petbhai.com" target="_blank" rel="noopener noreferrer"><span class="service-icon">✦</span><div><h3>Accessories & transport</h3><p>Shop pet essentials or arrange animal transport through PetBhai.</p></div><span class="service-status">PetBhai partner ↗</span></a>
+          <a class="service-card service-lost" href="#lost-found"><span class="service-icon">⌖</span><div><h3 data-i18n="service.lostTitle">Lost &amp; found alerts</h3><p data-i18n="service.lostDesc">Reach animal lovers around the right area.</p></div><span class="service-status">Live now ↗</span></a>
+          <a class="service-card service-blood" href="#blood-donors"><span class="service-icon">+</span><div><h3 data-i18n="service.bloodTitle">Blood donor network</h3><p data-i18n="service.bloodDesc">Find registered cat &amp; dog donors near your pet.</p></div><span class="service-status">Live now ↗</span></a>
+          <a class="service-card service-foster" href="#foster-care"><span class="service-icon">⌂</span><div><h3 data-i18n="service.fosterTitle">Foster map &amp; reviews</h3><p data-i18n="service.fosterDesc">Explore local fosters on Google Maps with real reviews.</p></div><span class="service-status">Live map ↗</span></a>
+          <a class="service-card service-adopt" href="#adoption"><span class="service-icon">♡</span><div><h3 data-i18n="service.adoptTitle">Safe adoption</h3><p data-i18n="service.adoptDesc">Adopt or rehome with screening and follow-up.</p></div><span class="service-status">Live now ↗</span></a>
+          <a class="service-card service-emergency" href="#find-care"><span class="service-icon">✚</span><div><h3 data-i18n="service.vetTitle">Emergency vet care</h3><p data-i18n="service.vetDesc">Find urgent veterinary support when needed.</p></div><span class="service-status">Available now ↗</span></a>
+          <article class="service-card service-community"><span class="service-icon">◌</span><div><h3 data-i18n="service.circleTitle">Local circles</h3><p data-i18n="service.circleDesc">Connect with animal lovers in your area.</p></div><span class="service-status">Coming soon</span></article>
+          <a class="service-card service-petbhai" href="https://www.petbhai.com" target="_blank" rel="noopener noreferrer"><span class="service-icon">✦</span><div><h3 data-i18n="service.shopTitle">Accessories &amp; transport</h3><p data-i18n="service.shopDesc">Shop pet essentials or arrange animal transport through PetBhai.</p></div><span class="service-status">PetBhai partner ↗</span></a>
         </div>
-        <div class="safety-strip"><span class="safety-icon">✓</span><p><strong>Our safety promise:</strong> PawNir does not allow buying or selling live animals. We are building with verification, moderation, consent, and animal welfare at the center.</p></div>
+        <div class="safety-strip"><span class="safety-icon">✓</span><p data-i18n-html="mission.safety"><strong>Our safety promise:</strong> PawNir does not allow buying or selling live animals. We are building with verification, moderation, consent, and animal welfare at the center.</p></div>
       </section>
 
       <section class="lost-found-section shell" id="lost-found" aria-labelledby="lost-found-title">
-        <div class="section-heading"><div><p class="eyebrow">Help that reaches nearby</p><h2 id="lost-found-title">Lost & found around you</h2></div><button class="btn btn-primary btn-small" id="report-lost-button" type="button">Report an animal</button></div>
-        <div class="lost-found-toolbar"><label class="search-field"><span aria-hidden="true">⌖</span><input id="lost-area-input" type="search" placeholder="Enter an area, e.g. Dhanmondi 10" aria-label="Search lost and found reports by area" /></label><select id="lost-type-filter" aria-label="Filter lost and found reports"><option value="all">Lost & found</option><option value="lost">Lost animals</option><option value="found">Found animals</option></select><button class="btn btn-outline btn-small" id="nearby-alert-button" type="button">Get alerts here</button></div>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow" data-i18n="lost.eyebrow">Help that reaches nearby</p>
+            <h2 id="lost-found-title" data-i18n="lost.title">Lost &amp; found around you</h2>
+          </div>
+          <button class="btn btn-primary btn-small" id="report-lost-button" type="button" data-i18n="lost.reportBtn">+ Report an animal</button>
+        </div>
+        <div class="lost-found-toolbar">
+          <label class="search-field"><span aria-hidden="true">⌖</span><input id="lost-area-input" type="search" placeholder="Search area or pet (e.g. Dhanmondi, Uttara, Mirpur)…" aria-label="Search lost and found reports by area" /></label>
+          <select id="lost-type-filter" aria-label="Filter lost and found reports"><option value="all">All reports</option><option value="lost">Lost animals</option><option value="found">Found animals</option></select>
+          <button class="btn btn-outline btn-small" id="nearby-alert-button" type="button" data-i18n="lost.alertBtn">🔔 Get alerts here</button>
+        </div>
+        <div class="filter-pills-row" id="lost-species-pills" role="group" aria-label="Filter by species">
+          <button type="button" class="chip active" data-lost-species="">All species</button>
+          <button type="button" class="chip" data-lost-species="cat">🐱 Cats</button>
+          <button type="button" class="chip" data-lost-species="dog">🐶 Dogs</button>
+          <button type="button" class="chip" data-lost-species="bird">🦜 Birds</button>
+          <button type="button" class="chip" data-lost-species="rabbit">🐰 Rabbits</button>
+        </div>
         <div class="live-feed-status" id="lost-live-status" role="status" aria-live="polite"><span class="live-pulse" aria-hidden="true"></span><strong>Live nearby feed</strong><span>Updating automatically</span></div>
         <div class="lost-report-grid" id="lost-report-grid"><p class="inline-state">Loading nearby reports…</p></div>
-        <div class="my-reports" id="my-lost-reports" hidden><div class="my-reports-heading"><strong>Your reports</strong><span>Update a report when the animal is safely reunited.</span></div><div class="my-report-list" id="my-lost-report-list"></div></div>
+        <div class="my-reports" id="my-lost-reports" hidden><div class="my-reports-heading"><strong>Your published alerts</strong><span>Mark a report as reunited once the animal is home safe.</span></div><div class="my-report-list" id="my-lost-report-list"></div></div>
       </section>
 
       <section class="donor-section shell" id="blood-donors" aria-labelledby="donor-title">
-        <div class="section-heading"><div><p class="eyebrow">Help in urgent moments</p><h2 id="donor-title">Animal blood donor network</h2></div><button class="btn btn-primary btn-small" id="register-donor-button" type="button">Register a donor</button></div>
-        <div class="lost-found-toolbar donor-toolbar"><label class="search-field"><span aria-hidden="true">⌖</span><input id="donor-area-input" type="search" placeholder="Search donor area" aria-label="Search blood donors by area" /></label><select id="donor-species-filter" aria-label="Filter donors by species"><option value="">All animals</option><option value="cat">Cats</option><option value="dog">Dogs</option></select><select id="donor-blood-filter" aria-label="Filter donors by blood type"><option value="">Any blood type</option><option value="Unknown">Blood type not recorded</option></select></div>
-        <p class="donor-disclaimer">PawNir connects consented donors; a veterinarian must confirm blood compatibility and medical suitability.</p>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow" data-i18n="donor.eyebrow">Help in urgent moments</p>
+            <h2 id="donor-title" data-i18n="donor.title">Animal blood donor network</h2>
+          </div>
+          <button class="btn btn-primary btn-small" id="register-donor-button" type="button" data-i18n="donor.registerBtn">+ Register a donor</button>
+        </div>
+        <div class="lost-found-toolbar donor-toolbar">
+          <label class="search-field"><span aria-hidden="true">⌖</span><input id="donor-area-input" type="search" placeholder="Search area or donor name (e.g. Dhanmondi, Uttara)…" aria-label="Search blood donors by area" /></label>
+          <select id="donor-species-filter" aria-label="Filter donors by species">
+            <option value="">All species</option>
+            <option value="cat">🐱 Cats</option>
+            <option value="dog">🐶 Dogs</option>
+          </select>
+          <select id="donor-blood-filter" aria-label="Filter donors by blood type">
+            <option value="">Any blood type</option>
+            <optgroup label="Cat Blood Types">
+              <option value="Type A">Cat · Type A</option>
+              <option value="Type B">Cat · Type B</option>
+              <option value="Type AB">Cat · Type AB</option>
+            </optgroup>
+            <optgroup label="Dog Blood Types">
+              <option value="DEA 1.1-">Dog · DEA 1.1- (Universal)</option>
+              <option value="DEA 1.1+">Dog · DEA 1.1+</option>
+              <option value="DEA 4">Dog · DEA 4</option>
+            </optgroup>
+            <option value="Unknown">Blood type not recorded</option>
+          </select>
+        </div>
+        <p class="donor-disclaimer" data-i18n="donor.disclaimer">PawNir connects consented donors; a licensed veterinarian must confirm blood cross-matching and medical suitability before donation.</p>
         <div class="donor-grid" id="donor-grid"><p class="inline-state">Loading verified donor network…</p></div>
-      </section>
-
-      <section class="adoption-section shell" id="adoption" aria-labelledby="adoption-title">
-        <div class="section-heading"><div><p class="eyebrow">A safer next home</p><h2 id="adoption-title">Adopt responsibly</h2></div></div>
-        <div class="adoption-grid" id="adoption-grid"><p class="inline-state">Loading verified adoption listings…</p></div>
+        <div class="my-reports donor-owner-panel" id="my-donor-panel" hidden>
+          <div class="my-reports-heading">
+            <strong>Your donor profiles &amp; urgent requests</strong>
+            <span>Toggle availability anytime or respond to incoming urgent requests.</span>
+          </div>
+          <div class="my-donor-grid" id="my-donor-list"></div>
+          <div class="my-donor-requests" id="my-donor-requests"></div>
+        </div>
       </section>
 
       <section class="foster-section shell" id="foster-care" aria-labelledby="foster-title">
-        <div class="section-heading"><div><p class="eyebrow">Registered local care</p><h2 id="foster-title">Find a foster or shelter</h2></div><select id="foster-city-filter" aria-label="Filter foster care by city"><option value="">All cities</option><option>Dhaka</option><option>Chattogram</option></select></div>
+        <div class="section-heading foster-heading-wrap">
+          <div>
+            <p class="eyebrow" data-i18n="foster.eyebrow">Google Maps local care &amp; verified reviews</p>
+            <h2 id="foster-title" data-i18n="foster.title">Find a foster or shelter</h2>
+          </div>
+          <div class="foster-header-actions">
+            <button class="btn btn-outline btn-small" id="add-foster-button" type="button">+ Add foster on Map</button>
+          </div>
+        </div>
+
+        <div class="lost-found-toolbar foster-toolbar">
+          <label class="search-field"><span aria-hidden="true">⌖</span><input id="foster-search-input" type="search" placeholder="Search foster name or area (e.g. Dhanmondi, Mirpur, Uttara)…" aria-label="Search foster care by area or name" /></label>
+          <select id="foster-city-filter" aria-label="Filter foster care by city">
+            <option value="">All cities</option>
+            <option value="Dhaka">Dhaka</option>
+            <option value="Chattogram">Chattogram</option>
+          </select>
+          <select id="foster-species-filter" aria-label="Filter foster care by species">
+            <option value="">All animals</option>
+            <option value="cat">🐱 Cats</option>
+            <option value="dog">🐶 Dogs</option>
+            <option value="bird">🦜 Birds</option>
+            <option value="rabbit">🐰 Rabbits</option>
+          </select>
+        </div>
+
+        <div class="foster-map-explorer" aria-label="Google Maps foster care explorer">
+          <div class="foster-map-stage">
+            <iframe
+              id="foster-google-map"
+              title="PawNir Local Foster Care Google Map"
+              src="https://maps.google.com/maps?q=Dhanmondi%2010A%20Dhaka%20Bangladesh&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="foster-map-sidebar">
+            <div class="foster-map-active-card" id="foster-map-active-card">
+              <span class="map-live-pill"><span class="live-pulse"></span> Google Maps Live Pin</span>
+              <h3 id="foster-map-active-title">Paws &amp; Care Dhanmondi</h3>
+              <p id="foster-map-active-meta">⌖ Dhanmondi Road 10, Dhaka · ★ 5.0</p>
+              <p class="foster-map-desc" id="foster-map-active-desc">Tap any foster location below or in the cards to preview its neighborhood on Google Maps and read community reviews.</p>
+              <div class="foster-map-active-actions">
+                <a class="btn btn-primary btn-small" id="foster-map-external-link" href="https://www.google.com/maps/search/?api=1&query=Dhanmondi+10A+Dhaka+Bangladesh" target="_blank" rel="noopener noreferrer">Directions in Google Maps ↗</a>
+                <button class="btn btn-outline btn-small" id="foster-map-reviews-btn" type="button">★ Read / write reviews</button>
+              </div>
+            </div>
+            <div class="foster-map-pins-wrap">
+              <small class="pins-label">Quick jump on map:</small>
+              <div class="foster-map-pins" id="foster-map-pins"></div>
+            </div>
+          </div>
+        </div>
+
         <div class="foster-grid" id="foster-grid"><p class="inline-state">Loading registered foster care…</p></div>
+      </section>
+
+      <section class="adoption-section shell" id="adoption" aria-labelledby="adoption-title">
+        <div class="section-heading"><div><p class="eyebrow" data-i18n="adopt.eyebrow">A safer next home</p><h2 id="adoption-title" data-i18n="adopt.title">Adopt responsibly</h2></div></div>
+        <div class="adoption-grid" id="adoption-grid"><p class="inline-state">Loading verified adoption listings…</p></div>
       </section>
 
       <section class="vet-coming-soon shell" id="find-care" aria-labelledby="find-care-title">
         <div class="vet-coming-copy">
-          <p class="eyebrow">A better care experience is coming</p>
-          <h2 id="find-care-title">Paid vet consultations,<br /><em>made for PawNir.</em></h2>
-          <p>We are preparing trusted paid consultations, online appointments, and follow-up care inside PawNir. Until it is ready, find local vet information through our trusted animal-care partner.</p>
-          <a class="btn btn-primary vet-directory-button" href="https://www.catwaala.com/find-vet" target="_blank" rel="noopener noreferrer">Find a local vet on Catwaala <span aria-hidden="true">↗</span></a>
+          <p class="eyebrow" data-i18n="vet.eyebrow">A better care experience is coming</p>
+          <h2 id="find-care-title" data-i18n-html="vet.title">Paid vet consultations,<br /><em>made for PawNir.</em></h2>
+          <p data-i18n="vet.desc">We are preparing trusted paid consultations, online appointments, and follow-up care inside PawNir. Until it is ready, find local vet information through our trusted animal-care partner.</p>
+          <a class="btn btn-primary vet-directory-button" href="https://www.catwaala.com/find-vet" target="_blank" rel="noopener noreferrer"><span data-i18n="vet.btn">Find a local vet on Catwaala</span> <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="vet-coming-art" aria-hidden="true"><span class="vet-orbit orbit-one"></span><span class="vet-orbit orbit-two"></span><span class="vet-coming-icon">✚</span><strong>Paid vet care</strong><small>Coming soon to PawNir</small></div>
+        <div class="vet-coming-art" aria-hidden="true"><span class="vet-orbit orbit-one"></span><span class="vet-orbit orbit-two"></span><span class="vet-coming-icon">✚</span><strong data-i18n="vet.artTitle">Paid vet care</strong><small data-i18n="vet.artSub">Coming soon to PawNir</small></div>
       </section>
 
       <section class="how-it-works shell" id="how-it-works">
-        <div class="section-heading"><div><p class="eyebrow">Simple from start to finish</p><h2>Care in three easy steps</h2></div></div>
+        <div class="section-heading"><div><p class="eyebrow" data-i18n="how.eyebrow">Simple from start to finish</p><h2 data-i18n="how.title">Care in three easy steps</h2></div></div>
         <div class="steps-shell">
           <div class="steps" role="region" aria-label="How PawNir works">
-            <article class="step-card is-active" data-step-card="0"><span class="step-number">01</span><span class="step-icon icon icon-search" aria-hidden="true"></span><h3>Find your vet</h3><p>Browse verified professionals by specialty, location, language, and availability.</p><span class="step-arrow" aria-hidden="true">↗</span></article>
-            <article class="step-card" data-step-card="1"><span class="step-number">02</span><span class="step-icon icon icon-calendar" aria-hidden="true"></span><h3>Book your time</h3><p>Choose a convenient online or in-clinic slot and pay securely in BDT.</p><span class="step-arrow" aria-hidden="true">↗</span></article>
-            <article class="step-card" data-step-card="2"><span class="step-number">03</span><span class="step-icon icon icon-heart" aria-hidden="true"></span><h3>Feel the difference</h3><p>Meet your vet, receive follow-up notes, and keep every prescription in one place.</p><span class="step-arrow" aria-hidden="true">↗</span></article>
+            <article class="step-card is-active" data-step-card="0"><span class="step-number">01</span><span class="step-icon icon icon-search" aria-hidden="true"></span><h3 data-i18n="how.step1Title">Find nearby support</h3><p data-i18n="how.step1Desc">Search verified blood donors, adoption listings, Google Maps fosters, or local veterinary partners by area.</p><span class="step-arrow" aria-hidden="true">↗</span></article>
+            <article class="step-card" data-step-card="1"><span class="step-number">02</span><span class="step-icon icon icon-calendar" aria-hidden="true"></span><h3 data-i18n="how.step2Title">Connect with consent</h3><p data-i18n="how.step2Desc">Send screened adoption, foster, sightings, or donor requests without exposing private phone numbers publicly.</p><span class="step-arrow" aria-hidden="true">↗</span></article>
+            <article class="step-card" data-step-card="2"><span class="step-number">03</span><span class="step-icon icon icon-heart" aria-hidden="true"></span><h3 data-i18n="how.step3Title">Keep every pet safe</h3><p data-i18n="how.step3Desc">Manage your pet profiles, nearby lost-pet alerts, and verified foster reviews in one trusted space.</p><span class="step-arrow" aria-hidden="true">↗</span></article>
           </div>
           <div class="steps-controls" aria-label="Step navigation">
             <button type="button" class="steps-control" data-step-prev aria-label="Previous care step">←</button>
@@ -171,8 +290,8 @@
       </section>
 
       <section class="vet-banner shell" id="for-vets">
-        <div><p class="eyebrow">For veterinary professionals</p><h2>Make more time for<br /><em>what matters most.</em></h2><p>Grow your practice, simplify your day, and give every patient a better care journey.</p></div>
-        <button class="btn btn-light" type="button" data-open-auth>Join PawNir <span aria-hidden="true">↗</span></button>
+        <div><p class="eyebrow" data-i18n="banner.eyebrow">For veterinary professionals</p><h2 data-i18n-html="banner.title">Make more time for<br /><em>what matters most.</em></h2><p data-i18n="banner.desc">Grow your practice, simplify your day, and give every patient a better care journey.</p></div>
+        <button class="btn btn-light" type="button" data-open-auth><span data-i18n="banner.btn">Join PawNir</span> <span aria-hidden="true">↗</span></button>
       </section>
     </main>
 
@@ -192,12 +311,350 @@
             </a>
           </div>
         </div>
-        <div class="footer-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 25.5c-1.6-1.2-9.2-5.8-9.2-11.4a4.7 4.7 0 0 1 8.2-3.1 4.7 4.7 0 0 1 8.2 3.1c0 5.6-7.6 10.2-9.2 11.4Z"></path><circle cx="10.2" cy="7.5" r="2.2"></circle><circle cx="16" cy="5.5" r="2.2"></circle><circle cx="21.8" cy="7.5" r="2.2"></circle></svg></span><span>Paw<span>Nir</span></span></a><p>Trusted care for every little life.</p><div><a href="#find-care">Find a vet</a><a href="#for-vets">For vets</a><a href="mailto:hello@pawnir.com">Contact</a></div></div>
+        <div class="footer-inner"><a class="brand" href="#main"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 25.5c-1.6-1.2-9.2-5.8-9.2-11.4a4.7 4.7 0 0 1 8.2-3.1 4.7 4.7 0 0 1 8.2 3.1c0 5.6-7.6 10.2-9.2 11.4Z"></path><circle cx="10.2" cy="7.5" r="2.2"></circle><circle cx="16" cy="5.5" r="2.2"></circle><circle cx="21.8" cy="7.5" r="2.2"></circle></svg></span><span>Paw<span>Nir</span></span></a><p>Trusted care for every little life.</p><div><a href="#lost-found">Lost &amp; found</a><a href="#foster-care">Fosters</a><a href="#find-care">Find a vet</a><a href="mailto:hello@pawnir.com">Contact</a></div></div>
       </div>
     </footer>
 
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <a class="is-active" href="#main" data-mobile-tab="home"><span class="mobile-nav-icon icon icon-home" aria-hidden="true"></span><small data-i18n="nav.home">Home</small></a>
+      <a href="#lost-found" data-mobile-tab="lost-found"><span class="mobile-nav-icon icon icon-pin" aria-hidden="true"></span><small data-i18n="nav.lostShort">Alerts</small></a>
+      <a href="#blood-donors" data-mobile-tab="blood-donors"><span class="mobile-nav-icon icon icon-plus" aria-hidden="true"></span><small data-i18n="nav.donorsShort">Donors</small></a>
+      <a href="#foster-care" data-mobile-tab="foster-care"><span class="mobile-nav-icon icon icon-heart" aria-hidden="true"></span><small data-i18n="nav.fosterShort">Fosters</small></a>
+      <button type="button" id="mobile-account-button" data-open-account data-mobile-tab="account"><span class="mobile-nav-icon icon icon-user" aria-hidden="true"></span><small id="mobile-account-label" data-i18n="nav.profile">Account</small></button>
+    </nav>
+
+    <dialog class="booking-dialog" id="auth-dialog">
+      <div class="dialog-card">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" data-close-auth aria-label="Close sign in dialog">×</button>
+
+        <div id="auth-step-credentials">
+          <p class="eyebrow">Welcome to PawNir</p>
+          <h2 id="auth-dialog-title">Sign in to your care space</h2>
+          <div class="auth-mode-tabs" role="tablist" aria-label="Account mode">
+            <button type="button" class="auth-mode-tab is-active" data-auth-mode="login" role="tab" aria-selected="true">Sign in</button>
+            <button type="button" class="auth-mode-tab" data-auth-mode="register" role="tab" aria-selected="false">Create account</button>
+          </div>
+          <a class="google-signin" id="google-signin-link" href="/auth/google/start">
+            <span class="google-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82Z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24Z"/><path fill="#FBBC05" d="M5.27 14.29a7.12 7.12 0 0 1 0-4.58V6.62H1.29a11.99 11.99 0 0 0 0 10.76l3.98-3.09Z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96Z"/></svg>
+            </span>
+            <span>Continue with Google</span>
+          </a>
+          <div class="auth-divider"><span>or continue with email</span></div>
+          <form id="auth-form" class="auth-stack">
+            <label id="auth-name-wrap">Your name <small>(for new accounts)</small><input id="auth-name" type="text" autocomplete="name" placeholder="Your full name" /></label>
+            <label>Email<input id="auth-email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required /></label>
+            <label>Password
+              <div class="password-field-wrap">
+                <input id="auth-password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required />
+                <button type="button" class="password-toggle-btn" id="toggle-password-btn" aria-label="Show password">Show</button>
+              </div>
+            </label>
+            <button class="btn btn-primary" id="auth-submit-btn" type="submit">Continue to verification <span aria-hidden="true">→</span></button>
+          </form>
+        </div>
+
+        <form id="auth-2fa-form" class="auth-2fa-panel" hidden>
+          <span class="step-kicker">Step 2 of 2 · Two-Factor Verification</span>
+          <h2>Quick security check</h2>
+          <p class="dialog-helper">Solve this simple number calculation to verify and complete your sign-in:</p>
+          <div class="math-challenge-box">
+            <div class="math-equation-display">
+              <span class="math-equation" id="auth-2fa-question">12 + 5</span>
+              <span class="math-equals">= ?</span>
+            </div>
+            <button type="button" class="math-refresh-btn" id="auth-2fa-refresh" aria-label="Generate a new calculation">↻ New numbers</button>
+          </div>
+          <label>Your answer
+            <input id="auth-2fa-answer" type="number" inputmode="numeric" pattern="[0-9-]*" placeholder="Type the result (e.g. 17)" required />
+          </label>
+          <div class="step-actions">
+            <button class="btn btn-outline" id="auth-2fa-back" type="button">← Back</button>
+            <button class="btn btn-primary" id="auth-2fa-submit" type="submit">Verify &amp; sign in <span aria-hidden="true">→</span></button>
+          </div>
+        </form>
+
+        <p class="secure-note" id="auth-status" role="status" aria-live="polite">Protected by 2-step math verification.</p>
+      </div>
+    </dialog>
+
+    <dialog class="booking-dialog" id="dashboard-dialog">
+      <section class="dialog-card dashboard-card">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" data-close-dashboard aria-label="Close care dashboard">×</button>
+        <div class="dashboard-header-row">
+          <div>
+            <p class="eyebrow">Your care space</p>
+            <h2>Everything your pet needs</h2>
+          </div>
+          <button class="btn btn-small btn-outline signout-btn" id="signout-button" type="button">Sign out</button>
+        </div>
+        <div class="dashboard-user-bar" id="dashboard-user-bar" hidden>
+          <span class="user-avatar-circle" id="dashboard-user-initials">P</span>
+          <div>
+            <strong id="dashboard-user-name">Pet parent</strong>
+            <small id="dashboard-user-email"></small>
+          </div>
+        </div>
+        <div class="dashboard-grid">
+          <div><h3>My pets</h3><div id="dashboard-pets" class="dashboard-list">Loading…</div></div>
+          <div><h3>Foster requests</h3><div id="dashboard-foster-requests" class="dashboard-list">Loading…</div></div>
+          <div><h3>Visits &amp; prescriptions</h3><div id="dashboard-bookings" class="dashboard-list">Loading…</div><div id="dashboard-prescriptions" class="dashboard-list" hidden></div></div>
+        </div>
+        <form id="pet-form" class="pet-form"><h3>Add a pet profile</h3><div class="pet-form-row"><input id="pet-name" placeholder="Pet name" required /><select id="pet-species" required><option value="">Species</option><option value="dog">Dog</option><option value="cat">Cat</option><option value="bird">Bird</option><option value="rabbit">Rabbit</option><option value="other">Other</option></select><button class="btn btn-primary btn-small" type="submit">Add pet</button></div><p class="secure-note" id="pet-status"></p></form>
+        <form id="profile-form" class="profile-form"><h3>My PawNir profile</h3><div class="pet-form-row"><input id="profile-name" placeholder="Your name" required /><input id="profile-area" placeholder="Your area (e.g. Dhanmondi 10)" /><button class="btn btn-primary btn-small" type="submit">Save profile</button></div><textarea id="profile-bio" rows="2" placeholder="A short introduction (optional)"></textarea><p class="secure-note" id="profile-status"></p></form>
+      </section>
+    </dialog>
+
+    <dialog class="booking-dialog" id="notifications-dialog">
+      <section class="dialog-card">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close notifications">×</button>
+        <div class="dashboard-header-row">
+          <div>
+            <p class="eyebrow">Real-time inbox</p>
+            <h2>Nearby alerts &amp; updates</h2>
+          </div>
+          <button class="btn btn-small btn-outline" id="mark-notifications-read" type="button">Mark all read</button>
+        </div>
+        <p class="dialog-helper">Receive instant alerts for lost pets in your area, sighting tips on your reports, and blood donor requests.</p>
+        <div class="notifications-list" id="notifications-list"><p class="inline-state">No nearby alerts yet.</p></div>
+      </section>
+    </dialog>
+
+    <dialog class="booking-dialog" id="sighting-dialog">
+      <form class="dialog-card" id="sighting-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close sighting tip dialog">×</button>
+        <p class="eyebrow">Community rescue help</p>
+        <h2 id="sighting-dialog-title">Share a sighting tip</h2>
+        <p class="dialog-helper">The person who posted this report will be notified immediately in real time.</p>
+        <label>Where did you spot the animal?
+          <input id="sighting-location" required maxlength="120" placeholder="e.g. Near Dhanmondi Lake Road 8 bridge" />
+        </label>
+        <label>Helpful details or how to reach you
+          <textarea id="sighting-note" rows="3" minlength="6" maxlength="500" required placeholder="Describe when you saw the pet, direction headed, or a safe way for the owner to contact you."></textarea>
+        </label>
+        <button class="btn btn-primary" id="sighting-submit" type="submit">Send sighting alert <span aria-hidden="true">→</span></button>
+        <p class="dialog-status" id="sighting-status" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+
+    <dialog class="booking-dialog" id="donor-request-dialog">
+      <form class="dialog-card" id="donor-request-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close donor connection request">×</button>
+        <p class="eyebrow">Urgent blood donor request</p>
+        <h2 id="donor-request-title">Request donor connection</h2>
+        <p class="dialog-helper">The donor owner is notified privately through PawNir. A licensed veterinarian must confirm blood cross-matching and medical suitability.</p>
+        <div class="form-two-col">
+          <label>Attending Vet Clinic &amp; Area
+            <input id="donor-request-clinic" required maxlength="120" placeholder="e.g. Care Vet Clinic, Dhanmondi" />
+          </label>
+          <label>Emergency Contact Phone (optional)
+            <input id="donor-request-phone" type="tel" maxlength="40" placeholder="017XXXXXXXX (shared with donor)" />
+          </label>
+        </div>
+        <label>Describe the urgent medical need
+          <textarea id="donor-request-reason" rows="3" minlength="10" required placeholder="Include your pet's condition, required blood group, and how urgently transfusion is needed."></textarea>
+        </label>
+        <button class="btn btn-primary" id="donor-request-submit" type="submit">Send urgent request <span aria-hidden="true">→</span></button>
+        <p class="dialog-status" id="donor-request-status" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+
+    <dialog class="booking-dialog" id="foster-request-dialog">
+      <form class="dialog-card" id="foster-request-form"><div class="sheet-handle" aria-hidden="true"></div><button class="dialog-close" type="button" aria-label="Close foster request">×</button><p class="eyebrow">Request foster care</p><h2 id="foster-request-title">Tell us what is needed</h2><label>Reason, dates, and care needs<textarea id="foster-request-reason" rows="4" minlength="10" required placeholder="Tell the foster team about your pet or rescue animal, dates needed, and any special care notes."></textarea></label><button class="btn btn-primary" type="submit">Send request <span aria-hidden="true">→</span></button><p class="dialog-status" id="foster-request-status" role="status" aria-live="polite"></p></form>
+    </dialog>
+
+    <dialog class="booking-dialog review-sheet-dialog" id="foster-review-dialog">
+      <section class="dialog-card review-dialog-card">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close foster reviews">×</button>
+        <p class="eyebrow">Real community reviews</p>
+        <h2 id="foster-review-title">Foster reviews &amp; ratings</h2>
+
+        <div class="review-summary-banner" id="foster-review-summary">
+          <div class="review-score-big">
+            <strong id="review-summary-avg">5.0</strong>
+            <div class="review-stars-static" id="review-summary-stars">★★★★★</div>
+            <small id="review-summary-count">Based on verified reviews</small>
+          </div>
+          <div class="review-bars" id="review-summary-bars"></div>
+        </div>
+
+        <div class="reviews-thread" id="foster-reviews-list">
+          <p class="inline-state">Loading community reviews…</p>
+        </div>
+
+        <form id="foster-review-form" class="review-compose-form">
+          <h3>Share your experience</h3>
+          <div class="star-picker-row">
+            <div class="star-picker" id="star-rating-picker" role="radiogroup" aria-label="Select star rating">
+              <button type="button" class="star-btn is-lit" data-star="1" aria-label="1 star">★</button>
+              <button type="button" class="star-btn is-lit" data-star="2" aria-label="2 stars">★</button>
+              <button type="button" class="star-btn is-lit" data-star="3" aria-label="3 stars">★</button>
+              <button type="button" class="star-btn is-lit" data-star="4" aria-label="4 stars">★</button>
+              <button type="button" class="star-btn is-lit" data-star="5" aria-label="5 stars">★</button>
+            </div>
+            <span class="star-picker-label" id="star-rating-label">5 — Excellent care</span>
+            <input type="hidden" id="foster-review-rating" value="5" />
+          </div>
+          <div class="form-two-col">
+            <label>Animal cared for
+              <select id="foster-review-species">
+                <option value="cat">🐱 Cat</option>
+                <option value="dog">🐶 Dog</option>
+                <option value="bird">🦜 Bird</option>
+                <option value="rabbit">🐰 Rabbit</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+          </div>
+          <label>Your review
+            <textarea id="foster-review-comment" rows="3" minlength="8" required placeholder="Share how clean, safe, and communicative this foster home or shelter was…"></textarea>
+          </label>
+          <button class="btn btn-primary" id="foster-review-submit" type="submit">Publish verified review <span aria-hidden="true">→</span></button>
+          <p class="dialog-status" id="foster-review-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </dialog>
+
+    <dialog class="booking-dialog" id="add-foster-dialog">
+      <form class="dialog-card" id="add-foster-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close add foster dialog">×</button>
+        <p class="eyebrow">Google Maps local network</p>
+        <h2>Add a foster or shelter</h2>
+        <p class="dialog-helper">Pin a trusted local foster home or animal rescue center onto the PawNir Google Maps directory.</p>
+        <label>Foster or shelter name
+          <input id="new-foster-name" required maxlength="90" placeholder="e.g. Banani Paws Foster Home" />
+        </label>
+        <div class="form-two-col">
+          <label>Area / Neighborhood
+            <input id="new-foster-area" required maxlength="80" placeholder="e.g. Banani Road 11" />
+          </label>
+          <label>City
+            <select id="new-foster-city" required>
+              <option value="Dhaka">Dhaka</option>
+              <option value="Chattogram">Chattogram</option>
+              <option value="Sylhet">Sylhet</option>
+              <option value="Rajshahi">Rajshahi</option>
+              <option value="Khulna">Khulna</option>
+            </select>
+          </label>
+        </div>
+        <label>Google Maps search query or address
+          <input id="new-foster-map-query" required maxlength="140" placeholder="e.g. Banani Road 11 Dhaka Bangladesh" />
+        </label>
+        <div class="form-two-col">
+          <label>Supported animals
+            <select id="new-foster-species">
+              <option value="cat,dog">Cats &amp; Dogs</option>
+              <option value="cat">Cats only</option>
+              <option value="dog">Dogs only</option>
+              <option value="cat,dog,bird">Cats, Dogs &amp; Birds</option>
+            </select>
+          </label>
+          <label>Capacity / Setup
+            <input id="new-foster-capacity" maxlength="80" placeholder="e.g. Netted indoor foster rooms" />
+          </label>
+        </div>
+        <label>About care &amp; safety standards
+          <textarea id="new-foster-description" rows="3" minlength="10" maxlength="400" required placeholder="Describe balcony netting, daily updates, isolation care, or rescue intake hours."></textarea>
+        </label>
+        <button class="btn btn-primary" type="submit">Pin to Google Maps directory <span aria-hidden="true">→</span></button>
+        <p class="dialog-status" id="add-foster-status" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+
+    <dialog class="booking-dialog" id="donor-dialog">
+      <form class="dialog-card" id="donor-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close donor form">×</button>
+        <p class="eyebrow">Consent-based donor network</p>
+        <h2>Register an animal donor</h2>
+        <p class="dialog-helper">Your exact home address and phone number are never shown publicly. You control availability and approve each connection.</p>
+        <div class="form-two-col">
+          <label>Pet's name
+            <input id="donor-pet-name" required maxlength="60" placeholder="e.g. Simba or Bruno" />
+          </label>
+          <label>Animal type
+            <select id="donor-species" required>
+              <option value="">Choose one</option>
+              <option value="cat">🐱 Cat</option>
+              <option value="dog">🐶 Dog</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-two-col">
+          <label>Blood type
+            <select id="donor-blood-type">
+              <option value="Unknown">Unknown (check at vet)</option>
+              <option value="Type A">Cat · Type A</option>
+              <option value="Type B">Cat · Type B</option>
+              <option value="Type AB">Cat · Type AB</option>
+              <option value="DEA 1.1- (Universal)">Dog · DEA 1.1- (Universal)</option>
+              <option value="DEA 1.1+">Dog · DEA 1.1+</option>
+              <option value="DEA 4">Dog · DEA 4</option>
+            </select>
+          </label>
+          <label>Approx. weight (kg)
+            <input id="donor-weight" type="number" step="0.1" min="1" max="80" placeholder="e.g. 4.5 or 25" />
+          </label>
+        </div>
+        <div class="form-two-col">
+          <label>Area<input id="donor-area" required placeholder="Dhanmondi 10" /></label>
+          <label>City<input id="donor-city" required placeholder="Dhaka" value="Dhaka" /></label>
+        </div>
+        <label class="check-line"><input id="donor-vaccinated" type="checkbox" checked /> Up-to-date on core vaccinations and healthy.</label>
+        <label class="check-line"><input id="donor-consent" type="checkbox" required /> I consent to receive urgent donor connection requests.</label>
+        <label class="check-line"><input id="donor-eligible" type="checkbox" required /> I understand a veterinarian must confirm cross-match &amp; eligibility.</label>
+        <button class="btn btn-primary" type="submit">Publish donor to network <span aria-hidden="true">→</span></button>
+        <p class="dialog-status" id="donor-status" role="status"></p>
+      </form>
+    </dialog>
+
+    <dialog class="booking-dialog" id="adoption-dialog"><form class="dialog-card" id="adoption-form"><div class="sheet-handle" aria-hidden="true"></div><button class="dialog-close" type="button" aria-label="Close adoption application">×</button><p class="eyebrow">Responsible adoption</p><h2 id="adoption-form-title">Apply to adopt</h2><p class="dialog-helper">This application helps the listing owner screen for a safe, permanent home. It is not an approval or purchase.</p><label>Housing and safety plan<textarea id="adopt-housing" rows="2" required placeholder="e.g. Netted windows/balcony, indoor apartment"></textarea></label><label>Previous animal-care experience<textarea id="adopt-experience" rows="2" required placeholder="Share your experience caring for pets"></textarea></label><label>Household and daily routine<textarea id="adopt-household" rows="2" required placeholder="Who lives at home and daily care schedule"></textarea></label><label>Veterinary-care plan<textarea id="adopt-vet-plan" rows="2" required placeholder="Vaccination, spay/neuter, and emergency clinic plan"></textarea></label><button class="btn btn-primary" type="submit">Submit application</button><p class="dialog-status" id="adoption-status" role="status"></p><a id="adoption-pdf-link" class="btn btn-outline" hidden>Download PawNir adoption PDF</a></form></dialog>
+
+    <dialog class="booking-dialog" id="lost-report-dialog">
+      <form class="dialog-card" id="lost-report-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close lost and found report">×</button>
+        <p class="eyebrow">Nearby animal alert</p><h2>Report lost or found</h2>
+        <p class="dialog-helper">Share an approximate area only. Never include your home address or private contact details.</p>
+        <p class="safety-note">Only post animals you personally saw or are actively helping. Never share a private phone number or exact home address.</p>
+        <div class="report-type-toggle"><label><input type="radio" name="report-type" value="lost" checked /> Lost pet</label><label><input type="radio" name="report-type" value="found" /> Found animal</label></div>
+        <label>Animal type<select id="report-species" required><option value="">Choose one</option><option value="cat">🐱 Cat</option><option value="dog">🐶 Dog</option><option value="bird">🦜 Bird</option><option value="rabbit">🐰 Rabbit</option><option value="other">Other</option></select></label>
+        <div class="form-two-col">
+          <label>Area<input id="report-area" required maxlength="80" placeholder="Dhanmondi 10" /></label>
+          <label>City<input id="report-city" required maxlength="60" placeholder="Dhaka" value="Dhaka" /></label>
+        </div>
+        <label>Short title<input id="report-title" required maxlength="120" placeholder="Orange cat missing near the park" /></label>
+        <label>What should nearby people know?<textarea id="report-description" required minlength="10" maxlength="1000" rows="3" placeholder="Describe markings, collar, last seen area, or where the animal was found."></textarea></label>
+        <div class="photo-picker-card">
+          <label class="photo-picker-label" for="report-photo">
+            <span class="photo-picker-icon" aria-hidden="true">📷</span>
+            <div>
+              <strong>Add a clear photo (optional)</strong>
+              <small class="photo-upload-warning">Camera or gallery · Auto-optimized for mobile (max 5 MB)</small>
+            </div>
+          </label>
+          <input id="report-photo" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" />
+          <div class="photo-preview-wrap" id="report-photo-preview-wrap" hidden>
+            <img id="report-photo-preview" alt="Selected animal photo preview" />
+            <button type="button" class="btn btn-small btn-outline" id="report-photo-clear">Remove photo</button>
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Publish nearby alert <span aria-hidden="true">→</span></button>
+        <p class="dialog-status" id="lost-report-status" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+
     <dialog class="booking-dialog" id="booking-dialog">
       <form method="dialog" class="dialog-card" id="booking-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
         <button class="dialog-close" value="cancel" aria-label="Close booking dialog">×</button>
         <p class="eyebrow">Book a consultation</p><h2 id="booking-title">Choose your veterinarian</h2>
         <ol class="booking-steps" aria-label="Booking progress"><li class="is-current" data-step-label="1">Vet</li><li data-step-label="2">Time</li><li data-step-label="3">Pet</li><li data-step-label="4">Confirm</li></ol>
@@ -209,64 +666,23 @@
         <p class="secure-note">⌁ Your appointment is protected with secure, encrypted checkout.</p>
       </form>
     </dialog>
-    <nav class="mobile-nav" aria-label="Mobile navigation">
-      <a class="is-active" href="#find-care"><span class="mobile-nav-icon icon icon-search" aria-hidden="true"></span><small data-i18n="nav.find">Find</small></a>
-      <button type="button" data-open-dashboard><span class="mobile-nav-icon icon icon-heart" aria-hidden="true"></span><small data-i18n="nav.care">My care</small></button>
-      <button type="button" data-open-dashboard><span class="mobile-nav-icon icon icon-calendar" aria-hidden="true"></span><small data-i18n="nav.bookings">Bookings</small></button>
-      <button type="button" data-open-auth><span class="mobile-nav-icon icon icon-user" aria-hidden="true"></span><small data-i18n="nav.profile">Profile</small></button>
-    </nav>
-    <dialog class="booking-dialog" id="auth-dialog">
-      <form class="dialog-card" id="auth-form"><button class="dialog-close" type="button" data-close-auth aria-label="Close sign in dialog">×</button><p class="eyebrow">Welcome to PawNir</p><h2>Sign in to your care space</h2><a class="google-signin" href="/auth/google/start"><span class="google-mark" aria-hidden="true">G</span> Continue with Google</a><div class="auth-divider"><span>or use email</span></div><label>Your name (new accounts)<input id="auth-name" type="text" autocomplete="name" placeholder="Your name" /></label><label>Email<input id="auth-email" type="email" autocomplete="email" placeholder="you@example.com" required /></label><label>Password<input id="auth-password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required /></label><button class="btn btn-primary" type="submit">Continue <span aria-hidden="true">→</span></button><p class="secure-note" id="auth-status">New here? We’ll create your account automatically.</p></form>
-    </dialog>
-    <dialog class="booking-dialog" id="dashboard-dialog">
-      <section class="dialog-card dashboard-card">
-        <button class="dialog-close" type="button" data-close-dashboard aria-label="Close care dashboard">×</button>
-        <p class="eyebrow">Your care space</p><h2>Everything your pet needs</h2>
-        <div class="dashboard-grid">
-          <div><h3>Upcoming visits</h3><div id="dashboard-bookings" class="dashboard-list">Loading…</div></div>
-          <div><h3>My pets</h3><div id="dashboard-pets" class="dashboard-list">Loading…</div></div>
-          <div><h3>Prescriptions</h3><div id="dashboard-prescriptions" class="dashboard-list">Loading…</div></div>
-        </div>
-        <form id="pet-form" class="pet-form"><h3>Add a pet profile</h3><div class="pet-form-row"><input id="pet-name" placeholder="Pet name" required /><select id="pet-species" required><option value="">Species</option><option value="dog">Dog</option><option value="cat">Cat</option><option value="bird">Bird</option><option value="rabbit">Rabbit</option><option value="other">Other</option></select><button class="btn btn-primary btn-small" type="submit">Add pet</button></div><p class="secure-note" id="pet-status"></p></form>
-        <form id="profile-form" class="profile-form"><h3>My PawNir profile</h3><div class="pet-form-row"><input id="profile-name" placeholder="Your name" required /><input id="profile-area" placeholder="Your area (optional)" /><button class="btn btn-primary btn-small" type="submit">Save profile</button></div><textarea id="profile-bio" rows="2" placeholder="A short introduction (optional)"></textarea><p class="secure-note" id="profile-status"></p></form>
-      </section>
-    </dialog>
-    <dialog class="booking-dialog" id="foster-request-dialog">
-      <form class="dialog-card" id="foster-request-form"><button class="dialog-close" type="button" aria-label="Close foster request">×</button><p class="eyebrow">Request foster care</p><h2 id="foster-request-title">Tell us what is needed</h2><label>Reason and care needs<textarea id="foster-request-reason" rows="5" minlength="10" required placeholder="Tell the foster team about the animal and the support needed."></textarea></label><button class="btn btn-primary" type="submit">Send request <span aria-hidden="true">→</span></button><p class="dialog-status" id="foster-request-status" role="status" aria-live="polite"></p></form>
-    </dialog>
-    <dialog class="booking-dialog" id="foster-review-dialog">
-      <form class="dialog-card" id="foster-review-form"><button class="dialog-close" type="button" aria-label="Close foster review">×</button><p class="eyebrow">Verified experience</p><h2 id="foster-review-title">Review foster care</h2><p class="dialog-helper">Reviews are published only after PawNir verifies a completed foster interaction.</p><label>Rating<select id="foster-review-rating"><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Okay</option><option value="2">2 — Poor</option><option value="1">1 — Very poor</option></select></label><label>Your experience<textarea id="foster-review-comment" rows="4" minlength="10" required></textarea></label><button class="btn btn-primary" type="submit">Submit review</button><p class="dialog-status" id="foster-review-status" role="status" aria-live="polite"></p></form>
-    </dialog>
-    <dialog class="booking-dialog" id="donor-dialog"><form class="dialog-card" id="donor-form"><button class="dialog-close" type="button" aria-label="Close donor form">×</button><p class="eyebrow">Consent-based donor network</p><h2>Register an animal donor</h2><p class="dialog-helper">Your exact address and contact details are never shown publicly. A vet must confirm suitability.</p><label>Animal type<select id="donor-species" required><option value="">Choose one</option><option value="cat">Cat</option><option value="dog">Dog</option></select></label><label>Area<input id="donor-area" required placeholder="Dhanmondi 10" /></label><label>City<input id="donor-city" required placeholder="Dhaka" /></label><label>Blood type, if known<input id="donor-blood-type" placeholder="Unknown is okay" /></label><label class="check-line"><input id="donor-consent" type="checkbox" required /> I consent to receive donor requests.</label><label class="check-line"><input id="donor-eligible" type="checkbox" required /> I understand a veterinarian must confirm eligibility.</label><button class="btn btn-primary" type="submit">Submit for verification</button><p class="dialog-status" id="donor-status" role="status"></p></form></dialog>
-    <dialog class="booking-dialog" id="adoption-dialog"><form class="dialog-card" id="adoption-form"><button class="dialog-close" type="button" aria-label="Close adoption application">×</button><p class="eyebrow">Responsible adoption</p><h2 id="adoption-form-title">Apply to adopt</h2><p class="dialog-helper">This application helps the listing owner screen for a safe, permanent home. It is not an approval or purchase.</p><label>Housing and safety plan<textarea id="adopt-housing" rows="2" required></textarea></label><label>Previous animal-care experience<textarea id="adopt-experience" rows="2" required></textarea></label><label>Household and daily routine<textarea id="adopt-household" rows="2" required></textarea></label><label>Veterinary-care plan<textarea id="adopt-vet-plan" rows="2" required></textarea></label><button class="btn btn-primary" type="submit">Submit application</button><p class="dialog-status" id="adoption-status" role="status"></p><a id="adoption-pdf-link" class="btn btn-outline" hidden>Download PawNir adoption PDF</a></form></dialog>
-    <dialog class="booking-dialog" id="lost-report-dialog">
-      <form class="dialog-card" id="lost-report-form">
-        <button class="dialog-close" type="button" aria-label="Close lost and found report">×</button>
-        <p class="eyebrow">Nearby animal alert</p><h2>Report lost or found</h2>
-        <p class="dialog-helper">Share an approximate area only. Never include your home address or private contact details.</p>
-        <p class="safety-note">Only post animals you personally saw or are actively helping. Never share a private phone number or exact home address.</p>
-        <div class="report-type-toggle"><label><input type="radio" name="report-type" value="lost" checked /> Lost</label><label><input type="radio" name="report-type" value="found" /> Found</label></div>
-        <label>Animal type<select id="report-species" required><option value="">Choose one</option><option value="cat">Cat</option><option value="dog">Dog</option><option value="bird">Bird</option><option value="rabbit">Rabbit</option><option value="other">Other</option></select></label>
-        <label>Area<input id="report-area" required maxlength="80" placeholder="Dhanmondi 10" /></label>
-        <label>City<input id="report-city" required maxlength="60" placeholder="Dhaka" /></label>
-        <label>Short title<input id="report-title" required maxlength="120" placeholder="Orange cat missing near the park" /></label>
-        <label>What should nearby people know?<textarea id="report-description" required minlength="10" maxlength="1000" rows="4" placeholder="Describe markings, collar, last seen area, or where the animal was found."></textarea></label>
-        <label>Photo <input id="report-photo" type="file" accept="image/jpeg,image/png,image/webp" /><small class="photo-upload-warning">Only photos are available. Maximum file size: 5 MB.</small></label>
-        <button class="btn btn-primary" type="submit">Publish nearby alert <span aria-hidden="true">→</span></button>
-        <p class="dialog-status" id="lost-report-status" role="status" aria-live="polite"></p>
-      </form>
-    </dialog>
+
     <dialog class="profile-sheet" id="vet-profile-dialog" aria-label="Veterinarian profile">
       <section class="profile-sheet-card">
+        <div class="sheet-handle" aria-hidden="true"></div>
         <button class="dialog-close" type="button" data-close-profile aria-label="Close veterinarian profile">×</button>
         <div id="vet-profile-content"></div>
         <button class="btn btn-primary profile-book-button" id="profile-book-button" type="button">Book a slot <span aria-hidden="true">→</span></button>
       </section>
     </dialog>
+
     <div class="mobile-booking-bar" id="mobile-booking-bar" hidden>
       <div><small>Selected veterinarian</small><strong id="mobile-booking-name"></strong></div>
       <button class="btn btn-primary btn-small" id="mobile-book-button" type="button">Book now <span aria-hidden="true">→</span></button>
     </div>
-    <script src="/app.js?v=20261029-4"></script>
+
+    <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="/app.js?v=20261030-2"></script>
   </body>
 </html>

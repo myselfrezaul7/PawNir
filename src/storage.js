@@ -147,18 +147,23 @@ class Storage {
     if (!(await fileExists(target.bookings))) {
       await writeJsonFile(target.bookings, []);
     }
+    const seedMap = {
+      fosters: "fosters.json",
+      adoptionListings: "adoption_listings.json",
+      lostReports: "lost_reports.json",
+      donors: "donors.json",
+      reviews: "reviews.json"
+    };
     for (const key of ["pets", "consultations", "prescriptions", "payments", "notifications", "lostReports", "areaSubscriptions", "fosters", "fosterRequests", "reviews", "donors", "donorRequests", "adoptionListings", "adoptionApplications"]) {
-      if (key === "fosters" && !(await fileExists(target[key]))) {
-        const seedFosters = path.join(this.baseDataDir, "fosters.json");
-        if (await fileExists(seedFosters)) await fsp.copyFile(seedFosters, target[key]);
-        else await writeJsonFile(target[key], []);
-        continue;
-      }
-      if (key === "adoptionListings" && !(await fileExists(target[key]))) {
-        const seedAdoptions = path.join(this.baseDataDir, "adoption_listings.json");
-        if (await fileExists(seedAdoptions)) await fsp.copyFile(seedAdoptions, target[key]);
-        else await writeJsonFile(target[key], []);
-        continue;
+      if (seedMap[key]) {
+        const seedPath = path.join(this.baseDataDir, seedMap[key]);
+        const exists = await fileExists(target[key]);
+        const current = exists ? await readJsonFile(target[key], []) : [];
+        const needsSeed = !exists || !Array.isArray(current) || current.length === 0 || (key === "donors" && !current.some((d) => d.verified));
+        if (needsSeed && (await fileExists(seedPath))) {
+          await fsp.copyFile(seedPath, target[key]);
+          continue;
+        }
       }
       if (!(await fileExists(target[key]))) await writeJsonFile(target[key], []);
     }

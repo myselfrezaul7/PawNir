@@ -1,0 +1,38 @@
+{
+  "name": "PawNir — Animal Safety & Care Network",
+  "short_name": "PawNir",
+  "description": "Bangladesh's local animal safety and care network for nearby lost-pet alerts, responsible adoption, blood donors, foster care, and veterinary support.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f8f4",
+  "theme_color": "#087f62",
+  "lang": "en-BD",
+  "categories": ["lifestyle", "medical", "social"],
+  "icons": [
+    {
+      "src": "/og-image.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Lost & Found Alerts",
+      "short_name": "Lost & Found",
+      "url": "/#lost-found"
+    },
+    {
+      "name": "Blood Donor Network",
+      "short_name": "Donors",
+      "url": "/#blood-donors"
+    },
+    {
+      "name": "Adopt Responsibly",
+      "short_name": "Adopt",
+      "url": "/#adoption"
+    }
+  ]
+}
