@@ -153,7 +153,9 @@ function sendFile(res, filepath) {
     ".svg": "image/svg+xml",
     ".png": "image/png",
     ".webp": "image/webp",
-    ".ico": "image/x-icon"
+    ".ico": "image/x-icon",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg"
   };
   res.writeHead(200, {
     "Content-Type": contentTypes[ext] || "application/octet-stream",
