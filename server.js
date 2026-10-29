@@ -46,7 +46,8 @@ const TOKEN_SECRET = process.env.AUTH_TOKEN_SECRET || crypto.randomBytes(32).toS
 const AUTH_REQUIRED = String(process.env.AUTH_REQUIRED || "false").toLowerCase() === "true";
 const REPORT_CACHE_TTL_MS = Number(process.env.REPORT_CACHE_TTL_MS || 8000);
 const DIGEST_INTERVAL_MS = Number(process.env.DIGEST_INTERVAL_MS || 15 * 60 * 1000);
-const MAX_BODY_BYTES = 64 * 1024;
+const MAX_BODY_BYTES = 7 * 1024 * 1024;
+const MAX_LOST_FOUND_IMAGE_BYTES = 5 * 1024 * 1024;
 const RATE_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT = 120;
 const requestBuckets = new Map();
@@ -239,8 +240,18 @@ function publicLostReport(report) {
     createdAt: report.createdAt,
     expiresAt: report.expiresAt,
     ownerName: report.ownerName,
-    photoUrl: report.photoUrl || null
+    photoUrl: report.photoUrl || null,
+    photoData: report.photoData || null
   };
+}
+
+function validateLostFoundPhoto(value) {
+  if (!value) return null;
+  const match = String(value).match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
+  if (!match) throw new Error("Only JPG, PNG, or WebP photos are allowed.");
+  const bytes = Buffer.byteLength(match[2], "base64");
+  if (bytes > MAX_LOST_FOUND_IMAGE_BYTES) throw new Error("Photo must be 5 MB or smaller.");
+  return value;
 }
 
 function publicFoster(foster, reviews) {
@@ -924,6 +935,12 @@ async function routeApi(req, res, urlObj, tenantId, user) {
       const city = cleanText(body.city, 60);
       const title = cleanText(body.title, 120);
       const description = cleanText(body.description, 1000);
+      let photoData;
+      try {
+        photoData = validateLostFoundPhoto(body.photoData);
+      } catch (error) {
+        return sendJson(res, 400, { error: error.message });
+      }
       if (!type || !species || !area || !city || !title || description.length < 10) {
         return sendJson(res, 400, { error: "Type, species, area, city, title, and a useful description are required" });
       }
@@ -938,6 +955,7 @@ async function routeApi(req, res, urlObj, tenantId, user) {
         species,
         title,
         description,
+        photoData,
         area,
         areaKey: areaKey(area),
         city,

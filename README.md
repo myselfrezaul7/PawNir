@@ -1,6 +1,6 @@
 # PawNir animal safety and care network
 
-PawNir is being shaped into a Bangladesh-focused animal safety and care network. The public homepage now explains the broader mission: nearby lost-pet alerts, safer adoption, blood donor discovery, local animal communities, emergency veterinary support, foster/shelter discovery, and pet supplies. The working release currently provides persisted veterinarian directory data, owner registration/login, pet profiles, and authenticated booking with duplicate-slot protection. Community alerts, adoption, donor, and circle workflows are intentionally labeled as the next product phase until their moderation, privacy, notification, and consent systems are implemented.
+PawNir is a Bangladesh-focused animal safety and care network. The public homepage explains the broader mission: nearby lost-pet alerts, safer adoption, blood donor discovery, local animal communities, emergency veterinary support, foster/shelter discovery, and pet supplies. The working release provides persisted veterinarian directory data, owner registration/login, pet profiles, authenticated booking with duplicate-slot protection, and working community workflows with privacy, consent, and verification controls.
 
 ## PawNir portal API
 
@@ -15,8 +15,9 @@ PawNir is being shaped into a Bangladesh-focused animal safety and care network.
 - `POST /api/bookings` — create a booking (`vetId`, `date`, `time`, `mode`)
 - `GET/POST /api/pets` — list or create authenticated pet profiles
 - `GET /api/lost-found?area=&type=lost|found|all` — public open nearby reports using approximate area matching
-- `POST /api/lost-found` — create an authenticated lost/found report; matching opted-in area subscribers receive in-app notifications
+- `POST /api/lost-found` — create an authenticated lost/found report with an optional JPG, PNG, or WebP photo up to 5 MB; matching opted-in area subscribers receive in-app notifications
 - `PATCH /api/lost-found/:reportId` — resolve or close a report owned by the authenticated reporter
+- Authenticated reporters can review their own reports in the homepage and mark an animal as reunited, removing it from the open nearby feed.
 - `POST /api/lost-found/subscribe` — subscribe an authenticated user to nearby alerts for an approximate area
 - `GET /api/notifications` — list authenticated in-app nearby-alert notifications
 - `POST /api/notifications/read` — mark the authenticated user's nearby alerts read

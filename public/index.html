@@ -38,7 +38,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261029-4" />
+    <link rel="stylesheet" href="/styles.css?v=20261029-6" />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -124,6 +124,7 @@
         <div class="lost-found-toolbar"><label class="search-field"><span aria-hidden="true">⌖</span><input id="lost-area-input" type="search" placeholder="Enter an area, e.g. Dhanmondi 10" aria-label="Search lost and found reports by area" /></label><select id="lost-type-filter" aria-label="Filter lost and found reports"><option value="all">Lost & found</option><option value="lost">Lost animals</option><option value="found">Found animals</option></select><button class="btn btn-outline btn-small" id="nearby-alert-button" type="button">Get alerts here</button></div>
         <div class="live-feed-status" id="lost-live-status" role="status" aria-live="polite"><span class="live-pulse" aria-hidden="true"></span><strong>Live nearby feed</strong><span>Updating automatically</span></div>
         <div class="lost-report-grid" id="lost-report-grid"><p class="inline-state">Loading nearby reports…</p></div>
+        <div class="my-reports" id="my-lost-reports" hidden><div class="my-reports-heading"><strong>Your reports</strong><span>Update a report when the animal is safely reunited.</span></div><div class="my-report-list" id="my-lost-report-list"></div></div>
       </section>
 
       <section class="donor-section shell" id="blood-donors" aria-labelledby="donor-title">
@@ -143,24 +144,14 @@
         <div class="foster-grid" id="foster-grid"><p class="inline-state">Loading registered foster care…</p></div>
       </section>
 
-      <section class="search-panel shell" id="find-care" aria-labelledby="find-care-title">
-        <div class="section-heading">
-          <div><p class="eyebrow">Start here</p><h2 id="find-care-title">Find the right care</h2></div>
-          <span class="location-label">⌖ <span>Bangladesh</span></span>
+      <section class="vet-coming-soon shell" id="find-care" aria-labelledby="find-care-title">
+        <div class="vet-coming-copy">
+          <p class="eyebrow">A better care experience is coming</p>
+          <h2 id="find-care-title">Paid vet consultations,<br /><em>made for PawNir.</em></h2>
+          <p>We are preparing trusted paid consultations, online appointments, and follow-up care inside PawNir. Until it is ready, find local vet information through our trusted animal-care partner.</p>
+          <a class="btn btn-primary vet-directory-button" href="https://www.catwaala.com/find-vet" target="_blank" rel="noopener noreferrer">Find a local vet on Catwaala <span aria-hidden="true">↗</span></a>
         </div>
-        <div class="search-controls">
-          <label class="search-field"><span aria-hidden="true">⌕</span><input id="search-input" type="search" placeholder="Search by vet name, specialty..." /><span class="sr-only">Search vets</span></label>
-          <label class="select-field"><span aria-hidden="true">♡</span><select id="specialty-filter" aria-label="Filter by specialty"><option value="all">All specialties</option><option value="small-animal">Small animals</option><option value="avian">Birds</option><option value="dermatology">Dermatology</option><option value="surgery">Surgery</option></select></label>
-          <label class="select-field"><span aria-hidden="true">⌖</span><select id="city-filter" aria-label="Filter by city"><option value="all">All cities</option><option value="dhaka">Dhaka</option><option value="chattogram">Chattogram</option><option value="sylhet">Sylhet</option></select></label>
-          <button class="btn btn-primary search-button" id="search-button" type="button">Search vets</button>
-        </div>
-        <div class="quick-filters" aria-label="Quick filters"><button class="chip active" data-mode="all" type="button">All care</button><button class="chip" data-mode="online" type="button">◉ Video consultation</button><button class="chip" data-mode="clinic" type="button">⌂ In-clinic visit</button><button class="chip" data-city="dhaka" type="button">Dhaka</button><button class="chip" data-city="chattogram" type="button">Chattogram</button><button class="chip" data-city="sylhet" type="button">Sylhet</button></div>
-      </section>
-
-      <section class="directory shell" aria-labelledby="directory-title">
-        <div class="section-heading directory-heading"><div><p class="eyebrow">Live directory · Bangladesh</p><h2 id="directory-title">Find a vet now</h2></div><button class="text-link" id="clear-filters" type="button">View all vets <span aria-hidden="true">→</span></button></div>
-        <div class="vet-grid" id="vet-grid"></div>
-        <p class="empty-state" id="empty-state" hidden>No vets match those filters yet. Try a different city or specialty.</p>
+        <div class="vet-coming-art" aria-hidden="true"><span class="vet-orbit orbit-one"></span><span class="vet-orbit orbit-two"></span><span class="vet-coming-icon">✚</span><strong>Paid vet care</strong><small>Coming soon to PawNir</small></div>
       </section>
 
       <section class="how-it-works shell" id="how-it-works">
@@ -253,12 +244,14 @@
         <button class="dialog-close" type="button" aria-label="Close lost and found report">×</button>
         <p class="eyebrow">Nearby animal alert</p><h2>Report lost or found</h2>
         <p class="dialog-helper">Share an approximate area only. Never include your home address or private contact details.</p>
+        <p class="safety-note">Only post animals you personally saw or are actively helping. Never share a private phone number or exact home address.</p>
         <div class="report-type-toggle"><label><input type="radio" name="report-type" value="lost" checked /> Lost</label><label><input type="radio" name="report-type" value="found" /> Found</label></div>
         <label>Animal type<select id="report-species" required><option value="">Choose one</option><option value="cat">Cat</option><option value="dog">Dog</option><option value="bird">Bird</option><option value="rabbit">Rabbit</option><option value="other">Other</option></select></label>
         <label>Area<input id="report-area" required maxlength="80" placeholder="Dhanmondi 10" /></label>
         <label>City<input id="report-city" required maxlength="60" placeholder="Dhaka" /></label>
         <label>Short title<input id="report-title" required maxlength="120" placeholder="Orange cat missing near the park" /></label>
         <label>What should nearby people know?<textarea id="report-description" required minlength="10" maxlength="1000" rows="4" placeholder="Describe markings, collar, last seen area, or where the animal was found."></textarea></label>
+        <label>Photo <input id="report-photo" type="file" accept="image/jpeg,image/png,image/webp" /><small class="photo-upload-warning">Only photos are available. Maximum file size: 5 MB.</small></label>
         <button class="btn btn-primary" type="submit">Publish nearby alert <span aria-hidden="true">→</span></button>
         <p class="dialog-status" id="lost-report-status" role="status" aria-live="polite"></p>
       </form>
@@ -274,6 +267,6 @@
       <div><small>Selected veterinarian</small><strong id="mobile-booking-name"></strong></div>
       <button class="btn btn-primary btn-small" id="mobile-book-button" type="button">Book now <span aria-hidden="true">→</span></button>
     </div>
-    <script src="/app.js?v=20261029-2"></script>
+    <script src="/app.js?v=20261029-4"></script>
   </body>
 </html>

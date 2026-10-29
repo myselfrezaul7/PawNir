@@ -75,9 +75,22 @@ let selectedFoster = null;
 let selectedAdoption = null;
 let lostRefreshTimer = null;
 let lostReportSignature = "";
-  function reportCard(report) {
+  function reportCard(report, own = false) {
     const label = report.type === "lost" ? "Lost" : "Found";
-    return `<article class="lost-report-card"><div class="lost-report-top"><span class="report-pill ${report.type}">${label}</span><span>${new Date(report.createdAt).toLocaleDateString("en-BD", { day: "numeric", month: "short" })}</span></div><h3>${report.title}</h3><p>${report.description}</p><div class="lost-report-meta"><span>⌖ ${report.area}, ${report.city}</span><span>${report.species}</span></div></article>`;
+    const photo = report.photoData ? `<img class="lost-report-photo" src="${report.photoData}" alt="${label} ${report.species} photo" loading="lazy" />` : "";
+    const status = report.status === "resolved" ? '<span class="report-status resolved">Reunited</span>' : '<span class="report-status">Open</span>';
+    return `<article class="lost-report-card">${photo}<div class="lost-report-top"><span class="report-pill ${report.type}">${label}</span><span>${new Date(report.createdAt).toLocaleDateString("en-BD", { day: "numeric", month: "short" })}</span></div><h3>${report.title}</h3><p>${report.description}</p><div class="lost-report-meta"><span>⌖ ${report.area}, ${report.city}</span><span>${report.species}</span>${status}</div>${own && report.status === "open" ? `<button class="btn btn-small btn-outline resolve-report-button" data-report-id="${report.id}" type="button">Mark as reunited</button>` : ""}</article>`;
+  }
+  function readLostPhoto(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) return resolve(null);
+      if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) return reject(new Error("Only JPG, PNG, or WebP photos are allowed."));
+      if (file.size > 5 * 1024 * 1024) return reject(new Error("Photo must be 5 MB or smaller."));
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error("Unable to read the selected photo."));
+      reader.readAsDataURL(file);
+    });
   }
   async function loadLostReports() {
     const area = document.getElementById("lost-area-input").value.trim();
@@ -85,15 +98,29 @@ let lostReportSignature = "";
     const grid = document.getElementById("lost-report-grid");
     if (!grid.querySelector(".lost-report-card")) grid.innerHTML = '<p class="inline-state">Loading nearby reports…</p>';
     try {
-      const response = await fetch(`/api/lost-found?area=${encodeURIComponent(area)}&type=${encodeURIComponent(type)}`);
+      const headers = localStorage.getItem("pawnir_token") ? { Authorization: "Bearer " + localStorage.getItem("pawnir_token") } : {};
+      const response = await fetch(`/api/lost-found?area=${encodeURIComponent(area)}&type=${encodeURIComponent(type)}`, { headers });
       if (!response.ok) throw new Error("Unable to load nearby reports.");
       const result = await response.json();
       const reports = Array.isArray(result) ? result : result.reports;
+      const mine = Array.isArray(result) ? [] : result.mine || [];
       const signature = reports.map((report) => `${report.id}:${report.updatedAt || report.createdAt}:${report.status}`).join("|");
       const changed = signature !== lostReportSignature;
       lostReportSignature = signature;
       if (changed || !grid.querySelector(".lost-report-card")) {
         grid.innerHTML = reports.length ? reports.map(reportCard).join("") : '<p class="inline-state">No open reports in this area yet. You can be the first to alert nearby animal lovers.</p>';
+      }
+      const mineWrap = document.getElementById("my-lost-reports");
+      const mineList = document.getElementById("my-lost-report-list");
+      if (mineWrap && mineList && localStorage.getItem("pawnir_token")) {
+        mineWrap.hidden = mine.length === 0;
+        mineList.innerHTML = mine.length ? mine.slice(0, 5).map((report) => reportCard(report, true)).join("") : "";
+        mineList.querySelectorAll(".resolve-report-button").forEach((button) => button.addEventListener("click", async () => {
+          button.disabled = true;
+          const response = await fetch(`/api/lost-found/${encodeURIComponent(button.dataset.reportId)}`, { method: "PATCH", headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") }, body: JSON.stringify({ status: "resolved" }) });
+          if (!response.ok) { button.disabled = false; return; }
+          await loadLostReports();
+        }));
       }
       const liveStatus = document.getElementById("lost-live-status");
       if (liveStatus) liveStatus.innerHTML = `<span class="live-pulse" aria-hidden="true"></span><strong>${changed ? "Live feed updated" : "Live nearby feed"}</strong><span>Updated ${new Date().toLocaleTimeString("en-BD", { hour: "numeric", minute: "2-digit" })}</span>`;
@@ -284,20 +311,6 @@ document.addEventListener("DOMContentLoaded", () => {
     stepCards.forEach((card, index) => { if (Math.abs(card.offsetLeft + card.offsetWidth / 2 - center) < Math.abs(stepCards[nearest].offsetLeft + stepCards[nearest].offsetWidth / 2 - center)) nearest = index; });
     if (nearest !== activeStep) showStep(nearest, false);
   }, { passive: true });
-  loadVets();
-  ["search-button", "specialty-filter", "city-filter"].forEach((id) => document.getElementById(id).addEventListener(id === "search-button" ? "click" : "change", loadVets));
-  document.getElementById("search-input").addEventListener("input", () => { clearTimeout(window.pawnirSearchTimer); window.pawnirSearchTimer = setTimeout(loadVets, 180); });
-  document.getElementById("clear-filters").addEventListener("click", () => { document.getElementById("search-input").value = ""; document.getElementById("specialty-filter").value = "all"; document.getElementById("city-filter").value = "all"; state.mode = "all"; loadVets(); });
-  document.querySelectorAll(".chip").forEach((chip) => chip.addEventListener("click", () => {
-    if (chip.dataset.city) {
-      document.getElementById("city-filter").value = chip.dataset.city;
-      document.querySelectorAll(".chip").forEach((item) => item.classList.toggle("active", item === chip));
-    } else {
-      state.mode = chip.dataset.mode;
-      document.querySelectorAll(".chip").forEach((item) => item.classList.toggle("active", item === chip));
-    }
-    loadVets();
-  }));
   document.querySelectorAll("[data-open-auth]").forEach((button) => button.addEventListener("click", (event) => openDialog(document.getElementById("auth-dialog"), event.currentTarget)));
   document.querySelectorAll("[data-open-dashboard]").forEach((button) => button.addEventListener("click", async (event) => { if (!localStorage.getItem("pawnir_token")) { openDialog(document.getElementById("auth-dialog"), event.currentTarget); return; } openDialog(document.getElementById("dashboard-dialog"), event.currentTarget); await loadDashboard(); }));
   setTheme(document.documentElement.dataset.theme || "light");
@@ -314,13 +327,17 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("lost-report-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const status = document.getElementById("lost-report-status");
+    let photoData;
+    try { photoData = await readLostPhoto(document.getElementById("report-photo").files[0]); }
+    catch (error) { status.textContent = error.message; status.classList.remove("is-success"); return; }
     const payload = {
       type: document.querySelector("input[name='report-type']:checked").value,
       species: document.getElementById("report-species").value,
       area: document.getElementById("report-area").value,
       city: document.getElementById("report-city").value,
       title: document.getElementById("report-title").value,
-      description: document.getElementById("report-description").value
+      description: document.getElementById("report-description").value,
+      photoData
     };
     const response = await fetch("/api/lost-found", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") }, body: JSON.stringify(payload) });
     const result = await response.json();
