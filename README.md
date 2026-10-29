@@ -1,6 +1,72 @@
-﻿# Process Leak Detector (IMIS MVP)
+# PawNir animal safety and care network
 
-Process Leak Detector identifies where business workflows lose value, then surfaces practical transformation actions.
+PawNir is being shaped into a Bangladesh-focused animal safety and care network. The public homepage now explains the broader mission: nearby lost-pet alerts, safer adoption, blood donor discovery, local animal communities, emergency veterinary support, foster/shelter discovery, and pet supplies. The working release currently provides persisted veterinarian directory data, owner registration/login, pet profiles, and authenticated booking with duplicate-slot protection. Community alerts, adoption, donor, and circle workflows are intentionally labeled as the next product phase until their moderation, privacy, notification, and consent systems are implemented.
+
+## PawNir portal API
+
+- `GET /api/vets?q=&specialty=&city=&mode=` — verified vet directory search
+- `GET /api/vets/:vetId/availability?date=YYYY-MM-DD&mode=online|clinic` — real schedule slots with booked times removed
+- `POST /api/auth/register` — create a pet-owner account (`email`, `password`, `name`)
+- `POST /api/auth/login` — authenticate an existing account
+- `GET /api/auth/me` — inspect the current bearer session
+- `GET /auth/google/start` — start Google OpenID Connect sign-in when configured
+- `GET /auth/google/callback` — validate the Google callback and establish a PawNir session
+- `GET /api/bookings` — list authenticated owner bookings
+- `POST /api/bookings` — create a booking (`vetId`, `date`, `time`, `mode`)
+- `GET/POST /api/pets` — list or create authenticated pet profiles
+- `GET /api/lost-found?area=&type=lost|found|all` — public open nearby reports using approximate area matching
+- `POST /api/lost-found` — create an authenticated lost/found report; matching opted-in area subscribers receive in-app notifications
+- `PATCH /api/lost-found/:reportId` — resolve or close a report owned by the authenticated reporter
+- `POST /api/lost-found/subscribe` — subscribe an authenticated user to nearby alerts for an approximate area
+- `GET /api/notifications` — list authenticated in-app nearby-alert notifications
+- `POST /api/notifications/read` — mark the authenticated user's nearby alerts read
+- `GET /api/donors?area=&species=&bloodType=` — list consented, verified, available animal donors without exact contact details
+- `POST /api/donors` — register an owner-managed donor for operator verification
+- `POST /api/donors/:donorId/requests` — send a consent-based donor connection request
+- `GET /api/adoptions` — list verified open adoption listings
+- `POST /api/adoptions` — submit an authenticated responsible-adoption application
+- `GET /api/adoptions/:applicationId/pdf` — download the authenticated applicant's PawNir-branded adoption application PDF
+- `GET /api/auth/me` — read the authenticated PawNir profile
+- `PATCH /api/auth/me` — update the authenticated profile name, area, and bio
+- `GET /api/fosters?city=&species=` — list verified foster/shelter records with map links and genuine review aggregates
+- `GET /api/fosters/:fosterId` — view a verified foster record and published reviews
+- `POST /api/fosters/:fosterId/requests` — submit an authenticated foster-care request
+- `GET /api/foster-requests` — view the authenticated user's foster requests
+- `POST /api/fosters/:fosterId/reviews` — publish a review only after an operator verifies a completed foster interaction
+- `PATCH /api/foster-requests/:requestId` — operator-only request verification transition (`accepted`, `completed`, or `declined`)
+- `POST /api/payments` — create a payment record for a booking; returns an explicit provider-required state until a gateway is configured
+- `GET/POST /api/consultations` — list owner consultations or create a vet/operator consultation record
+- `GET/POST /api/prescriptions` — list owner prescriptions or issue one from an authorized consultation
+
+The initial directory is seeded from `data/portal_vets.json` into the tenant data store. Each seeded vet includes weekly availability in Bangladesh time (`Asia/Dhaka`); the availability endpoint removes pending/confirmed bookings before returning slots. Set `DATA_DIR` to use a persistent data location in production. All booking writes are audit logged and reject unavailable or duplicate vet/date/time slots.
+
+### Google sign-in setup
+
+Create a Google Cloud OAuth client of type **Web application**, configure the OAuth consent screen, and add these values to the environment:
+
+```text
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_REDIRECT_URI=https://your-domain.example/auth/google/callback
+```
+
+Add the exact redirect URI to the Google client. For local development use `http://localhost:3000/auth/google/callback`; production must use HTTPS. The integration only accepts verified Google email identities, uses a short-lived server-side OAuth state, and returns PawNir's existing tenant-bound session token. Never expose `GOOGLE_CLIENT_SECRET` in frontend code or commit it.
+
+## PawNir family links
+
+The public footer includes a responsive PawNir family panel with safe new-tab links to:
+
+- [Kuttawaala](https://www.kuttawaala.com) — dog lovers of Bangladesh
+- [Catwaala](https://www.catwaala.com) — cat lovers of Bangladesh
+- [PetBhai](https://www.petbhai.com) — pet shop
+
+PawNir directs pet-accessory shopping and animal transport requests to the PetBhai partner service. PawNir does not claim to process PetBhai inventory, checkout, delivery, or transport bookings inside the PawNir app.
+
+## Required production integrations
+
+The API deliberately does not claim successful payment or calling without provider configuration. Configure `PAYMENT_PROVIDER` and `CALL_PROVIDER`, then implement the corresponding signed webhook/token adapters before production launch. Until then, payment records remain `requires_provider` and consultations have no external room reference. This keeps failures visible instead of producing false confirmations.
+
+PawNir connects Bangladesh's pet families with trusted veterinary care, online booking, consultations, prescriptions, and long-term pet records.
 
 ## Supported datasets
 
@@ -155,12 +221,10 @@ node src/buildRossmannReport.js "C:\path\to\train.csv" "C:\path\to\store.csv"
 
 ## Auth and RBAC quick start
 
-- Default seeded users (tenant `default`):
-  - `ceo@pld.local` / `ChangeMe123!`
-  - `ops@pld.local` / `ChangeMe123!`
-  - `store@pld.local` / `ChangeMe123!`
-- Enable strict enforcement by setting environment variable: `AUTH_REQUIRED=true`
-- Pass bearer token in header: `Authorization: Bearer <token>`
+- New deployments do not seed privileged demo users by default. Use a controlled provisioning flow or set `SEED_DEMO_USERS=true` only for isolated development.
+- Set a unique high-entropy `AUTH_TOKEN_SECRET` in every deployed environment. When omitted, the server generates a per-process random secret, invalidating sessions after restart.
+- Pass bearer token in header: `Authorization: Bearer <token>`.
+- Tokens are tenant-bound; changing the tenant query/header does not switch an authenticated session into another tenant.
 
 ## Rossmann leak logic (store-level)
 
@@ -175,4 +239,3 @@ node src/buildRossmannReport.js "C:\path\to\train.csv" "C:\path\to\store.csv"
 2. Add per-store action plans with expected savings simulation.
 3. Add automatic anomaly alerts for sudden leak spikes.
 4. Add user roles: executive summary, operations detail, store manager view.
-

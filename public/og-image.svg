@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">PawNir veterinary care in Bangladesh</title>
+  <desc id="desc">Find trusted vets and book pet care with PawNir.</desc>
+  <rect width="1200" height="630" fill="#f7fbf8"/>
+  <circle cx="1000" cy="90" r="290" fill="#dcefe4"/>
+  <circle cx="1050" cy="510" r="220" fill="#f5dd9f"/>
+  <path d="M155 438c-35-120 26-239 153-239s188 119 153 239H155Z" fill="#b97b59"/>
+  <path d="M165 236C88 150 102 73 153 72c59-2 86 73 59 145Z" fill="#965d49"/>
+  <path d="M451 236c77-86 63-163 12-164-59-2-86 73-59 145Z" fill="#965d49"/>
+  <path d="M174 248c0-95 54-159 134-159s134 64 134 159v74c0 75-58 119-134 119s-134-44-134-119v-74Z" fill="#d99b6d"/>
+  <circle cx="255" cy="268" r="12" fill="#2b4038"/><circle cx="361" cy="268" r="12" fill="#2b4038"/>
+  <path d="M262 310c21-22 66-22 87 0v45c-21 34-66 34-87 0v-45Z" fill="#f4c49b"/>
+  <path d="M285 320c10-10 30-10 40 0-2 16-10 22-20 22s-18-6-20-22Z" fill="#2b4038"/>
+  <path d="M197 383c72 38 150 38 222 0v37c-72 41-150 41-222 0v-37Z" fill="#347c61"/>
+  <text x="570" y="286" fill="#245b46" font-family="Arial, sans-serif" font-size="92" font-weight="800">Paw<tspan fill="#74b894">Nir</tspan></text>
+  <text x="578" y="365" fill="#52665c" font-family="Arial, sans-serif" font-size="30">Trusted veterinary care for every pet</text>
+  <text x="578" y="415" fill="#52665c" font-family="Arial, sans-serif" font-size="28">Find verified vets in Bangladesh</text>
+</svg>

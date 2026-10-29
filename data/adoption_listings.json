@@ -1,0 +1,22 @@
+[
+  {
+    "id": "adoption-mimi",
+    "name": "Mimi",
+    "species": "cat",
+    "area": "Dhanmondi, Dhaka",
+    "description": "A gentle adult cat looking for a calm, committed indoor home.",
+    "status": "open",
+    "verified": true,
+    "createdAt": "2026-10-20T08:00:00.000Z"
+  },
+  {
+    "id": "adoption-buddy",
+    "name": "Buddy",
+    "species": "dog",
+    "area": "Uttara, Dhaka",
+    "description": "A friendly young dog ready for a family that can provide daily care and exercise.",
+    "status": "open",
+    "verified": true,
+    "createdAt": "2026-10-21T08:00:00.000Z"
+  }
+]

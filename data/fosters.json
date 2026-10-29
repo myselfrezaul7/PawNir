@@ -1,0 +1,41 @@
+[
+  {
+    "id": "foster-paws-dhanmondi",
+    "name": "Paws & Care Dhanmondi",
+    "area": "Dhanmondi",
+    "city": "Dhaka",
+    "species": ["cat", "dog"],
+    "capacity": "Small emergency foster",
+    "description": "A registered home-style foster space for short-term recovery and safe reunification.",
+    "verified": true,
+    "lat": 23.7465,
+    "lng": 90.3760,
+    "mapQuery": "Paws and Care Dhanmondi Dhaka"
+  },
+  {
+    "id": "foster-tails-uttara",
+    "name": "Tails Home Uttara",
+    "area": "Uttara Sector 7",
+    "city": "Dhaka",
+    "species": ["cat", "dog", "bird"],
+    "capacity": "Temporary foster beds",
+    "description": "Verified foster support for rescued animals while a permanent home is arranged.",
+    "verified": true,
+    "lat": 23.8759,
+    "lng": 90.3795,
+    "mapQuery": "Tails Home Uttara Dhaka"
+  },
+  {
+    "id": "foster-rescue-chattogram",
+    "name": "Safe Paws Chattogram",
+    "area": "Panchlaish",
+    "city": "Chattogram",
+    "species": ["cat", "dog"],
+    "capacity": "Rescue intake by availability",
+    "description": "A registered local rescue partner offering temporary shelter and recovery coordination.",
+    "verified": true,
+    "lat": 22.3636,
+    "lng": 91.8220,
+    "mapQuery": "Safe Paws Chattogram"
+  }
+]

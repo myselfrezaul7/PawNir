@@ -22,6 +22,22 @@ function buildPaths(baseDataDir, tenantId) {
   return {
     dir,
     report: path.join(dir, "report.json"),
+    vets: path.join(dir, "vets.json"),
+    bookings: path.join(dir, "bookings.json"),
+    pets: path.join(dir, "pets.json"),
+    consultations: path.join(dir, "consultations.json"),
+    prescriptions: path.join(dir, "prescriptions.json"),
+    payments: path.join(dir, "payments.json"),
+    notifications: path.join(dir, "notifications.json"),
+    lostReports: path.join(dir, "lost_reports.json"),
+    areaSubscriptions: path.join(dir, "area_subscriptions.json"),
+    fosters: path.join(dir, "fosters.json"),
+    fosterRequests: path.join(dir, "foster_requests.json"),
+    reviews: path.join(dir, "reviews.json"),
+    donors: path.join(dir, "donors.json"),
+    donorRequests: path.join(dir, "donor_requests.json"),
+    adoptionListings: path.join(dir, "adoption_listings.json"),
+    adoptionApplications: path.join(dir, "adoption_applications.json"),
     interventions: path.join(dir, "interventions.json"),
     alerts: path.join(dir, "alerts.json"),
     tasks: path.join(dir, "tasks.json"),
@@ -120,6 +136,32 @@ class Storage {
     if (!(await fileExists(target.audit))) {
       await writeJsonFile(target.audit, []);
     }
+    if (!(await fileExists(target.vets))) {
+      const seedVets = path.join(this.baseDataDir, "portal_vets.json");
+      if (await fileExists(seedVets)) {
+        await fsp.copyFile(seedVets, target.vets);
+      } else {
+        await writeJsonFile(target.vets, []);
+      }
+    }
+    if (!(await fileExists(target.bookings))) {
+      await writeJsonFile(target.bookings, []);
+    }
+    for (const key of ["pets", "consultations", "prescriptions", "payments", "notifications", "lostReports", "areaSubscriptions", "fosters", "fosterRequests", "reviews", "donors", "donorRequests", "adoptionListings", "adoptionApplications"]) {
+      if (key === "fosters" && !(await fileExists(target[key]))) {
+        const seedFosters = path.join(this.baseDataDir, "fosters.json");
+        if (await fileExists(seedFosters)) await fsp.copyFile(seedFosters, target[key]);
+        else await writeJsonFile(target[key], []);
+        continue;
+      }
+      if (key === "adoptionListings" && !(await fileExists(target[key]))) {
+        const seedAdoptions = path.join(this.baseDataDir, "adoption_listings.json");
+        if (await fileExists(seedAdoptions)) await fsp.copyFile(seedAdoptions, target[key]);
+        else await writeJsonFile(target[key], []);
+        continue;
+      }
+      if (!(await fileExists(target[key]))) await writeJsonFile(target[key], []);
+    }
   }
 
   tenantPaths(tenantId) {
@@ -193,6 +235,34 @@ class Storage {
   async writeUsers(tenantId, items) {
     const p = this.tenantPaths(tenantId);
     await writeJsonFile(p.users, items);
+  }
+
+  async readVets(tenantId) {
+    const p = this.tenantPaths(tenantId);
+    return readJsonFile(p.vets, []);
+  }
+
+  async writeVets(tenantId, items) {
+    const p = this.tenantPaths(tenantId);
+    await writeJsonFile(p.vets, items);
+  }
+
+  async readBookings(tenantId) {
+    const p = this.tenantPaths(tenantId);
+    return readJsonFile(p.bookings, []);
+  }
+
+  async writeBookings(tenantId, items) {
+    const p = this.tenantPaths(tenantId);
+    await writeJsonFile(p.bookings, items);
+  }
+
+  async readCollection(tenantId, key) {
+    return readJsonFile(this.tenantPaths(tenantId)[key], []);
+  }
+
+  async writeCollection(tenantId, key, items) {
+    await writeJsonFile(this.tenantPaths(tenantId)[key], items);
   }
 
   async writeDigest(tenantId, text) {

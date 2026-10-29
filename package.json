@@ -1,7 +1,7 @@
 {
-  "name": "process-leak-detector",
+  "name": "pawnir",
   "version": "0.1.0",
-  "description": "MVP analytics app to detect process leaks in business workflows.",
+  "description": "PawNir veterinary care and appointment platform for Bangladesh.",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
@@ -11,10 +11,9 @@
     "test": "node tests/run-smoke.js"
   },
   "keywords": [
-    "analytics",
-    "process-mining",
-    "business-transformation"
+    "veterinary-care",
+    "pet-health",
+    "bangladesh"
   ],
   "license": "MIT"
 }
-
