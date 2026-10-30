@@ -296,8 +296,13 @@ function setTheme(theme) {
   localStorage.setItem("pawnir-theme", theme);
   const toggle = document.getElementById("theme-toggle");
   const dark = theme === "dark";
-  toggle.setAttribute("aria-pressed", String(dark));
-  toggle.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+  if (toggle) {
+    toggle.setAttribute("aria-pressed", String(dark));
+    toggle.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+  }
+  document.querySelectorAll(".brand-logo").forEach((logo) => {
+    logo.src = dark ? "/pawnir-logo-dark.png?v=20261031-1" : "/pawnir-logo.png?v=20261031-1";
+  });
 }
 
 function applyLanguage(language) {
@@ -2360,6 +2365,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Start initial auto-cycle
   startAutoSlide();
+
+  // ── Hero Style Selector (4 Bangladesh Stray Animal Styles) ──
+  const heroPetImg = document.getElementById("hero-pet-image");
+  const heroStyleChips = document.querySelectorAll(".hero-style-chip");
+  const heroStyleMap = {
+    photo: "/hero-bangladesh-stray-photo.jpg?v=20261031-1",
+    "3d": "/hero-bangladesh-stray-3d.jpg?v=20261031-1",
+    vector: "/hero-bangladesh-stray-vector.jpg?v=20261031-1",
+    painting: "/hero-bangladesh-stray-painting.jpg?v=20261031-1"
+  };
+
+  heroStyleChips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const styleKey = chip.dataset.heroStyle;
+      if (!styleKey || !heroStyleMap[styleKey] || !heroPetImg) return;
+      heroStyleChips.forEach((c) => c.classList.toggle("is-active", c === chip));
+      heroPetImg.classList.add("is-fading");
+      setTimeout(() => {
+        heroPetImg.src = heroStyleMap[styleKey];
+        heroPetImg.onload = () => {
+          heroPetImg.classList.remove("is-fading");
+        };
+      }, 150);
+    });
+  });
 
   // App Store & Google Play Download & PWA Install Handlers
   let deferredInstallPrompt = null;

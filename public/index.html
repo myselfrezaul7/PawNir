@@ -47,7 +47,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Bengali:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261031-1" />
+    <link rel="stylesheet" href="/styles.css?v=20261031-2" />
   </head>
   <body data-view="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -203,11 +203,16 @@
             <p data-i18n-html="hero.trust"><strong>10,000+</strong> pet parents<br />already trust PawNir</p>
           </div>
         </div>
-        <div class="hero-art" aria-label="PawNir rescue dog and cat companions">
-          <div class="sun-shape"></div>
+        <div class="hero-art" id="hero-art-container" aria-label="PawNir rescue Bangladesh deshi dog and cat companions">
           <div class="hero-card hero-card-top"><span class="card-icon">✓</span><span><strong data-i18n="hero.badge1Title">Verified network</strong><small data-i18n="hero.badge1Sub">Community checked</small></span></div>
           <div class="pet-illustration">
-            <img class="hero-pet-image" src="/hero-pet.jpg?v=20261030-6" alt="PawNir rescue dog and cat caring companions" width="340" height="340" loading="eager" />
+            <img class="hero-pet-image" id="hero-pet-image" src="/hero-bangladesh-stray-photo.jpg?v=20261031-1" alt="Rescued Bangladeshi Deshi dog and cat caring companions" width="340" height="340" loading="eager" />
+          </div>
+          <div class="hero-style-selector" id="hero-style-selector" role="tablist" aria-label="Hero illustration styles">
+            <button type="button" class="hero-style-chip is-active" data-hero-style="photo">Photo</button>
+            <button type="button" class="hero-style-chip" data-hero-style="3d">3D Studio</button>
+            <button type="button" class="hero-style-chip" data-hero-style="vector">Vector</button>
+            <button type="button" class="hero-style-chip" data-hero-style="painting">Painting</button>
           </div>
           <div class="hero-card hero-card-bottom"><span class="rating">★</span><span><strong>4.9 / 5</strong><small data-i18n="hero.badge2Sub">Loved by pet parents</small></span></div>
         </div>
@@ -1442,6 +1447,6 @@
 
     <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
 
-    <script src="/app.js?v=20261030-10"></script>
+    <script src="/app.js?v=20261031-2"></script>
   </body>
 </html>
