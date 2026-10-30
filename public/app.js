@@ -1436,13 +1436,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       link.classList.toggle("is-active", isHome || target === view);
     });
 
-    // Mobile bottom navigation active tab
-    document.querySelectorAll(".mobile-nav [data-mobile-tab]").forEach((item) => {
-      const tab = item.dataset.mobileTab;
-      const isTarget = (view === "home" && tab === "home") || (tab === view);
-      item.classList.toggle("is-active", isTarget);
-    });
-
     // Scroll smoothly to top on view change
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -2288,22 +2281,85 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Interactive Mobile App Screens Switcher
-  const mockupTabs = document.querySelectorAll(".mockup-tab");
-  const mockupViews = document.querySelectorAll(".mockup-screen-view");
-  mockupTabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const targetScreenId = tab.dataset.appScreen;
-      mockupTabs.forEach((t) => {
-        const isActive = t === tab;
-        t.classList.toggle("is-active", isActive);
-        t.setAttribute("aria-selected", String(isActive));
-      });
-      mockupViews.forEach((view) => {
-        view.classList.toggle("is-active", view.id === targetScreenId);
-      });
+  // ── Automated & Swipeable Smartphone Showcase Carousel ──
+  const screensTrack = document.getElementById("phone-screens-track");
+  const sliderDots = document.querySelectorAll("#phone-slider-dots .slider-dot");
+  const phoneFrame = document.getElementById("phone-frame-container");
+  const totalSlides = 4;
+  let currentSlide = 0;
+  let autoSlideTimer = null;
+
+  function goToSlide(index) {
+    currentSlide = (index + totalSlides) % totalSlides;
+    if (screensTrack) {
+      screensTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+    sliderDots.forEach((dot, idx) => {
+      dot.classList.toggle("is-active", idx === currentSlide);
+      dot.setAttribute("aria-selected", String(idx === currentSlide));
+    });
+  }
+
+  function startAutoSlide() {
+    stopAutoSlide();
+    autoSlideTimer = setInterval(() => {
+      goToSlide(currentSlide + 1);
+    }, 3200);
+  }
+
+  function stopAutoSlide() {
+    if (autoSlideTimer) {
+      clearInterval(autoSlideTimer);
+      autoSlideTimer = null;
+    }
+  }
+
+  // Click on indicator dot
+  sliderDots.forEach((dot) => {
+    dot.addEventListener("click", () => {
+      const idx = parseInt(dot.dataset.slideIndex, 10);
+      if (!isNaN(idx)) {
+        goToSlide(idx);
+        startAutoSlide();
+      }
     });
   });
+
+  // Touch Swipe Gesture Support
+  if (phoneFrame) {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    phoneFrame.addEventListener("touchstart", (e) => {
+      stopAutoSlide();
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    phoneFrame.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
+        if (diffX < 0) {
+          goToSlide(currentSlide + 1);
+        } else {
+          goToSlide(currentSlide - 1);
+        }
+      }
+      startAutoSlide();
+    }, { passive: true });
+
+    // Pause on mouse hover (desktop)
+    phoneFrame.addEventListener("mouseenter", stopAutoSlide);
+    phoneFrame.addEventListener("mouseleave", startAutoSlide);
+  }
+
+  // Start initial auto-cycle
+  startAutoSlide();
 
   // App Store & Google Play Download & PWA Install Handlers
   let deferredInstallPrompt = null;

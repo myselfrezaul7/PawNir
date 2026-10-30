@@ -47,14 +47,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Bengali:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261030-9" />
+    <link rel="stylesheet" href="/styles.css?v=20261030-10" />
   </head>
   <body data-view="home">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="shell nav-wrap">
         <a class="brand" href="#main" aria-label="PawNir home">
-          <img class="brand-logo" src="/pawnir-logo.png?v=20261030-4" alt="PawNir" width="148" height="42" />
+          <img class="brand-logo" src="/pawnir-logo.png?v=20261030-10" alt="PawNir" width="148" height="42" />
         </a>
 
         <!-- Desktop Navigation Links matching Reference Image 2 -->
@@ -76,8 +76,8 @@
             <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg>
             <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"></path></svg>
           </button>
-          <!-- Primary CTA Button matching Reference Image 2 -->
-          <a href="#download-app" class="btn btn-pill-violet header-store-cta" id="header-play-store-cta">
+          <!-- Primary CTA Button (x.ai / bot style sleek black pill) -->
+          <a href="#download-app" class="btn btn-pill-black header-store-cta" id="header-play-store-cta">
             <span class="play-triangle-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
             </span>
@@ -512,25 +512,7 @@
           </div>
         </div>
 
-        <!-- Interactive Screen Switcher Tabs -->
-        <div class="mockup-tab-nav" role="tablist" aria-label="Mobile app screens preview">
-          <button type="button" class="mockup-tab is-active" data-app-screen="screen-lost" role="tab" aria-selected="true">
-            <span class="tab-badge">01</span>
-            <span class="tab-label">Lost &amp; Found Radar</span>
-          </button>
-          <button type="button" class="mockup-tab" data-app-screen="screen-donor" role="tab" aria-selected="false">
-            <span class="tab-badge">02</span>
-            <span class="tab-label">Emergency Blood Match</span>
-          </button>
-          <button type="button" class="mockup-tab" data-app-screen="screen-foster" role="tab" aria-selected="false">
-            <span class="tab-badge">03</span>
-            <span class="tab-label">Google Maps Fosters</span>
-          </button>
-          <button type="button" class="mockup-tab" data-app-screen="screen-passport" role="tab" aria-selected="false">
-            <span class="tab-badge">04</span>
-            <span class="tab-label">Pet Passport &amp; 2FA</span>
-          </button>
-        </div>
+
 
         <!-- Realistic Smartphone Mockup Display Stage -->
         <div class="mockup-stage-container">
@@ -552,13 +534,10 @@
             </div>
           </div>
 
-          <!-- Central Hardware Mockup Frame -->
+          <!-- Central Hardware Mockup Frame: Notchless & <1mm Bezels -->
           <div class="phone-frame-wrapper">
-            <div class="phone-frame">
+            <div class="phone-frame" id="phone-frame-container">
               <div class="phone-rim"></div>
-              <div class="phone-island">
-                <span class="phone-lens"></span>
-              </div>
               <div class="phone-screen">
                 <!-- Status Bar -->
                 <div class="mockup-status-bar">
@@ -570,12 +549,14 @@
                   </div>
                 </div>
 
-                <!-- Screen 1: Lost & Found Radar -->
-                <div class="mockup-screen-view is-active" id="screen-lost" role="tabpanel">
-                  <div class="app-screen-header">
-                    <span class="app-screen-brand">PawNir <small>Alerts</small></span>
-                    <span class="app-screen-pill pill-alert"><span class="live-pulse"></span> Dhanmondi</span>
-                  </div>
+                <!-- Automated & Swipeable Screen Slider Track -->
+                <div class="phone-screens-track" id="phone-screens-track">
+                  <!-- Screen 1: Lost & Found Radar -->
+                  <div class="mockup-screen-view" id="screen-lost" role="tabpanel">
+                    <div class="app-screen-header">
+                      <span class="app-screen-brand">01 · Lost &amp; Found Radar</span>
+                      <span class="app-screen-pill pill-alert"><span class="live-pulse"></span> Dhanmondi</span>
+                    </div>
                   <div class="app-push-banner">
                     <div class="push-icon">🔔</div>
                     <div class="push-text">
@@ -607,7 +588,7 @@
                 <!-- Screen 2: Emergency Blood Match -->
                 <div class="mockup-screen-view" id="screen-donor" role="tabpanel">
                   <div class="app-screen-header">
-                    <span class="app-screen-brand">PawNir <small>Blood Network</small></span>
+                    <span class="app-screen-brand">02 · Emergency Blood Match</span>
                     <span class="app-screen-pill pill-blood">🩸 Urgent</span>
                   </div>
                   <div class="app-urgent-callout">
@@ -639,7 +620,7 @@
                 <!-- Screen 3: Google Maps Fosters -->
                 <div class="mockup-screen-view" id="screen-foster" role="tabpanel">
                   <div class="app-screen-header">
-                    <span class="app-screen-brand">PawNir <small>Foster Map</small></span>
+                    <span class="app-screen-brand">03 · Google Maps Fosters</span>
                     <span class="app-screen-pill pill-foster">📍 Google Maps</span>
                   </div>
                   <div class="app-map-mini-stage">
@@ -667,7 +648,7 @@
                 <!-- Screen 4: Pet Passport & 2FA -->
                 <div class="mockup-screen-view" id="screen-passport" role="tabpanel">
                   <div class="app-screen-header">
-                    <span class="app-screen-brand">PawNir <small>Passport</small></span>
+                    <span class="app-screen-brand">04 · Pet Passport &amp; 2FA</span>
                     <span class="app-screen-pill pill-secure">🛡️ 2FA Active</span>
                   </div>
                   <div class="app-passport-card">
@@ -694,19 +675,27 @@
                     </div>
                   </div>
                 </div>
+              </div> <!-- /phone-screens-track -->
 
-                <!-- Virtual Phone Bottom Navigation -->
-                <div class="mockup-bottom-nav">
-                  <span class="nav-item is-active"><span class="nav-icon">🏠</span><small>Home</small></span>
-                  <span class="nav-item"><span class="nav-icon">⌖</span><small>Alerts</small></span>
-                  <span class="nav-item"><span class="nav-icon">+</span><small>Donors</small></span>
-                  <span class="nav-item"><span class="nav-icon">📍</span><small>Fosters</small></span>
-                  <span class="nav-item"><span class="nav-icon">👤</span><small>Passport</small></span>
-                </div>
-                <div class="phone-home-bar"></div>
+              <!-- Virtual Phone Bottom Navigation -->
+              <div class="mockup-bottom-nav">
+                <span class="nav-item is-active"><span class="nav-icon">🏠</span><small>Home</small></span>
+                <span class="nav-item"><span class="nav-icon">⌖</span><small>Alerts</small></span>
+                <span class="nav-item"><span class="nav-icon">+</span><small>Donors</small></span>
+                <span class="nav-item"><span class="nav-icon">📍</span><small>Fosters</small></span>
+                <span class="nav-item"><span class="nav-icon">👤</span><small>Passport</small></span>
               </div>
+              <div class="phone-home-bar"></div>
             </div>
           </div>
+          <!-- Automated & Swipeable Screen Slider Dots -->
+          <div class="phone-slider-dots" id="phone-slider-dots" role="tablist" aria-label="Screens carousel">
+            <button type="button" class="slider-dot is-active" data-slide-index="0" aria-label="Screen 1: Lost &amp; Found Radar"></button>
+            <button type="button" class="slider-dot" data-slide-index="1" aria-label="Screen 2: Emergency Blood Match"></button>
+            <button type="button" class="slider-dot" data-slide-index="2" aria-label="Screen 3: Google Maps Fosters"></button>
+            <button type="button" class="slider-dot" data-slide-index="3" aria-label="Screen 4: Pet Passport &amp; 2FA"></button>
+          </div>
+        </div>
 
           <!-- Side Feature 2 (Desktop) -->
           <div class="mockup-side-feature feature-right">
@@ -785,18 +774,9 @@
 
         <div class="footer-inner">
           <div class="footer-brand-wrap">
-            <a class="brand" href="#main" aria-label="PawNir home"><img class="brand-logo footer-logo" src="/pawnir-logo.png?v=20261030-4" alt="PawNir" width="132" height="38" /></a>
+            <a class="brand" href="#main" aria-label="PawNir home"><img class="brand-logo footer-logo" src="/pawnir-logo.png?v=20261030-10" alt="PawNir" width="132" height="38" /></a>
           </div>
           <div class="footer-links-wrap">
-            <div class="footer-nav-row">
-              <a href="#lost-found">Lost &amp; found</a>
-              <a href="#blood-donors">Blood donors</a>
-              <a href="#foster-care">Fosters &amp; Map</a>
-              <a href="#adoption">Adopt</a>
-              <a href="#find-care">Find a vet</a>
-              <a href="#mobile-app">Mobile app</a>
-              <a href="mailto:hello@pawnir.com">Contact</a>
-            </div>
             <div class="footer-legal-row">
               <button type="button" class="footer-policy-link" data-policy="privacy">Privacy Policy</button>
               <span class="legal-dot">·</span>
@@ -812,14 +792,6 @@
         </div>
       </div>
     </footer>
-
-    <nav class="mobile-nav" aria-label="Mobile navigation">
-      <a class="is-active" href="#main" data-mobile-tab="home"><span class="mobile-nav-icon icon icon-home" aria-hidden="true"></span><small data-i18n="nav.home">Home</small></a>
-      <a href="#lost-found" data-mobile-tab="lost-found"><span class="mobile-nav-icon icon icon-pin" aria-hidden="true"></span><small data-i18n="nav.lostShort">Alerts</small></a>
-      <a href="#blood-donors" data-mobile-tab="blood-donors"><span class="mobile-nav-icon icon icon-plus" aria-hidden="true"></span><small data-i18n="nav.donorsShort">Donors</small></a>
-      <a href="#foster-care" data-mobile-tab="foster-care"><span class="mobile-nav-icon icon icon-heart" aria-hidden="true"></span><small data-i18n="nav.fosterShort">Fosters</small></a>
-      <button type="button" id="mobile-account-button" data-open-account data-mobile-tab="account"><span class="mobile-nav-icon icon icon-user" aria-hidden="true"></span><small id="mobile-account-label" data-i18n="nav.profile">Account</small></button>
-    </nav>
 
     <dialog class="booking-dialog" id="auth-dialog">
       <div class="dialog-card">
@@ -1470,6 +1442,6 @@
 
     <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
 
-    <script src="/app.js?v=20261030-9"></script>
+    <script src="/app.js?v=20261030-10"></script>
   </body>
 </html>
