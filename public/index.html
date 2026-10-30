@@ -46,8 +46,8 @@
     <title>PawNir | Help for animals, close to home</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261030-5" />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Bengali:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css?v=20261030-6" />
   </head>
   <body data-view="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -99,7 +99,7 @@
           <div class="sun-shape"></div>
           <div class="hero-card hero-card-top"><span class="card-icon">✓</span><span><strong data-i18n="hero.badge1Title">Verified network</strong><small data-i18n="hero.badge1Sub">Community checked</small></span></div>
           <div class="pet-illustration">
-            <img class="hero-pet-image" src="/hero-illustration.jpg" alt="PawNir rescue dog and cat caring companions" width="340" height="340" loading="eager" />
+            <img class="hero-pet-image" src="/hero-pet.jpg?v=20261030-6" alt="PawNir rescue dog and cat caring companions" width="340" height="340" loading="eager" />
           </div>
           <div class="hero-card hero-card-bottom"><span class="rating">★</span><span><strong>4.9 / 5</strong><small data-i18n="hero.badge2Sub">Loved by pet parents</small></span></div>
         </div>
@@ -305,9 +305,42 @@
       <section class="adoption-section shell" id="adoption" aria-labelledby="adoption-title">
         <div class="view-back-bar">
           <a href="#main" class="view-back-link"><span aria-hidden="true">←</span> <span>Back to Home</span></a>
-          <span class="view-badge-pill">Safe Pet Adoption</span>
+          <span class="view-badge-pill">Safe Animal Adoption &amp; Rehoming</span>
         </div>
-        <div class="section-heading"><div><p class="eyebrow" data-i18n="adopt.eyebrow">A safer next home</p><h2 id="adoption-title" data-i18n="adopt.title">Adopt responsibly</h2></div></div>
+        <div class="section-heading adoption-heading-wrap">
+          <div>
+            <p class="eyebrow" data-i18n="adopt.eyebrow">A safer next home</p>
+            <h2 id="adoption-title" data-i18n="adopt.title">Adopt or rehome responsibly</h2>
+          </div>
+          <div class="adoption-header-actions">
+            <button class="btn btn-primary btn-small" id="list-adoption-button" type="button" data-i18n="adopt.btnList">+ List a pet for adoption</button>
+          </div>
+        </div>
+
+        <div class="lost-found-toolbar adoption-toolbar">
+          <label class="search-field"><span aria-hidden="true">⌖</span><input id="adoption-area-input" type="search" placeholder="Search area or breed (e.g. Dhanmondi, Uttara, Persian)…" aria-label="Search adoption listings by area" /></label>
+          <select id="adoption-species-filter" aria-label="Filter adoption listings by species">
+            <option value="">All animals</option>
+            <option value="cat">🐱 Cats</option>
+            <option value="dog">🐶 Dogs</option>
+            <option value="bird">🦜 Birds</option>
+            <option value="rabbit">🐰 Rabbits</option>
+          </select>
+        </div>
+
+        <div class="filter-pills-row" id="adoption-species-pills" role="group" aria-label="Filter adoption listings by species">
+          <button type="button" class="chip active" data-adoption-species="" data-i18n="adopt.filterAll">All animals</button>
+          <button type="button" class="chip" data-adoption-species="cat" data-i18n="adopt.filterCats">🐱 Cats</button>
+          <button type="button" class="chip" data-adoption-species="dog" data-i18n="adopt.filterDogs">🐶 Dogs</button>
+          <button type="button" class="chip" data-adoption-species="bird" data-i18n="adopt.filterBirds">🦜 Birds</button>
+          <button type="button" class="chip" data-adoption-species="rabbit" data-i18n="adopt.filterRabbits">🐰 Rabbits</button>
+        </div>
+
+        <div class="safety-strip adoption-safety-note">
+          <span class="safety-icon">✓</span>
+          <p><strong>Strictly Non-Commercial Adoption:</strong> Selling or trading live animals is strictly banned under Bangladesh law. All listings on PawNir are 100% free adoptions requiring screened application and follow-up consent.</p>
+        </div>
+
         <div class="adoption-grid" id="adoption-grid"><p class="inline-state">Loading verified adoption listings…</p></div>
       </section>
 
@@ -619,15 +652,6 @@
 
     <footer class="site-footer">
       <div class="shell">
-        <!-- Prominent Non-Profit Animal Welfare Concern Banner -->
-        <div class="footer-concern-strip">
-          <div class="concern-flag">
-            <span class="concern-heart" aria-hidden="true">❤️</span>
-            <strong>Non-Profit Welfare Initiative</strong>
-          </div>
-          <p>A concern of <strong>Kuttawaala &amp; Catwaala Animal Welfare, Bangladesh</strong> · Dedicated to street animal rescue, community foster homes, humane treatment &amp; zero pet abandonment across Bangladesh.</p>
-        </div>
-
         <div class="footer-network">
           <div class="footer-network-copy"><p class="eyebrow">The PawNir family</p><h2>One kinder world for every pet.</h2><p>Meet the people and places helping Bangladesh care a little more.</p></div>
           <div class="partner-grid" aria-label="PawNir family partners">
@@ -646,13 +670,13 @@
         <div class="footer-inner">
           <div class="footer-brand-wrap">
             <a class="brand" href="#main" aria-label="PawNir home"><img class="brand-logo footer-logo" src="/pawnir-logo.png?v=20261030-4" alt="PawNir" width="132" height="38" /></a>
-            <p>Trusted care for every little life across Bangladesh.</p>
           </div>
           <div class="footer-links-wrap">
             <div class="footer-nav-row">
               <a href="#lost-found">Lost &amp; found</a>
               <a href="#blood-donors">Blood donors</a>
               <a href="#foster-care">Fosters &amp; Map</a>
+              <a href="#adoption">Adopt</a>
               <a href="#find-care">Find a vet</a>
               <a href="#mobile-app">Mobile app</a>
               <a href="mailto:hello@pawnir.com">Contact</a>
@@ -665,6 +689,10 @@
               <button type="button" class="footer-policy-link" data-policy="guidelines">Community Guidelines</button>
             </div>
           </div>
+        </div>
+
+        <div class="footer-bottom-credit">
+          <p>A concern of <strong>Kuttawaala &amp; Catwaala Animal Welfare, Bangladesh</strong></p>
         </div>
       </div>
     </footer>
@@ -733,32 +761,232 @@
       </div>
     </dialog>
 
-    <dialog class="booking-dialog" id="dashboard-dialog">
+    <dialog class="booking-dialog modern-profile-dialog" id="dashboard-dialog">
       <section class="dialog-card dashboard-card">
         <div class="sheet-handle" aria-hidden="true"></div>
         <button class="dialog-close" type="button" data-close-dashboard aria-label="Close care dashboard">×</button>
-        <div class="dashboard-header-row">
-          <div>
-            <p class="eyebrow">Your care space</p>
-            <h2>Everything your pet needs</h2>
+
+        <div class="profile-hero-card" id="dashboard-user-bar">
+          <div class="profile-avatar-wrap">
+            <span class="user-avatar-circle" id="dashboard-user-initials">P</span>
+            <span class="avatar-verified-badge" title="Verified Member">✓</span>
+          </div>
+          <div class="profile-hero-info">
+            <div class="profile-name-row">
+              <strong id="dashboard-user-name">Pet Parent</strong>
+              <span class="profile-area-pill" id="dashboard-user-area-chip">⌖ Dhaka</span>
+            </div>
+            <small id="dashboard-user-email">user@example.com</small>
           </div>
           <button class="btn btn-small btn-outline signout-btn" id="signout-button" type="button">Sign out</button>
         </div>
-        <div class="dashboard-user-bar" id="dashboard-user-bar" hidden>
-          <span class="user-avatar-circle" id="dashboard-user-initials">P</span>
-          <div>
-            <strong id="dashboard-user-name">Pet parent</strong>
-            <small id="dashboard-user-email"></small>
+
+        <!-- Modern Profile Dashboard Tabs -->
+        <div class="dash-tab-nav" role="tablist" aria-label="Dashboard views">
+          <button type="button" class="dash-tab is-active" data-dash-tab="pets" role="tab" aria-selected="true">
+            <span>🐾 Pet Passports</span>
+          </button>
+          <button type="button" class="dash-tab" data-dash-tab="activity" role="tab" aria-selected="false">
+            <span>📋 My Activity</span>
+          </button>
+          <button type="button" class="dash-tab" data-dash-tab="settings" role="tab" aria-selected="false">
+            <span>⚙️ Settings &amp; 2FA</span>
+          </button>
+        </div>
+
+        <!-- Panel 1: Pet Passports -->
+        <div class="dash-panel is-active" id="dash-panel-pets" role="tabpanel">
+          <div class="panel-section-head">
+            <div>
+              <h4>Registered Pet Passports</h4>
+              <p class="dialog-helper">Health records, breed details, and emergency donor eligibility.</p>
+            </div>
+            <button class="btn btn-primary btn-small" id="toggle-add-pet-btn" type="button">+ Register pet</button>
+          </div>
+
+          <div class="dashboard-pets-grid" id="dashboard-pets">
+            <p class="inline-state">Loading pet passports…</p>
+          </div>
+
+          <!-- Collapsible / Inline Pet Registration Form -->
+          <form id="pet-form" class="pet-register-card" hidden>
+            <h5>Register a new pet companion</h5>
+            <div class="pet-form-grid">
+              <label>Pet name
+                <input id="pet-name" placeholder="e.g. Bagha, Mimi" required />
+              </label>
+              <label>Species
+                <select id="pet-species" required>
+                  <option value="">Select species</option>
+                  <option value="cat">🐱 Cat</option>
+                  <option value="dog">🐶 Dog</option>
+                  <option value="bird">🦜 Bird</option>
+                  <option value="rabbit">🐰 Rabbit</option>
+                  <option value="other">🐾 Other</option>
+                </select>
+              </label>
+              <label>Breed
+                <input id="pet-breed" placeholder="e.g. Deshi Mix, Persian" />
+              </label>
+              <label>Approx. age
+                <input id="pet-age" placeholder="e.g. 1.5 years" />
+              </label>
+            </div>
+            <div class="pet-form-actions">
+              <button class="btn btn-outline btn-small" id="cancel-add-pet-btn" type="button">Cancel</button>
+              <button class="btn btn-primary btn-small" type="submit">Save pet passport</button>
+            </div>
+            <p class="secure-note" id="pet-status"></p>
+          </form>
+        </div>
+
+        <!-- Panel 2: My Activity -->
+        <div class="dash-panel" id="dash-panel-activity" role="tabpanel">
+          <div class="activity-blocks-stack">
+            <!-- My Published Adoption Listings -->
+            <div class="activity-block">
+              <div class="activity-block-head">
+                <strong>Your Adoption Rehoming Listings</strong>
+                <small>Mark as rehomed once a verified adopter is found.</small>
+              </div>
+              <div class="dashboard-activity-list" id="dashboard-my-adoptions">
+                <p class="inline-state">No adoption listings published yet.</p>
+              </div>
+            </div>
+
+            <!-- My Published Lost & Found Alerts -->
+            <div class="activity-block">
+              <div class="activity-block-head">
+                <strong>Your Lost &amp; Found Alerts</strong>
+                <small>Update sightings or mark as reunited.</small>
+              </div>
+              <div class="dashboard-activity-list" id="dashboard-my-lost">
+                <p class="inline-state">No active lost alerts published.</p>
+              </div>
+            </div>
+
+            <!-- My Foster Care Requests -->
+            <div class="activity-block">
+              <div class="activity-block-head">
+                <strong>Foster Care Inquiries</strong>
+                <small>Status of your requested shelter stays.</small>
+              </div>
+              <div class="dashboard-activity-list" id="dashboard-foster-requests">
+                <p class="inline-state">No pending foster requests.</p>
+              </div>
+            </div>
+
+            <!-- Vet Visits & Consultations -->
+            <div class="activity-block">
+              <div class="activity-block-head">
+                <strong>Appointments &amp; Prescriptions</strong>
+                <small>Upcoming clinic appointments.</small>
+              </div>
+              <div class="dashboard-activity-list" id="dashboard-bookings">
+                <p class="inline-state">No upcoming clinic visits.</p>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="dashboard-grid">
-          <div><h3>My pets</h3><div id="dashboard-pets" class="dashboard-list">Loading…</div></div>
-          <div><h3>Foster requests</h3><div id="dashboard-foster-requests" class="dashboard-list">Loading…</div></div>
-          <div><h3>Visits &amp; prescriptions</h3><div id="dashboard-bookings" class="dashboard-list">Loading…</div><div id="dashboard-prescriptions" class="dashboard-list" hidden></div></div>
+
+        <!-- Panel 3: Settings & 2FA Security -->
+        <div class="dash-panel" id="dash-panel-settings" role="tabpanel">
+          <form id="profile-form" class="profile-settings-form">
+            <h4>Profile Information</h4>
+            <div class="pet-form-grid">
+              <label>Your full name
+                <input id="profile-name" placeholder="Full name" required />
+              </label>
+              <label>Primary area
+                <input id="profile-area" placeholder="e.g. Dhanmondi 10A, Dhaka" />
+              </label>
+            </div>
+            <label>Short bio / rescuer note
+              <textarea id="profile-bio" rows="2" placeholder="Tell the community a little about your pet care experience (optional)"></textarea>
+            </label>
+            <button class="btn btn-primary btn-small" type="submit">Update profile</button>
+            <p class="secure-note" id="profile-status"></p>
+          </form>
+
+          <div class="security-card-box">
+            <div class="security-card-top">
+              <span class="security-shield-icon">🛡️</span>
+              <div>
+                <strong>Two-Factor Authentication: Enabled</strong>
+                <p>Your account is protected with cryptographic mathematical HMAC-SHA256 verification. Zero SMS interception risk.</p>
+              </div>
+            </div>
+            <span class="security-status-badge">✓ Active Protection</span>
+          </div>
         </div>
-        <form id="pet-form" class="pet-form"><h3>Add a pet profile</h3><div class="pet-form-row"><input id="pet-name" placeholder="Pet name" required /><select id="pet-species" required><option value="">Species</option><option value="dog">Dog</option><option value="cat">Cat</option><option value="bird">Bird</option><option value="rabbit">Rabbit</option><option value="other">Other</option></select><button class="btn btn-primary btn-small" type="submit">Add pet</button></div><p class="secure-note" id="pet-status"></p></form>
-        <form id="profile-form" class="profile-form"><h3>My PawNir profile</h3><div class="pet-form-row"><input id="profile-name" placeholder="Your name" required /><input id="profile-area" placeholder="Your area (e.g. Dhanmondi 10)" /><button class="btn btn-primary btn-small" type="submit">Save profile</button></div><textarea id="profile-bio" rows="2" placeholder="A short introduction (optional)"></textarea><p class="secure-note" id="profile-status"></p></form>
       </section>
+    </dialog>
+
+    <!-- Modal to List a Pet for Adoption -->
+    <dialog class="booking-dialog" id="list-adoption-dialog" aria-labelledby="list-adoption-title">
+      <form class="dialog-card" id="list-adoption-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" data-close-adoption-form aria-label="Close adoption form">×</button>
+        <p class="eyebrow">Safe Animal Rehoming</p>
+        <h2 id="list-adoption-title">List a pet for safe adoption</h2>
+        <p class="dialog-helper">Connect directly with vetted pet lovers across Bangladesh. Strictly non-commercial.</p>
+
+        <label>Pet name
+          <input id="adopt-pet-name" placeholder="e.g. Luna, Milo" required />
+        </label>
+
+        <div class="field-row">
+          <label>Species
+            <select id="adopt-pet-species" required>
+              <option value="">Choose species</option>
+              <option value="cat">🐱 Cat</option>
+              <option value="dog">🐶 Dog</option>
+              <option value="bird">🦜 Bird</option>
+              <option value="rabbit">🐰 Rabbit</option>
+              <option value="other">🐾 Other</option>
+            </select>
+          </label>
+          <label>Breed
+            <input id="adopt-pet-breed" placeholder="e.g. Domestic Short Hair, Deshi Mix" />
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label>Approx. age
+            <input id="adopt-pet-age" placeholder="e.g. 1 year, 4 months" required />
+          </label>
+          <label>Gender
+            <select id="adopt-pet-gender">
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+              <option value="Pair">Bonded Pair</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </label>
+        </div>
+
+        <label>Location / Area
+          <input id="adopt-pet-area" placeholder="e.g. Dhanmondi 10, Dhaka" required />
+        </label>
+
+        <div class="check-options-row">
+          <label class="check-line"><input type="checkbox" id="adopt-pet-vaccinated" checked /> <span>Vaccinated</span></label>
+          <label class="check-line"><input type="checkbox" id="adopt-pet-neutered" /> <span>Neutered / Spayed</span></label>
+          <label class="check-line"><input type="checkbox" id="adopt-pet-indoor" checked /> <span>Indoor-only preferred</span></label>
+        </div>
+
+        <label>Description &amp; Personality
+          <textarea id="adopt-pet-desc" rows="3" placeholder="Tell us about their behavior, rescue story, food habits, and ideal home environment…" required minlength="15"></textarea>
+        </label>
+
+        <div class="safety-strip adoption-promise-strip">
+          <span class="safety-icon">✓</span>
+          <p><strong>Safety Promise:</strong> I confirm this is a free, compassionate adoption with zero fee or commercial animal trade.</p>
+        </div>
+
+        <button class="btn btn-primary" id="adopt-submit-button" type="submit">Publish adoption listing <span aria-hidden="true">→</span></button>
+        <p class="dialog-status" id="list-adoption-status" role="status" aria-live="polite"></p>
+      </form>
     </dialog>
 
     <dialog class="booking-dialog" id="notifications-dialog">
@@ -1155,6 +1383,6 @@
 
     <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
 
-    <script src="/app.js?v=20261030-5"></script>
+    <script src="/app.js?v=20261030-6"></script>
   </body>
 </html>

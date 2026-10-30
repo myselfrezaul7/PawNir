@@ -147,6 +147,13 @@ async function runAsyncTests() {
     assert.ok(detailRes.json.ratingBreakdown);
     assert.ok(Array.isArray(detailRes.json.reviews));
     process.stdout.write("PASS: GET /api/fosters/:id returns rating breakdown and review thread\n");
+
+    const adoptRes = await callApi("GET", "/api/adoptions?species=cat");
+    assert.equal(adoptRes.statusCode, 200);
+    assert.ok(Array.isArray(adoptRes.json));
+    assert.ok(adoptRes.json.length >= 1);
+    assert.ok(adoptRes.json.every((item) => item.species === "cat"));
+    process.stdout.write("PASS: GET /api/adoptions?species=cat filters by species correctly\n");
   } catch (err) {
     process.stderr.write(`FAIL: API smoke test\n${err.stack}\n`);
     process.exitCode = 1;

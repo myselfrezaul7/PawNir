@@ -20,6 +20,9 @@ let selectedAdoption = null;
 let selectedDonor = null;
 let selectedSightingReport = null;
 let lostSpeciesFilter = "";
+let adoptionSpeciesFilter = "";
+let pendingReviewFoster = null;
+let pendingAdoptionAction = null;
 let cachedFosters = [];
 let activeMapFosterId = null;
 let lostRefreshTimer = null;
@@ -109,7 +112,13 @@ const copy = {
     "donor.registerBtn": "Register a donor",
     "donor.disclaimer": "PawNir connects consented donors; a veterinarian must confirm blood compatibility and medical suitability.",
     "adopt.eyebrow": "A safer next home",
-    "adopt.title": "Adopt responsibly",
+    "adopt.title": "Adopt or rehome responsibly",
+    "adopt.btnList": "+ List a pet for adoption",
+    "adopt.filterAll": "All animals",
+    "adopt.filterCats": "🐱 Cats",
+    "adopt.filterDogs": "🐶 Dogs",
+    "adopt.filterBirds": "🦜 Birds",
+    "adopt.filterRabbits": "🐰 Rabbits",
     "foster.eyebrow": "Registered local care",
     "foster.title": "Find a foster or shelter",
     "vet.eyebrow": "A better care experience is coming",
@@ -133,83 +142,89 @@ const copy = {
   },
   bn: {
     "nav.home": "হোম",
-    "nav.lost": "হারানো ও পাওয়া",
+    "nav.lost": "হারানো প্রাণী",
     "nav.lostShort": "অ্যালার্ট",
     "nav.donors": "রক্তদাতা",
     "nav.donorsShort": "রক্তদাতা",
     "nav.adopt": "দত্তক",
     "nav.adoptShort": "দত্তক",
     "nav.foster": "ফস্টার কেয়ার",
-    "nav.find": "ভেট খুঁজুন",
+    "nav.find": "জরুরি ভেট",
     "nav.how": "যেভাবে কাজ করে",
     "nav.vets": "ভেটদের জন্য",
     "nav.care": "আমার যত্ন",
     "nav.signin": "সাইন ইন",
     "nav.bookings": "বুকিং",
     "nav.profile": "অ্যাকাউন্ট",
-    "hero.eyebrow": "প্রাণীদের জন্য সহায়তা, আপনার এলাকাতেই",
+    "hero.eyebrow": "কাছের মানুষ, বিপন্ন প্রাণের পাশে",
     "hero.title": "প্রাণীদের যখন সাহায্য প্রয়োজন,<br /><em>আপনার এলাকা পাশে দাঁড়ায়।</em>",
-    "hero.subtitle": "PawNir সারা বাংলাদেশে হারানো প্রাণীর অ্যালার্ট, নিরাপদ দত্তক, রক্তদাতা নেটওয়ার্ক, ফস্টার কেয়ার এবং বিশ্বস্ত ভেটেরিনারি সেবাকে একত্রিত করে।",
-    "hero.cta": "PawNir কী করে দেখুন",
-    "hero.vetLink": "ভেটেরিনারিয়ান খুঁজুন",
-    "hero.trust": "<strong>১০,০০০+</strong> পেট প্যারেন্ট<br />ইতিমধ্যে PawNir-এ আস্থা রাখেন",
+    "hero.subtitle": "PawNir সারা বাংলাদেশে হারানো প্রাণীর দ্রুত অ্যালার্ট, দায়িত্বশীল দত্তক ও পুনর্বাসন, জরুরি রক্তদাতা নেটওয়ার্ক, ফস্টার কেয়ার এবং বিশ্বস্ত ভেটেরিনারি সেবাকে এক মায়ার ঠিকানায় যুক্ত করেছে।",
+    "hero.cta": "PawNir কীভাবে সাহায্য করে",
+    "hero.vetLink": "নিকটস্থ ভেটেরিনারিয়ান",
+    "hero.trust": "<strong>১০,০০০+</strong> সচেতন পেট প্যারেন্ট<br />ইতিমধ্যে PawNir-এ আস্থা রাখেন",
     "hero.badge1Title": "যাচাইকৃত নেটওয়ার্ক",
-    "hero.badge1Sub": "কমিউনিটি সুরক্ষিত",
-    "hero.badge2Sub": "পেট প্যারেন্টদের প্রিয়",
-    "mission.eyebrow": "প্রাণী সহায়তার এক ঠিকানা",
-    "mission.title": "অগোছালো গ্রুপ পোস্ট নয়।<br /><em>সঠিক মানুষের কাছে দ্রুত এলাকার খবর।</em>",
-    "mission.badge": "বাংলাদেশের জন্য তৈরি",
-    "mission.exampleLabel": "একটি সহজ উদাহরণ",
+    "hero.badge1Sub": "কমিউনিটি দ্বারা সুরক্ষিত",
+    "hero.badge2Sub": "পেট প্যারেন্টদের প্রথম পছন্দ",
+    "mission.eyebrow": "প্রাণী সুরক্ষায় এক প্ল্যাটফর্ম",
+    "mission.title": "অগোছালো সোশ্যাল পোস্ট নয়।<br /><em>সঠিক এলাকার মানুষের কাছে সরাসরি বার্তা।</em>",
+    "mission.badge": "বাংলাদেশের প্রাণীদের জন্য",
+    "mission.exampleLabel": "একটি বাস্তব উদাহরণ",
     "mission.exampleTitle": "ধানমন্ডি ১০ থেকে আপনার বিড়ালটি হারিয়ে গেছে।",
-    "mission.exampleText": "অসংখ্য গ্রুপে পোস্ট না করে, PawNir সেই এলাকার নিবন্ধিত প্রাণীপ্রেমীদের সাথে সাথে জানাতে পারে: <strong>“আপনার কাছেই একটি পোষা প্রাণী হারিয়েছে।”</strong>",
-    "mission.exampleNote": "শুধুমাত্র আনুমানিক এলাকা · সম্মতিতেই যোগাযোগের তথ্য",
+    "mission.exampleText": "অসংখ্য অসংলগ্ন গ্রুপে পোস্ট না করে, PawNir ওই এলাকার নিবন্ধিত প্রাণীপ্রেমীদের ফোনে সাথে সাথে সতর্কবার্তা পাঠায়: <strong>“আপনার এলাকায় একটি পোষা প্রাণী হারিয়েছে।”</strong> সম্পূর্ণ স্থানীয়, নিরাপদ ও কার্যকর।",
+    "mission.exampleNote": "শুধুমাত্র আনুমানিক এলাকা · উভয়পক্ষের সম্মতিতে যোগাযোগ",
     "mission.alertTitle": "আপনার কাছেই হারানো প্রাণী",
     "mission.alertSub": "ধানমন্ডি ১০ এর কাছে বিড়াল রিপোর্ট করা হয়েছে",
-    "mission.alertMeta": "এই এলাকার ৮৯ জন PawNir সদস্যকে জানানো হয়েছে",
-    "mission.safety": "<strong>আমাদের নিরাপত্তা প্রতিশ্রুতি:</strong> PawNir-এ জীবন্ত প্রাণী কেনা-বেচা সম্পূর্ণ নিষিদ্ধ। যাচাইকরণ, সম্মতি এবং প্রাণী কল্যাণই আমাদের মূল ভিত্তি।",
-    "service.lostTitle": "হারানো ও পাওয়া অ্যালার্ট",
-    "service.lostDesc": "সঠিক এলাকার প্রাণীপ্রেমীদের কাছে দ্রুত বার্তা পৌঁছান।",
-    "service.adoptTitle": "নিরাপদ দত্তক",
-    "service.adoptDesc": "যাচাই ও ফলো-আপের মাধ্যমে নিরাপদ দত্তক নিন।",
-    "service.bloodTitle": "রক্তদাতা নেটওয়ার্ক",
-    "service.bloodDesc": "আপনার পোষা প্রাণীর কাছে নিবন্ধিত রক্তদাতা খুঁজুন।",
-    "service.circleTitle": "লোকাল সার্কেল",
-    "service.circleDesc": "আপনার এলাকার প্রাণীপ্রেমীদের সাথে যুক্ত হোন।",
+    "mission.alertMeta": "এই এলাকার ৮৯ জন প্রাণীপ্রেমীকে সতর্ক করা হয়েছে",
+    "mission.safety": "<strong>নিরাপত্তা ও নৈতিকতার অঙ্গীকার:</strong> PawNir-এ জীবন্ত প্রাণী কেনা-বেচা আইনত ও নীতিগতভাবে সম্পূর্ণ নিষিদ্ধ। যাচাইকরণ, সম্মতি এবং প্রাণী কল্যাণই আমাদের একমাত্র লক্ষ্য।",
+    "service.lostTitle": "হারানো ও প্রাপ্তি অ্যালার্ট",
+    "service.lostDesc": "আপনার এলাকার মানবিক মানুষদের কাছে দ্রুত সন্ধানবার্তা।",
+    "service.adoptTitle": "নিরাপদ দত্তক ও পুনর্বাসন",
+    "service.adoptDesc": "যাচাই ও নিয়মিত ফলো-আপের মাধ্যমে প্রাণীকে দিন সুরক্ষিত নতুন পরিবার।",
+    "service.bloodTitle": "জরুরি রক্তদাতা নেটওয়ার্ক",
+    "service.bloodDesc": "সংকটাপন্ন মুহূর্তে পোষা প্রাণীর রক্তের গ্রুপ অনুযায়ী কাছের রক্তদাতা।",
+    "service.circleTitle": "স্থানীয় অ্যানিমেল সার্কেল",
+    "service.circleDesc": "আপনার এলাকার প্রাণীপ্রেমীদের সাথে সরাসরি যুক্ত হোন।",
     "service.vetTitle": "জরুরি ভেট সেবা",
-    "service.vetDesc": "প্রয়োজনে দ্রুত ভেটেরিনারি সহায়তা খুঁজুন।",
-    "service.fosterTitle": "ফস্টার ও শেল্টার",
-    "service.fosterDesc": "নিবন্ধিত ফস্টার এবং নিরাপদ আশ্রয় কেন্দ্র খুঁজুন।",
-    "service.shopTitle": "পেট শপ ও পরিবহন",
-    "service.shopDesc": "PetBhai-এর মাধ্যমে প্রয়োজনীয় সামগ্রী ও পরিবহন সেবা নিন।",
-    "lost.eyebrow": "কাছাকাছি মানুষের সহায়তা",
-    "lost.title": "আপনার আশেপাশে হারানো ও পাওয়া",
-    "lost.reportBtn": "রিপোর্ট করুন",
-    "lost.alertBtn": "এই এলাকার অ্যালার্ট পান",
-    "donor.eyebrow": "জরুরি মুহূর্তে সহায়তা",
+    "service.vetDesc": "প্রয়োজনের মুহূর্তে সঠিক ভেটেরিনারি পরামর্শ ও সহায়তা।",
+    "service.fosterTitle": "ফস্টার ও আশ্রয়কেন্দ্র",
+    "service.fosterDesc": "গুগল ম্যাপসে নিবন্ধিত নিরাপদ ফস্টার হোম ও শেল্টার।",
+    "service.shopTitle": "সামগ্রী ও জরুরি পরিবহন",
+    "service.shopDesc": "PetBhai-এর মাধ্যমে প্রয়োজনীয় খাবার ও প্রাণী পরিবহনের সহায়তা।",
+    "lost.eyebrow": "কাছাকাছি মানুষের ভালোবাসা",
+    "lost.title": "আপনার আশেপাশে হারানো ও পাওয়া প্রাণী",
+    "lost.reportBtn": "হারানো প্রাণীর রিপোর্ট করুন",
+    "lost.alertBtn": "আমার এলাকায় অ্যালার্ট চালু করুন",
+    "donor.eyebrow": "জরুরি সংকট মুহূর্তে",
     "donor.title": "প্রাণী রক্তদাতা নেটওয়ার্ক",
-    "donor.registerBtn": "রক্তদাতা নিবন্ধন",
-    "donor.disclaimer": "PawNir সম্মতিপ্রাপ্ত দাতাদের যুক্ত করে; রক্ত দেওয়ার আগে অবশ্যই ভেটেরিনারিয়ানের পরামর্শ ও পরীক্ষা আবশ্যক।",
-    "adopt.eyebrow": "একটি নিরাপদ নতুন ঘর",
-    "adopt.title": "দায়িত্বশীলভাবে দত্তক নিন",
-    "foster.eyebrow": "নিবন্ধিত স্থানীয় সেবা",
-    "foster.title": "ফস্টার বা শেল্টার খুঁজুন",
-    "vet.eyebrow": "আরও উন্নত সেবা আসছে",
-    "vet.title": "পেইড ভেট কনসালটেশন,<br /><em>PawNir-এর ভেতরেই।</em>",
-    "vet.desc": "আমরা PawNir-এ সরাসরি ভেট অ্যাপয়েন্টমেন্ট ও অনলাইন পরামর্শ সেবা চালু করছি। তার আগ পর্যন্ত আমাদের পার্টনার Catwaala-তে স্থানীয় ভেট খুঁজুন।",
+    "donor.registerBtn": "রক্তদাতা হিসেবে যুক্ত হোন",
+    "donor.disclaimer": "PawNir সম্মতিপ্রাপ্ত দাতাদের তালিকাভুক্ত করে; রক্ত সঞ্চালনের আগে অবশ্যই রেজিস্টার্ড ভেটেরিনারিয়ানের ক্রস-ম্যাচ ও স্বাস্থ্য পরীক্ষা আবশ্যক।",
+    "adopt.eyebrow": "একটি নিরাপদ ও মায়ার ঠিকানা",
+    "adopt.title": "ভালোবাসায় দত্তক নিন বা পুনর্বাসন করুন",
+    "adopt.btnList": "+ দত্তকের জন্য যুক্ত করুন",
+    "adopt.filterAll": "সকল প্রাণী",
+    "adopt.filterCats": "🐱 বিড়াল",
+    "adopt.filterDogs": "🐶 কুকুর",
+    "adopt.filterBirds": "🦜 পাখি",
+    "adopt.filterRabbits": "🐰 খরগোশ",
+    "foster.eyebrow": "যাচাইকৃত স্থানীয় যত্ন",
+    "foster.title": "ফস্টার বা নিরাপদ আশ্রয়কেন্দ্র খুঁজুন",
+    "vet.eyebrow": "বিশেষজ্ঞ চিকিৎসকের যত্ন",
+    "vet.title": "অনলাইন ভেট কনসালটেশন,<br /><em>PawNir-এর ভেতরেই।</em>",
+    "vet.desc": "আমরা অভিজ্ঞ ভেটেরিনারিয়ানদের সমন্বয়ে সরাসরি অ্যাপয়েন্টমেন্ট ও ডিজিটাল প্রেসক্রিপশন সেবা প্রস্তুত করছি। ততক্ষণ আমাদের পার্টনার Catwaala-তে স্থানীয় ভেটদের তথ্য দেখতে পারেন।",
     "vet.btn": "Catwaala-তে স্থানীয় ভেট খুঁজুন",
-    "vet.artTitle": "পেইড ভেট সেবা",
+    "vet.artTitle": "ভেট কনসালটেশন",
     "vet.artSub": "শীঘ্রই আসছে PawNir-এ",
-    "how.eyebrow": "শুরু থেকে শেষ পর্যন্ত সহজ",
-    "how.title": "সহজ তিন ধাপে সেবা",
+    "how.eyebrow": "সহজ ও কার্যকর",
+    "how.title": "সহজ তিন ধাপে সুরক্ষা",
     "how.step1Title": "কাছের সহায়তা খুঁজুন",
-    "how.step1Desc": "এলাকা অনুযায়ী রক্তদাতা, দত্তক, ফস্টার বা স্থানীয় ভেট খুঁজুন।",
-    "how.step2Title": "সম্মতির সাথে যোগাযোগ",
-    "how.step2Desc": "ব্যক্তিগত নম্বর প্রকাশ না করেই নিরাপদে অনুরোধ পাঠান।",
-    "how.step3Title": "প্রতিটি প্রাণী থাকুক নিরাপদ",
-    "how.step3Desc": "পোষা প্রাণীর প্রোফাইল ও অ্যালার্ট এক জায়গাতেই রাখুন।",
-    "banner.eyebrow": "ভেটেরিনারি পেশাজীবীদের জন্য",
-    "banner.title": "যত্নের জন্য রাখুন<br /><em>আরও বেশি সময়।</em>",
-    "banner.desc": "আপনার চেম্বার ও রোগীদের সেবা আরও সহজ করতে PawNir-এ যুক্ত হোন।",
+    "how.step1Desc": "এলাকা অনুযায়ী রক্তদাতা, দত্তকের প্রাণী, ফস্টার বা ভেট সেন্টার খুঁজুন।",
+    "how.step2Title": "নিরাপদ যোগাযোগ",
+    "how.step2Desc": "ব্যক্তিগত গোপনীয়তা বজায় রেখে প্ল্যাটফর্মের মাধ্যমে যোগাযোগ করুন।",
+    "how.step3Title": "প্রতিটি প্রাণীর সুরক্ষা",
+    "how.step3Desc": "ডিজিটাল পেট পাসপোর্ট, ভ্যাকসিন হিস্ট্রি ও এলাকার সতর্কবার্তা একসাথে।",
+    "banner.eyebrow": "ভেটেরিনারি চিকিৎসকদের জন্য",
+    "banner.title": "সেবার জন্য থাকুক<br /><em>আরও বেশি সময়।</em>",
+    "banner.desc": "আপনার চেম্বার ও রোগীদের সেবা আরও ডিজিটাল করতে PawNir নেটওয়ার্কে যুক্ত হোন।",
     "banner.btn": "PawNir-এ যোগ দিন"
   }
 };
@@ -626,21 +641,19 @@ function selectFosterOnMap(foster, scrollIntoMap = false) {
     iframe.src = foster.embedMapUrl;
     iframe.dataset.currentSrc = foster.embedMapUrl;
   }
-  const activeCard = document.getElementById("foster-map-active-card");
-  if (activeCard) {
-    const ratingText = foster.rating ? `★ ${foster.rating} (${foster.reviewCount} reviews)` : "New community foster";
-    activeCard.innerHTML = `
-      <span class="verified-badge"><span class="icon icon-check" aria-hidden="true"></span> ${escapeHtml(foster.city)} · ${escapeHtml(foster.area)}</span>
-      <h3>${escapeHtml(foster.name)}</h3>
-      <p>${escapeHtml(foster.description)}</p>
-      <small><strong>${escapeHtml(ratingText)}</strong> · ${escapeHtml(foster.capacity)}</small>
-    `;
+  const ratingText = foster.rating ? `★ ${foster.rating} (${foster.reviewCount} reviews)` : "New community foster";
+  const activeTitle = document.getElementById("foster-map-active-title");
+  if (activeTitle) activeTitle.textContent = foster.name;
+  const activeMeta = document.getElementById("foster-map-active-meta");
+  if (activeMeta) activeMeta.textContent = `⌖ ${foster.area}, ${foster.city} · ★ ${foster.rating || "5.0"} (${foster.reviewCount || 0} reviews)`;
+  const activeDesc = document.getElementById("foster-map-active-desc");
+  if (activeDesc) activeDesc.textContent = foster.description;
+
+  const dirLink = document.getElementById("foster-map-directions-link") || document.getElementById("foster-map-external-link");
+  if (dirLink && (foster.mapUrl || foster.embedMapUrl)) {
+    dirLink.href = foster.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(foster.name + " " + foster.area + " Bangladesh")}`;
   }
-  const dirLink = document.getElementById("foster-map-directions-link");
-  if (dirLink && foster.mapUrl) {
-    dirLink.href = foster.mapUrl;
-  }
-  const reviewBtn = document.getElementById("foster-map-review-btn");
+  const reviewBtn = document.getElementById("foster-map-review-btn") || document.getElementById("foster-map-reviews-btn");
   if (reviewBtn) {
     reviewBtn.onclick = (event) => openFosterReviews(foster.id, foster.name, event.currentTarget);
   }
@@ -978,30 +991,99 @@ async function loadDonors() {
 }
 
 async function loadAdoptions() {
-  const response = await fetch("/api/adoptions");
-  const listings = await response.json();
-  const homeCountAdopt = document.getElementById("home-count-adopt");
-  if (homeCountAdopt && Array.isArray(listings)) {
-    homeCountAdopt.textContent = `${listings.length} pet${listings.length === 1 ? "" : "s"} ready ↗`;
+  const areaInput = document.getElementById("adoption-area-input");
+  const area = areaInput ? areaInput.value.trim() : "";
+  const params = new URLSearchParams();
+  if (adoptionSpeciesFilter) params.set("species", adoptionSpeciesFilter);
+  if (area) params.set("area", area);
+  params.set("includeMine", "1");
+
+  const token = localStorage.getItem("pawnir_token");
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+  try {
+    const response = await fetch(`/api/adoptions?${params.toString()}`, { headers });
+    const data = await response.json();
+    const listings = Array.isArray(data) ? data : (Array.isArray(data.listings) ? data.listings : []);
+
+    const homeCountAdopt = document.getElementById("home-count-adopt");
+    if (homeCountAdopt) {
+      homeCountAdopt.textContent = `${listings.length} pet${listings.length === 1 ? "" : "s"} ready ↗`;
+    }
+
+    const grid = document.getElementById("adoption-grid");
+    if (!grid) return;
+
+    if (!listings.length) {
+      grid.innerHTML = '<p class="inline-state">No adoption listings match your filter right now. Have an animal needing a safe home? Click <strong>+ List a pet for adoption</strong> above.</p>';
+      return;
+    }
+
+    grid.innerHTML = listings.map((listing) => {
+      const isOwner = Boolean(listing.isOwner || (state.user && listing.ownerId === state.user.id));
+      const speciesEmoji = listing.species === "cat" ? "🐱" : listing.species === "dog" ? "🐶" : listing.species === "bird" ? "🦜" : listing.species === "rabbit" ? "🐰" : "🐾";
+      const statusPill = listing.status === "adopted"
+        ? '<span class="adoption-badge-pill adopted">Rehomed ✓</span>'
+        : (isOwner ? '<span class="adoption-badge-pill owner">Your Listing</span>' : '<span class="adoption-badge-pill open">Open for Adoption</span>');
+      const vaxBadge = listing.vaccinated !== false ? '<span class="adoption-tag">💉 Vaccinated</span>' : '';
+      const neuteredBadge = listing.neutered ? '<span class="adoption-tag">✂ Neutered</span>' : '';
+      const indoorBadge = listing.indoorOnly ? '<span class="adoption-tag">🏠 Indoor</span>' : '';
+
+      return `
+        <article class="adoption-card ${isOwner ? 'is-my-listing' : ''}">
+          <div class="adoption-card-header">
+            <span class="adoption-species-avatar">${speciesEmoji}</span>
+            ${statusPill}
+          </div>
+          <h3>${escapeHtml(listing.name)}</h3>
+          <div class="adoption-meta-row">
+            <span>⌖ ${escapeHtml(listing.area || "Dhaka")}</span>
+            <span>🎂 ${escapeHtml(listing.age || "Young")}</span>
+            ${listing.gender ? `<span>${escapeHtml(listing.gender)}</span>` : ""}
+            ${listing.breed ? `<span>${escapeHtml(listing.breed)}</span>` : ""}
+          </div>
+          <p class="adoption-desc">${escapeHtml(listing.description || "")}</p>
+          <div class="adoption-tags-row">
+            ${vaxBadge}
+            ${neuteredBadge}
+            ${indoorBadge}
+          </div>
+          <div class="adoption-card-actions">
+            ${isOwner
+              ? `<button class="btn btn-small btn-outline manage-my-adopt-btn" type="button">Manage in Profile ↗</button>`
+              : `<button class="btn btn-small btn-primary adoption-apply-button" data-listing="${escapeHtml(listing.id)}" data-name="${escapeHtml(listing.name)}" type="button">Apply to adopt ♡</button>`
+            }
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    grid.querySelectorAll(".adoption-apply-button").forEach((button) =>
+      button.addEventListener("click", (event) => {
+        selectedAdoption = { id: button.dataset.listing, name: button.dataset.name };
+        if (!localStorage.getItem("pawnir_token")) {
+          showAuthStep("credentials");
+          document.getElementById("auth-status").textContent = "Sign in first to apply for adoption.";
+          openDialog(document.getElementById("auth-dialog"), event.currentTarget);
+          return;
+        }
+        document.getElementById("adoption-form-title").textContent = `Apply to adopt ${selectedAdoption.name}`;
+        document.getElementById("adoption-status").textContent = "";
+        document.getElementById("adoption-pdf-link").hidden = true;
+        openDialog(document.getElementById("adoption-dialog"), event.currentTarget);
+      })
+    );
+
+    grid.querySelectorAll(".manage-my-adopt-btn").forEach((button) =>
+      button.addEventListener("click", (event) => {
+        openDialog(document.getElementById("dashboard-dialog"), event.currentTarget);
+        const activityTab = document.querySelector('[data-dash-tab="activity"]');
+        if (activityTab) activityTab.click();
+      })
+    );
+  } catch (err) {
+    // network error fallback
   }
-  document.getElementById("adoption-grid").innerHTML = listings.length
-    ? listings.map((listing) => `<article class="adoption-card"><span class="adoption-mark">♡</span><h3>${escapeHtml(listing.name)}</h3><p>${escapeHtml(listing.species)} · ${escapeHtml(listing.area)}</p><p>${escapeHtml(listing.description)}</p><button class="btn btn-small btn-dark adoption-apply-button" data-listing="${escapeHtml(listing.id)}" data-name="${escapeHtml(listing.name)}" type="button">Apply safely</button></article>`).join("")
-    : '<p class="inline-state">No verified adoption listings are open right now.</p>';
-  document.querySelectorAll(".adoption-apply-button").forEach((button) =>
-    button.addEventListener("click", (event) => {
-      selectedAdoption = { id: button.dataset.listing, name: button.dataset.name };
-      if (!localStorage.getItem("pawnir_token")) {
-        showAuthStep("credentials");
-        document.getElementById("auth-status").textContent = "Sign in first to apply for adoption.";
-        openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-        return;
-      }
-      document.getElementById("adoption-form-title").textContent = `Apply to adopt ${selectedAdoption.name}`;
-      document.getElementById("adoption-status").textContent = "";
-      document.getElementById("adoption-pdf-link").hidden = true;
-      openDialog(document.getElementById("adoption-dialog"), event.currentTarget);
-    })
-  );
 }
 
 async function loadPets() {
@@ -1021,43 +1103,147 @@ async function loadPets() {
 
 async function loadDashboard() {
   const token = localStorage.getItem("pawnir_token");
-  if (!token) {
-    document.getElementById("dashboard-bookings").textContent = "Sign in to see your visits.";
-    return;
-  }
+  if (!token) return;
   const headers = { Authorization: `Bearer ${token}` };
-  const [bookings, petList, prescriptions, profile, fosterRequests] = await Promise.all(
-    ["/api/bookings", "/api/pets", "/api/prescriptions", "/api/auth/me", "/api/foster-requests"].map((path) =>
-      fetch(path, { headers }).then((res) => (res.ok ? res.json() : []))
-    )
-  );
+
+  const [bookings, petList, prescriptions, profile, fosterRequests, adoptionsData, lostData] = await Promise.all([
+    fetch("/api/bookings", { headers }).then((res) => (res.ok ? res.json() : [])),
+    fetch("/api/pets", { headers }).then((res) => (res.ok ? res.json() : [])),
+    fetch("/api/prescriptions", { headers }).then((res) => (res.ok ? res.json() : [])),
+    fetch("/api/auth/me", { headers }).then((res) => (res.ok ? res.json() : null)),
+    fetch("/api/foster-requests", { headers }).then((res) => (res.ok ? res.json() : [])),
+    fetch("/api/adoptions?includeMine=1", { headers }).then((res) => (res.ok ? res.json() : [])),
+    fetch("/api/lost-found", { headers }).then((res) => (res.ok ? res.json() : []))
+  ]);
+
   if (profile && profile.user) {
     state.user = profile.user;
     updateAuthUI();
-    document.getElementById("profile-name").value = profile.user.name || "";
-    document.getElementById("profile-area").value = profile.user.area || "";
-    document.getElementById("profile-bio").value = profile.user.bio || "";
-  }
-  document.getElementById("dashboard-pets").innerHTML = Array.isArray(petList) && petList.length
-    ? petList.map((pet) => `<div class="dashboard-item"><strong>${escapeHtml(pet.name)}</strong><span>${escapeHtml(pet.species)}${pet.breed ? ` · ${escapeHtml(pet.breed)}` : ""}</span></div>`).join("")
-    : "Add your first pet below.";
+    const initials = (state.user.name || "P").charAt(0).toUpperCase();
+    const initialsEl = document.getElementById("dashboard-user-initials");
+    if (initialsEl) initialsEl.textContent = initials;
+    const nameEl = document.getElementById("dashboard-user-name");
+    if (nameEl) nameEl.textContent = state.user.name || "Pet Parent";
+    const emailEl = document.getElementById("dashboard-user-email");
+    if (emailEl) emailEl.textContent = state.user.email || "";
+    const areaChip = document.getElementById("dashboard-user-area-chip");
+    if (areaChip) areaChip.textContent = `⌖ ${state.user.area || "Dhaka"}`;
 
+    const profName = document.getElementById("profile-name");
+    if (profName) profName.value = state.user.name || "";
+    const profArea = document.getElementById("profile-area");
+    if (profArea) profArea.value = state.user.area || "";
+    const profBio = document.getElementById("profile-bio");
+    if (profBio) profBio.value = state.user.bio || "";
+  }
+
+  // 1. Pet Passports Grid
+  const petsGrid = document.getElementById("dashboard-pets");
+  if (petsGrid) {
+    if (Array.isArray(petList) && petList.length) {
+      pets = petList;
+      petsGrid.innerHTML = petList.map((pet) => {
+        const icon = pet.species === "cat" ? "🐱" : pet.species === "dog" ? "🐶" : pet.species === "bird" ? "🦜" : pet.species === "rabbit" ? "🐰" : "🐾";
+        return `
+          <div class="pet-passport-card">
+            <div class="passport-icon">${icon}</div>
+            <div class="passport-info">
+              <strong>${escapeHtml(pet.name)}</strong>
+              <p>${escapeHtml(pet.species.toUpperCase())}${pet.breed ? ` · ${escapeHtml(pet.breed)}` : ""}${pet.age ? ` · ${escapeHtml(pet.age)}` : ""}</p>
+              <div class="passport-tags">
+                <span class="passport-tag">Verified Digital Passport</span>
+                <span class="passport-tag tag-green">✓ Active Care</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    } else {
+      petsGrid.innerHTML = '<p class="inline-state">No pet passports registered yet. Click <strong>+ Register pet</strong> to add your first companion.</p>';
+    }
+  }
+
+  // 2. User's Adoption Listings
+  const myAdoptionsEl = document.getElementById("dashboard-my-adoptions");
+  if (myAdoptionsEl) {
+    const rawList = Array.isArray(adoptionsData) ? adoptionsData : (Array.isArray(adoptionsData.myListings) ? adoptionsData.myListings : []);
+    const myListings = rawList.filter((item) => item.isOwner || (state.user && item.ownerId === state.user.id));
+    if (myListings.length) {
+      myAdoptionsEl.innerHTML = myListings.map((item) => `
+        <div class="dashboard-item">
+          <div>
+            <strong>${escapeHtml(item.name)} (${escapeHtml(item.species)})</strong>
+            <span>${escapeHtml(item.area || "Dhaka")} · Status: <strong class="${item.status === "adopted" ? "text-green" : ""}">${escapeHtml(item.status || "open")}</strong></span>
+          </div>
+          ${item.status !== "adopted"
+            ? `<button class="btn btn-small btn-primary mark-rehomed-btn" data-rehome-id="${escapeHtml(item.id)}" type="button">Mark Rehomed ✓</button>`
+            : `<small class="status-pill-rehomed">Rehomed successfully ✓</small>`
+          }
+        </div>
+      `).join("");
+
+      myAdoptionsEl.querySelectorAll(".mark-rehomed-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          const patchRes = await fetch(`/api/adoptions/listings/${encodeURIComponent(btn.dataset.rehomeId)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ status: "adopted" })
+          });
+          if (patchRes.ok) {
+            showToast("Marked as safely rehomed! 🎉");
+            await Promise.all([loadDashboard(), loadAdoptions()]);
+          } else {
+            showToast("Unable to update listing status.");
+            btn.disabled = false;
+          }
+        });
+      });
+    } else {
+      myAdoptionsEl.innerHTML = '<p class="inline-state">No adoption listings published yet. Rehome a rescue directly from the adoption portal.</p>';
+    }
+  }
+
+  // 3. User's Lost & Found Alerts
+  const myLostEl = document.getElementById("dashboard-my-lost");
+  if (myLostEl) {
+    const myLost = (Array.isArray(lostData) ? lostData : []).filter((item) => state.user && (item.userId === state.user.id || item.reportedBy === state.user.name));
+    if (myLost.length) {
+      myLostEl.innerHTML = myLost.map((item) => `
+        <div class="dashboard-item">
+          <div>
+            <strong>${escapeHtml(item.title || item.species)}</strong>
+            <span>${escapeHtml(item.area || item.city)} · Status: <strong>${escapeHtml(item.status || "active")}</strong></span>
+          </div>
+          <span class="profile-area-pill">${escapeHtml(item.type === "lost" ? "Lost Pet" : "Found Pet")}</span>
+        </div>
+      `).join("");
+    } else {
+      myLostEl.innerHTML = '<p class="inline-state">No active lost or found alerts posted by you.</p>';
+    }
+  }
+
+  // 4. Foster Care Requests
   const fosterEl = document.getElementById("dashboard-foster-requests");
   if (fosterEl) {
     fosterEl.innerHTML = Array.isArray(fosterRequests) && fosterRequests.length
-      ? fosterRequests.slice(0, 4).map((req) => `<div class="dashboard-item"><strong>Foster request</strong><span>${escapeHtml(req.reason.slice(0, 60))}</span><small>Status: ${escapeHtml(req.status)}</small></div>`).join("")
-      : "No foster requests yet.";
+      ? fosterRequests.slice(0, 4).map((req) => `<div class="dashboard-item"><strong>Foster inquiry</strong><span>${escapeHtml(req.reason ? req.reason.slice(0, 60) : "")}</span><small>Status: ${escapeHtml(req.status || "pending")}</small></div>`).join("")
+      : '<p class="inline-state">No foster requests yet.</p>';
   }
 
+  // 5. Clinic Visits & Prescriptions
   const bookingItems = Array.isArray(bookings) ? bookings : [];
   const rxItems = Array.isArray(prescriptions) ? prescriptions : [];
-  if (bookingItems.length || rxItems.length) {
-    document.getElementById("dashboard-bookings").innerHTML = [
-      ...bookingItems.slice(0, 3).map((booking) => `<div class="dashboard-item"><strong>${escapeHtml(booking.vetName)}</strong><span>${escapeHtml(booking.date)} · ${escapeHtml(booking.time)}</span><small>${escapeHtml(booking.petName || "Pet")} · ${escapeHtml(booking.status)}</small></div>`),
-      ...rxItems.slice(0, 2).map((item) => `<div class="dashboard-item"><strong>Rx: ${escapeHtml(item.items?.[0]?.medicine || "Prescription")}</strong><span>${new Date(item.issuedAt).toLocaleDateString("en-BD")}</span></div>`)
-    ].join("");
-  } else {
-    document.getElementById("dashboard-bookings").textContent = "No visits or prescriptions yet.";
+  const bookingsEl = document.getElementById("dashboard-bookings");
+  if (bookingsEl) {
+    if (bookingItems.length || rxItems.length) {
+      bookingsEl.innerHTML = [
+        ...bookingItems.slice(0, 3).map((booking) => `<div class="dashboard-item"><strong>${escapeHtml(booking.vetName || "Vet")}</strong><span>${escapeHtml(booking.date || "")} · ${escapeHtml(booking.time || "")}</span><small>${escapeHtml(booking.petName || "Pet")} · ${escapeHtml(booking.status || "confirmed")}</small></div>`),
+        ...rxItems.slice(0, 2).map((item) => `<div class="dashboard-item"><strong>Rx: ${escapeHtml(item.items?.[0]?.medicine || "Prescription")}</strong><span>${new Date(item.issuedAt).toLocaleDateString("en-BD")}</span></div>`)
+      ].join("");
+    } else {
+      bookingsEl.innerHTML = '<p class="inline-state">No clinic visits or prescriptions recorded yet.</p>';
+    }
   }
 }
 
@@ -1103,7 +1289,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     localStorage.setItem("pawnir_token", googleToken);
     window.history.replaceState({}, "", window.location.pathname);
     await syncSession();
-    showToast("Signed in with Google!");
+    await Promise.all([loadPets(), loadLostReports(), loadDonors(), loadNotifications(), loadAdoptions()]);
+    if (pendingReviewFoster) {
+      const foster = pendingReviewFoster;
+      pendingReviewFoster = null;
+      openFosterReviews(foster.id, foster.name);
+      showToast(`Welcome! You can now review ${foster.name}.`);
+    } else if (pendingAdoptionAction === "list") {
+      pendingAdoptionAction = null;
+      openDialog(document.getElementById("list-adoption-dialog"));
+    } else {
+      showToast("Signed in with Google!");
+    }
   } else if (googlePending) {
     state.pending2faToken = googlePending;
     window.history.replaceState({}, "", window.location.pathname);
@@ -1310,8 +1507,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     updateAuthUI();
     closeDialog(document.getElementById("auth-dialog"));
     showAuthStep("credentials");
-    showToast(`Welcome, ${result.user?.name || "Pet parent"}!`);
-    await Promise.all([loadPets(), loadLostReports(), loadDonors(), loadNotifications()]);
+    await Promise.all([loadPets(), loadLostReports(), loadDonors(), loadNotifications(), loadAdoptions()]);
+    if (pendingReviewFoster) {
+      const foster = pendingReviewFoster;
+      pendingReviewFoster = null;
+      openFosterReviews(foster.id, foster.name);
+      showToast(`Welcome! You can now review ${foster.name}.`);
+    } else if (pendingAdoptionAction === "list") {
+      pendingAdoptionAction = null;
+      openDialog(document.getElementById("list-adoption-dialog"));
+    } else {
+      showToast(`Welcome, ${result.user?.name || "Pet parent"}!`);
+    }
   });
 
   // Sign Out
@@ -1576,6 +1783,95 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Adoptions
+  document.getElementById("list-adoption-button")?.addEventListener("click", (event) => {
+    if (!localStorage.getItem("pawnir_token")) {
+      pendingAdoptionAction = "list";
+      showAuthStep("credentials");
+      document.getElementById("auth-status").textContent = "Sign in first to list an animal for adoption.";
+      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
+      return;
+    }
+    const statusEl = document.getElementById("list-adoption-status");
+    if (statusEl) statusEl.textContent = "";
+    openDialog(document.getElementById("list-adoption-dialog"), event.currentTarget);
+  });
+
+  document.querySelectorAll("[data-close-adoption-form]").forEach((btn) => {
+    btn.addEventListener("click", () => closeDialog(document.getElementById("list-adoption-dialog")));
+  });
+
+  document.querySelectorAll("#adoption-species-pills [data-adoption-species]").forEach((pill) => {
+    pill.addEventListener("click", () => {
+      adoptionSpeciesFilter = pill.dataset.adoptionSpecies || "";
+      document.querySelectorAll("#adoption-species-pills [data-adoption-species]").forEach((p) => {
+        p.classList.toggle("active", p === pill);
+      });
+      const select = document.getElementById("adoption-species-filter");
+      if (select) select.value = adoptionSpeciesFilter;
+      loadAdoptions();
+    });
+  });
+
+  document.getElementById("adoption-species-filter")?.addEventListener("change", (e) => {
+    adoptionSpeciesFilter = e.target.value;
+    document.querySelectorAll("#adoption-species-pills [data-adoption-species]").forEach((p) => {
+      p.classList.toggle("active", p.dataset.adoptionSpecies === adoptionSpeciesFilter);
+    });
+    loadAdoptions();
+  });
+
+  document.getElementById("adoption-area-input")?.addEventListener("input", () => {
+    clearTimeout(window.pawnirAdoptTimer);
+    window.pawnirAdoptTimer = setTimeout(loadAdoptions, 250);
+  });
+
+  document.getElementById("list-adoption-form")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const token = localStorage.getItem("pawnir_token");
+    if (!token) {
+      pendingAdoptionAction = "list";
+      showAuthStep("credentials");
+      document.getElementById("auth-status").textContent = "Sign in first to list an animal for adoption.";
+      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
+      return;
+    }
+    const statusEl = document.getElementById("list-adoption-status");
+    const submitBtn = document.getElementById("adopt-submit-button");
+    if (submitBtn) submitBtn.disabled = true;
+
+    const payload = {
+      name: document.getElementById("adopt-pet-name").value.trim(),
+      species: document.getElementById("adopt-pet-species").value,
+      breed: document.getElementById("adopt-pet-breed")?.value.trim() || "",
+      age: document.getElementById("adopt-pet-age").value.trim(),
+      gender: document.getElementById("adopt-pet-gender")?.value || "Unknown",
+      area: document.getElementById("adopt-pet-area").value.trim(),
+      vaccinated: document.getElementById("adopt-pet-vaccinated")?.checked !== false,
+      neutered: document.getElementById("adopt-pet-neutered")?.checked === true,
+      indoorOnly: document.getElementById("adopt-pet-indoor")?.checked !== false,
+      description: document.getElementById("adopt-pet-desc").value.trim()
+    };
+
+    const response = await fetch("/api/adoptions/listings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    if (submitBtn) submitBtn.disabled = false;
+
+    if (!response.ok) {
+      if (statusEl) statusEl.textContent = result.error || "Unable to publish listing.";
+      return;
+    }
+
+    if (statusEl) statusEl.textContent = "Adoption listing published successfully!";
+    showToast(`${result.name || "Pet"} listed for free adoption! ♡`);
+    document.getElementById("list-adoption-form").reset();
+    window.setTimeout(() => closeDialog(document.getElementById("list-adoption-dialog")), 600);
+    await Promise.all([loadAdoptions(), loadDashboard()]);
+  });
+
   document.getElementById("adoption-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const response = await fetch("/api/adoptions", {
@@ -1681,6 +1977,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!selectedFoster) return;
     const token = localStorage.getItem("pawnir_token");
     if (!token) {
+      pendingReviewFoster = { id: selectedFoster.id, name: selectedFoster.name };
       showAuthStep("credentials");
       document.getElementById("auth-status").textContent = "Sign in first to publish a verified community review.";
       openDialog(document.getElementById("auth-dialog"), event.submitter);
@@ -1740,20 +2037,49 @@ document.addEventListener("DOMContentLoaded", async () => {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({
-        name: document.getElementById("pet-name").value,
-        species: document.getElementById("pet-species").value
+        name: document.getElementById("pet-name").value.trim(),
+        species: document.getElementById("pet-species").value,
+        breed: document.getElementById("pet-breed")?.value.trim() || "",
+        age: document.getElementById("pet-age")?.value.trim() || ""
       })
     });
     const result = await response.json();
-    document.getElementById("pet-status").textContent = response.ok
-      ? `${result.name} added to your care space.`
-      : result.error;
+    const statusEl = document.getElementById("pet-status");
+    if (statusEl) statusEl.textContent = response.ok ? `${result.name} added to your care space.` : result.error;
     if (response.ok) {
       event.target.reset();
-      await loadPets();
-      await loadDashboard();
-      showToast(`${result.name} added!`);
+      event.target.hidden = true;
+      await Promise.all([loadPets(), loadDashboard()]);
+      showToast(`${result.name} added to Pet Passports!`);
     }
+  });
+
+  // Toggle pet registration form
+  document.getElementById("toggle-add-pet-btn")?.addEventListener("click", () => {
+    const pf = document.getElementById("pet-form");
+    if (pf) {
+      pf.hidden = !pf.hidden;
+      if (!pf.hidden) document.getElementById("pet-name")?.focus();
+    }
+  });
+  document.getElementById("cancel-add-pet-btn")?.addEventListener("click", () => {
+    const pf = document.getElementById("pet-form");
+    if (pf) pf.hidden = true;
+  });
+
+  // Modern Dashboard Tabs
+  document.querySelectorAll("[data-dash-tab]").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.dashTab;
+      document.querySelectorAll("[data-dash-tab]").forEach((t) => {
+        const isTarget = t === tab;
+        t.classList.toggle("is-active", isTarget);
+        t.setAttribute("aria-selected", String(isTarget));
+      });
+      document.querySelectorAll(".dash-panel").forEach((panel) => {
+        panel.classList.toggle("is-active", panel.id === `dash-panel-${target}`);
+      });
+    });
   });
 
   // Step 1 Auth Form -> Step 2 Math 2FA Verification
@@ -1804,8 +2130,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       localStorage.setItem("pawnir_token", result.token);
       await syncSession();
       closeDialog(document.getElementById("auth-dialog"));
-      await loadPets();
-      showToast("Signed in!");
+      await Promise.all([loadPets(), loadLostReports(), loadDonors(), loadNotifications(), loadAdoptions()]);
+      if (pendingReviewFoster) {
+        const foster = pendingReviewFoster;
+        pendingReviewFoster = null;
+        openFosterReviews(foster.id, foster.name);
+        showToast(`Welcome! You can now review ${foster.name}.`);
+      } else if (pendingAdoptionAction === "list") {
+        pendingAdoptionAction = null;
+        openDialog(document.getElementById("list-adoption-dialog"));
+      } else {
+        showToast("Signed in!");
+      }
     }
   });
 

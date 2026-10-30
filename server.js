@@ -1416,8 +1416,85 @@ async function routeApi(req, res, urlObj, tenantId, user) {
   }
 
   if (pathname === "/api/adoptions" && req.method === "GET") {
+      const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
+      const area = cleanText(urlObj.searchParams.get("area"), 60).toLowerCase();
+      const includeMine = urlObj.searchParams.get("includeMine") === "1";
       const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
-      sendJson(res, 200, listings.filter((item) => item.status === "open" && item.verified));
+      const openListings = listings.filter((item) => {
+        if (item.status !== "open" || !item.verified) return false;
+        if (species && (item.species || "").toLowerCase() !== species) return false;
+        if (area && !((item.area || "").toLowerCase().includes(area) || (item.name || "").toLowerCase().includes(area))) return false;
+        return true;
+      });
+      const myListings = (user && includeMine)
+        ? listings.filter((item) => item.ownerId === user.sub)
+        : [];
+      sendJson(res, 200, includeMine ? { listings: openListings, myListings } : openListings);
+      return;
+  }
+  if (pathname === "/api/adoptions/listings" && req.method === "POST") {
+      if (!user) return sendJson(res, 401, { error: "Sign in is required to list an animal for adoption" });
+      const body = await readBodyJson(req);
+      const name = cleanText(body.name, 60);
+      const species = cleanText(body.species, 20).toLowerCase();
+      const breed = cleanText(body.breed, 60) || "Mixed Breed";
+      const age = cleanText(body.age, 40) || "Young";
+      const gender = cleanText(body.gender, 20) || "Unknown";
+      const area = cleanText(body.area, 80);
+      const description = cleanText(body.description, 500);
+      const vaccinated = body.vaccinated !== false;
+      const neutered = body.neutered === true;
+      const indoorOnly = body.indoorOnly !== false;
+      const photo = body.photo && typeof body.photo === "string" && body.photo.startsWith("data:image/") ? body.photo : null;
+
+      if (!name || !species || !area || description.length < 10) {
+        return sendJson(res, 400, { error: "Pet name, species, area, and a clear description are required." });
+      }
+
+      const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
+      const listing = {
+        id: `adoption-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        ownerId: user.sub,
+        ownerName: cleanText(user.name || "PawNir pet parent", 80),
+        name,
+        species,
+        breed,
+        age,
+        gender,
+        area,
+        vaccinated,
+        neutered,
+        indoorOnly,
+        description,
+        photo,
+        status: "open",
+        verified: true,
+        createdAt: new Date().toISOString()
+      };
+      await appState.storage.writeCollection(tenantId, "adoptionListings", [listing, ...listings]);
+      await appendAudit(tenantId, user.email, "adoption.listing.created", { listingId: listing.id, name });
+      pushSse(tenantId, "adoption_update", { action: "listing_created", listingId: listing.id });
+      sendJson(res, 201, listing);
+      return;
+  }
+  const adoptionListingMatch = pathname.match(/^\/api\/adoptions\/listings\/([^/]+)$/);
+  if (adoptionListingMatch && req.method === "PATCH") {
+      if (!user) return sendJson(res, 401, { error: "Sign in is required to update an adoption listing" });
+      const listingId = decodeURIComponent(adoptionListingMatch[1]);
+      const body = await readBodyJson(req);
+      const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
+      const idx = listings.findIndex((item) => item.id === listingId);
+      if (idx < 0) return sendJson(res, 404, { error: "Adoption listing not found" });
+      if (listings[idx].ownerId !== user.sub && user.role !== "admin") {
+        return sendJson(res, 403, { error: "You can only update your own adoption listings" });
+      }
+      const allowedStatuses = ["open", "adopted", "closed"];
+      const nextStatus = allowedStatuses.includes(body.status) ? body.status : listings[idx].status;
+      listings[idx] = { ...listings[idx], status: nextStatus, updatedAt: new Date().toISOString() };
+      await appState.storage.writeCollection(tenantId, "adoptionListings", listings);
+      await appendAudit(tenantId, user.email, "adoption.listing.updated", { listingId, status: nextStatus });
+      pushSse(tenantId, "adoption_update", { action: "listing_updated", listingId, status: nextStatus });
+      sendJson(res, 200, listings[idx]);
       return;
   }
   if (pathname === "/api/adoptions" && req.method === "POST") {
@@ -1732,7 +1809,7 @@ async function routeApi(req, res, urlObj, tenantId, user) {
       return sendJson(res, 400, { error: "Pet name and supported species are required" });
     }
     const pets = await appState.storage.readCollection(tenantId, "pets");
-    const pet = { id: `pet-${Date.now()}`, ownerId: user.sub, name: String(body.name).trim(), species: body.species, breed: String(body.breed || "").trim(), notes: String(body.notes || "").trim(), createdAt: new Date().toISOString() };
+    const pet = { id: `pet-${Date.now()}`, ownerId: user.sub, name: String(body.name).trim(), species: body.species, breed: String(body.breed || "").trim(), age: String(body.age || "").trim(), notes: String(body.notes || "").trim(), createdAt: new Date().toISOString() };
     await appState.storage.writeCollection(tenantId, "pets", [pet, ...pets]);
     await appendAudit(tenantId, user.email, "pet.created", { petId: pet.id });
     return sendJson(res, 201, pet);

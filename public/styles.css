@@ -1,6 +1,6 @@
 :root{--ink:#19332f;--muted:#6d827e;--paper:#fbfaf7;--surface:#fff;--surface-soft:#f2f7f3;--mint:#dff3ea;--green:#287d61;--dark:#193d35;--line:#dce7e1;--peach:#f8e6d8;--lavender:#e9e5f5;--blue:#dfeef2;--shadow-color:#234d3b0d;--glass-nav:rgba(255,255,255,.72);--glass-card:rgba(255,255,255,.78);--glass-footer:rgba(25,61,53,.94);--glass-line:rgba(255,255,255,.68);--glass-inset:rgba(255,255,255,.82);--glass-blur:18px;color-scheme:light}
 :root[data-theme=dark]{--ink:#e7f2ed;--muted:#9bb2aa;--paper:#111a18;--surface:#192622;--surface-soft:#1d302a;--mint:#173b30;--green:#6dc39f;--dark:#dff3ea;--line:#30443d;--peach:#4a3429;--lavender:#342f4b;--blue:#263d43;--shadow-color:#0008;--glass-nav:rgba(22,36,32,.78);--glass-card:rgba(28,45,39,.84);--glass-footer:rgba(12,27,23,.95);--glass-line:rgba(181,226,207,.2);--glass-inset:rgba(223,243,234,.16);color-scheme:dark}
-*{box-sizing:border-box}html{scroll-behavior:smooth;overflow-x:hidden}body{margin:0;color:var(--ink);font:15px/1.55 "DM Sans",sans-serif;background:var(--paper);overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(#d5e8df .7px,transparent .7px);background-size:22px 22px;opacity:.35;z-index:-1}
+*{box-sizing:border-box}html{scroll-behavior:smooth;overflow-x:hidden}body{margin:0;color:var(--ink);font:15px/1.55 "IBM Plex Sans","IBM Plex Sans Bengali",-apple-system,sans-serif;background:var(--paper);overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(#d5e8df .7px,transparent .7px);background-size:22px 22px;opacity:.35;z-index:-1}
 .shell{width:min(1120px,calc(100% - 40px));margin:auto}.skip-link{position:absolute;left:1rem;top:-3rem;background:var(--dark);color:white;padding:.6rem 1rem;border-radius:4px;z-index:5}.skip-link:focus{top:1rem}
 .site-header{border-bottom:1px solid var(--glass-line);background:var(--glass-nav);box-shadow:0 8px 26px #193d3512,inset 0 -1px 0 var(--glass-inset);backdrop-filter:blur(var(--glass-blur)) saturate(150%);-webkit-backdrop-filter:blur(var(--glass-blur)) saturate(150%);position:sticky;top:0;z-index:4}.nav-wrap{height:76px;display:flex;align-items:center;gap:2.2rem}.brand{display:flex;align-items:center;gap:.45rem;text-decoration:none;flex-shrink:0}.brand-logo{height:40px;width:auto;max-width:168px;object-fit:contain;display:block;filter:drop-shadow(0 2px 6px rgba(15,45,36,.08));transition:transform .2s cubic-bezier(.22,1,.36,1)}.brand-logo.footer-logo{height:38px;background:rgba(255,255,255,.95);padding:5px 11px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.22)}.brand:hover .brand-logo{transform:scale(1.04)}:root[data-theme=dark] .brand-logo{background:rgba(255,255,255,.95);padding:5px 11px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.38)}.main-nav{display:flex;align-items:center;gap:1.15rem;margin-right:auto}.main-nav a,.footer-inner a{color:var(--muted);text-decoration:none;font-weight:600;font-size:14px;padding:.34rem .7rem;border-radius:999px;transition:color .16s ease,background .16s ease}.main-nav a:hover,.footer-inner a:hover{color:var(--green)}.nav-actions{display:flex;align-items:center;gap:.7rem}.language-switch{border:0;background:none;color:var(--muted);font:600 13px "DM Sans";cursor:pointer}.theme-toggle{width:37px;height:37px;display:grid;place-items:center;border:1px solid var(--glass-line);border-radius:50%;background:var(--glass-card);color:var(--ink);cursor:pointer;transition:transform .18s,background .18s}.theme-toggle:hover{transform:rotate(12deg);background:var(--mint)}.theme-icon{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.theme-icon-moon{display:none;fill:currentColor;stroke:none}:root[data-theme=dark] .theme-icon-sun{display:none}:root[data-theme=dark] .theme-icon-moon{display:block}
 .btn{border:0;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;gap:.65rem;cursor:pointer;font:700 14px "DM Sans";padding:.9rem 1.25rem;text-decoration:none;transition:transform .18s,box-shadow .18s}.btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px var(--shadow-color)}.btn-primary{background:var(--green);color:#fff}.btn-outline{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn-dark{background:var(--dark);color:var(--paper);padding:.62rem .85rem;font-size:12px}.btn-light{background:#fffaf0;color:#193d35}.btn-small{padding:.55rem .9rem;font-size:13px}.text-link{color:var(--green);font-weight:700;text-decoration:none;background:none;border:0;cursor:pointer;padding:0}.text-link:hover{text-decoration:underline}
@@ -679,4 +679,106 @@ body[data-view="find-care"] .vet-coming-soon .view-back-bar{display:flex!importa
   .store-buttons-cluster{flex-direction:column;width:100%}
   .store-btn{width:100%;justify-content:center}
   .footer-concern-strip{flex-direction:column;align-items:flex-start}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Native Bengali Font Cascade & Smooth Micro-Interactions
+   ═══════════════════════════════════════════════════════════════════════════ */
+html[lang="bn"] body,
+html[lang="bn"] button,
+html[lang="bn"] input,
+html[lang="bn"] select,
+html[lang="bn"] textarea,
+html[lang="bn"] h1,
+html[lang="bn"] h2,
+html[lang="bn"] h3,
+html[lang="bn"] h4,
+html[lang="bn"] strong,
+html[lang="bn"] small,
+html[lang="bn"] .brand {
+  font-family: "IBM Plex Sans Bengali", "IBM Plex Sans", -apple-system, sans-serif !important;
+}
+
+button:active, .btn:active, .chip:active, .store-btn:active, .mockup-tab:active, .dash-tab:active {
+  transform: scale(0.96) !important;
+}
+
+/* ── Footer Bottom Welfare Line (Final line of footer) ── */
+.footer-bottom-credit{text-align:center;padding:1.6rem 0 .4rem;margin-top:1.8rem;border-top:1px solid rgba(255,255,255,.12)}
+.footer-bottom-credit p{margin:0;font:700 13.5px "IBM Plex Sans","IBM Plex Sans Bengali",sans-serif;color:#d1e6dc;letter-spacing:.02em}
+.footer-bottom-credit strong{color:#fff;font-weight:800}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Unified Adoption & Rehoming Portal Styles
+   ═══════════════════════════════════════════════════════════════════════════ */
+.adoption-heading-wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap}
+.adoption-toolbar{margin-bottom:1rem}
+.adoption-safety-note{margin-bottom:1.4rem;background:var(--mint);border-color:#bce5d5}
+.adoption-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.adoption-card{background:var(--glass-card);border:1px solid var(--glass-line);border-radius:20px;padding:1.15rem;box-shadow:0 12px 30px var(--shadow-color);display:flex;flex-direction:column;gap:.55rem;transition:all .22s cubic-bezier(.22,1,.36,1)}
+.adoption-card:hover{transform:translateY(-4px);border-color:#087f6266;box-shadow:0 18px 36px var(--shadow-color)}
+.adoption-card-top{display:flex;justify-content:space-between;align-items:center}
+.adoption-species-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.26rem .65rem;border-radius:999px;font:800 10.5px "Manrope";text-transform:uppercase;background:var(--lavender);color:var(--green)}
+.adoption-meta-row{display:flex;gap:.35rem;flex-wrap:wrap;margin:.25rem 0}
+.adoption-pill{font:700 10.5px "DM Sans";padding:.2rem .55rem;border-radius:6px;background:var(--surface-soft);color:var(--muted)}
+.adoption-pill.is-vax{background:var(--mint);color:var(--green)}
+.adoption-card h3{font:800 16px "Manrope";margin:.2rem 0 0;color:var(--ink)}
+.adoption-card p{color:var(--muted);font-size:12.5px;line-height:1.45;margin:0}
+.adoption-apply-button{width:100%;margin-top:auto}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Modernized User Profile & Care Space Styles
+   ═══════════════════════════════════════════════════════════════════════════ */
+.modern-profile-dialog{max-width:680px;width:calc(100% - 28px);border-radius:24px}
+.dashboard-card{padding:1.8rem 2rem;display:flex;flex-direction:column;gap:1rem;max-height:88vh;overflow-y:auto}
+.profile-hero-card{display:flex;align-items:center;gap:1rem;padding:1.1rem 1.35rem;border-radius:18px;background:linear-gradient(135deg,var(--mint),var(--surface));border:1px solid var(--line);box-shadow:0 6px 18px var(--shadow-color);flex-wrap:wrap}
+.profile-avatar-wrap{position:relative}
+.user-avatar-circle{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--green);color:#fff;font:800 18px "Manrope"}
+.avatar-verified-badge{position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#22c55e;color:#fff;font-size:10px;font-weight:900;display:grid;place-items:center;border:2px solid #fff}
+.profile-hero-info{flex:1;min-width:160px}
+.profile-hero-info strong{display:block;font:800 16px "Manrope";color:var(--ink)}
+.profile-hero-info small{color:var(--muted);font-size:12px}
+.profile-area-pill{font:700 11px "DM Sans";padding:.18rem .55rem;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--green)}
+.profile-name-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+
+.dash-tab-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;background:var(--surface-soft);padding:4px;border-radius:14px}
+.dash-tab{border:0;background:transparent;padding:.65rem .4rem;border-radius:10px;font:800 13px "Manrope";color:var(--muted);cursor:pointer;transition:all .18s ease}
+.dash-tab.is-active{background:var(--surface);color:var(--green);box-shadow:0 3px 10px var(--shadow-color)}
+
+.dash-panel{display:none;animation:cardPopIn .24s ease both}
+.dash-panel.is-active{display:block}
+.panel-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+.panel-section-head h4{margin:0;font:800 16px "Manrope"}
+.dashboard-pets-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}
+.pet-passport-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1rem;display:flex;gap:.8rem;align-items:center;box-shadow:0 4px 12px var(--shadow-color)}
+.passport-pet-icon{font-size:28px}
+.pet-register-card{margin-top:1rem;padding:1.2rem;background:var(--surface-soft);border:1px solid var(--line);border-radius:16px}
+.pet-register-card h5{margin:0 0 .7rem;font:800 14px "Manrope"}
+.pet-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.7rem}
+.pet-form-actions{display:flex;justify-content:flex-end;gap:.5rem}
+
+.activity-blocks-stack{display:flex;flex-direction:column;gap:1.2rem}
+.activity-block{background:var(--surface-soft);border:1px solid var(--line);border-radius:16px;padding:1rem 1.15rem}
+.activity-block-head{margin-bottom:.6rem}
+.activity-block-head strong{display:block;font:800 14px "Manrope";color:var(--ink)}
+.activity-block-head small{color:var(--muted);font-size:11.5px}
+
+.security-card-box{margin-top:1.2rem;background:var(--surface-soft);border:1px solid var(--line);border-radius:16px;padding:1.15rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.security-card-top{display:flex;gap:.8rem;align-items:center}
+.security-shield-icon{font-size:26px}
+.security-status-badge{font:800 11px "DM Sans";padding:.3rem .7rem;border-radius:999px;background:var(--mint);color:var(--green);white-space:nowrap}
+
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.check-options-row{display:flex;gap:1rem;flex-wrap:wrap;margin:.4rem 0 .8rem}
+
+@media(max-width:860px){
+  .adoption-grid{grid-template-columns:repeat(2,1fr)}
+  .dashboard-pets-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:640px){
+  .adoption-grid{grid-template-columns:1fr}
+  .pet-form-grid,.field-row{grid-template-columns:1fr}
+  .dash-tab{font-size:11px;padding:.5rem .2rem}
+  .profile-hero-card{flex-direction:column;align-items:flex-start}
 }
