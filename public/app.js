@@ -600,6 +600,19 @@ async function loadLostReports() {
     if (liveStatus) {
       liveStatus.innerHTML = `<span class="live-pulse" aria-hidden="true"></span><strong>${changed ? "Live feed updated" : "Live nearby feed"}</strong><span>${reports.length} open report${reports.length === 1 ? "" : "s"} · Updated ${new Date().toLocaleTimeString("en-BD", { hour: "numeric", minute: "2-digit" })}</span>`;
     }
+    const homeCountLost = document.getElementById("home-count-lost");
+    if (homeCountLost) {
+      homeCountLost.textContent = `${reports.length} open alert${reports.length === 1 ? "" : "s"} ↗`;
+    }
+    if (reports.length > 0) {
+      const topReport = reports[0];
+      const snapArea = document.getElementById("snapshot-lost-area");
+      const snapTitle = document.getElementById("snapshot-lost-title");
+      const snapDesc = document.getElementById("snapshot-lost-desc");
+      if (snapArea) snapArea.textContent = `⌖ ${topReport.area || "Dhaka"}`;
+      if (snapTitle) snapTitle.textContent = topReport.title || "Nearby pet alert";
+      if (snapDesc) snapDesc.textContent = (topReport.description || "").slice(0, 115) + ((topReport.description || "").length > 115 ? "…" : "");
+    }
   } catch (error) {
     grid.innerHTML = `<p class="inline-state error-state" role="alert">${escapeHtml(error.message)}</p>`;
   }
@@ -788,6 +801,17 @@ async function loadFosters() {
   if (cachedFosters.length) {
     const current = cachedFosters.find((f) => f.id === activeMapFosterId) || cachedFosters[0];
     selectFosterOnMap(current, false);
+    const homeCountFosters = document.getElementById("home-count-fosters");
+    if (homeCountFosters) {
+      homeCountFosters.textContent = `${cachedFosters.length} on Google Maps ↗`;
+    }
+    const topFoster = [...cachedFosters].sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0))[0] || cachedFosters[0];
+    const snapRating = document.getElementById("snapshot-foster-rating");
+    const snapTitle = document.getElementById("snapshot-foster-title");
+    const snapDesc = document.getElementById("snapshot-foster-desc");
+    if (snapRating) snapRating.textContent = `★ ${topFoster.rating || "5.0"} · ${topFoster.area}`;
+    if (snapTitle) snapTitle.textContent = topFoster.name;
+    if (snapDesc) snapDesc.textContent = (topFoster.description || "").slice(0, 115) + ((topFoster.description || "").length > 115 ? "…" : "");
   }
 
   document.querySelectorAll(".foster-focus-map-btn").forEach((button) =>
@@ -918,6 +942,21 @@ async function loadDonors() {
 
   renderMyDonorPanel(myDonors, incomingRequests);
 
+  const homeCountDonors = document.getElementById("home-count-donors");
+  if (homeCountDonors) {
+    homeCountDonors.textContent = `${donors.length} verified donor${donors.length === 1 ? "" : "s"} ↗`;
+  }
+  if (donors.length > 0) {
+    const topDonor = donors[0];
+    const speciesLabel = topDonor.species === "cat" ? "Cat" : "Dog";
+    const snapBlood = document.getElementById("snapshot-donor-blood");
+    const snapTitle = document.getElementById("snapshot-donor-title");
+    const snapDesc = document.getElementById("snapshot-donor-desc");
+    if (snapBlood) snapBlood.textContent = `🩸 ${topDonor.bloodType} · ${topDonor.area}`;
+    if (snapTitle) snapTitle.textContent = `${topDonor.petName || speciesLabel} (${speciesLabel} donor)`;
+    if (snapDesc) snapDesc.textContent = `Consented & vaccinated ${speciesLabel.toLowerCase()} donor ready near ${topDonor.area}, ${topDonor.city}.`;
+  }
+
   const grid = document.getElementById("donor-grid");
   grid.innerHTML = donors.length
     ? donors.map(donorCard).join("")
@@ -941,6 +980,10 @@ async function loadDonors() {
 async function loadAdoptions() {
   const response = await fetch("/api/adoptions");
   const listings = await response.json();
+  const homeCountAdopt = document.getElementById("home-count-adopt");
+  if (homeCountAdopt && Array.isArray(listings)) {
+    homeCountAdopt.textContent = `${listings.length} pet${listings.length === 1 ? "" : "s"} ready ↗`;
+  }
   document.getElementById("adoption-grid").innerHTML = listings.length
     ? listings.map((listing) => `<article class="adoption-card"><span class="adoption-mark">♡</span><h3>${escapeHtml(listing.name)}</h3><p>${escapeHtml(listing.species)} · ${escapeHtml(listing.area)}</p><p>${escapeHtml(listing.description)}</p><button class="btn btn-small btn-dark adoption-apply-button" data-listing="${escapeHtml(listing.id)}" data-name="${escapeHtml(listing.name)}" type="button">Apply safely</button></article>`).join("")
     : '<p class="inline-state">No verified adoption listings are open right now.</p>';
@@ -1102,7 +1145,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Desktop header active nav styling
     document.querySelectorAll(".main-nav a").forEach((link) => {
       const href = (link.getAttribute("href") || "").replace(/^#/, "");
-      link.classList.toggle("is-active", href === view);
+      const isHomeLink = href === "main" || href === "home";
+      link.classList.toggle("is-active", (view === "home" && isHomeLink) || href === view);
     });
 
     // Mobile bottom navigation active tab
@@ -1119,7 +1163,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.addEventListener("hashchange", updateViewFromHash);
   updateViewFromHash();
 
-  // Homepage Foster Teaser "Add Foster" trigger
+  // Homepage Snapshot quick-action triggers
+  document.getElementById("home-report-lost-btn")?.addEventListener("click", (event) => {
+    if (!localStorage.getItem("pawnir_token")) {
+      showAuthStep("credentials");
+      document.getElementById("auth-status").textContent = "Sign in first to report a lost or found animal.";
+      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
+      return;
+    }
+    document.getElementById("lost-report-status").textContent = "";
+    openDialog(document.getElementById("lost-report-dialog"), event.currentTarget);
+  });
+
   document.getElementById("home-add-foster-btn")?.addEventListener("click", (event) => {
     if (!localStorage.getItem("pawnir_token")) {
       showAuthStep("credentials");
