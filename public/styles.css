@@ -12,7 +12,7 @@
 .donor-section,.adoption-section{padding:1rem 0 3rem}.donor-disclaimer{color:var(--muted);font-size:11px;margin:-.35rem 0 1rem}.donor-grid,.adoption-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}.donor-card,.adoption-card{background:var(--glass-card);border:1px solid var(--glass-line);border-radius:18px;padding:1rem;box-shadow:0 10px 24px var(--shadow-color),inset 0 1px 0 var(--glass-inset)}.donor-card-top{display:flex;justify-content:space-between;align-items:center}.donor-mark,.adoption-mark{display:grid;place-items:center;width:36px;height:36px;border-radius:12px;background:#f6dede;color:#b95858;font:800 21px "Manrope"}.adoption-mark{background:var(--lavender);color:var(--green)}.donor-card h3,.adoption-card h3{font:700 16px "Manrope";margin:1rem 0 .35rem}.donor-card p,.adoption-card p{color:var(--muted);font-size:12px;line-height:1.5;margin:.3rem 0}.donor-card small{display:block;color:var(--muted);font-size:10px;margin:1rem 0}.donor-card .btn,.adoption-card .btn{width:100%}.adoption-card{min-height:190px}.check-line{display:flex;align-items:flex-start;gap:.5rem;font-size:12px}.check-line input{width:auto;margin-top:.25rem;accent-color:var(--green)}
 .search-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1.6rem 1.8rem;box-shadow:0 12px 35px var(--shadow-color)}.section-heading{display:flex;justify-content:space-between;align-items:end;margin-bottom:1.2rem}.section-heading h2{font:800 26px "Manrope",sans-serif;letter-spacing:-.05em;margin:0}.section-heading .eyebrow{margin-bottom:.3rem}.location-label{color:var(--muted);font-size:13px}.search-controls{display:grid;grid-template-columns:1.5fr 1fr 1fr auto;gap:.7rem}.search-field,.select-field{display:flex;align-items:center;gap:.5rem;background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:0 .8rem;color:var(--muted)}.search-field input,.select-field select{border:0;background:transparent;color:var(--ink);font:14px "DM Sans";outline:0;width:100%;padding:.85rem 0}.select-field select{cursor:pointer}.quick-filters{display:flex;gap:.5rem;margin-top:1.1rem}.chip{border:1px solid var(--line);background:white;border-radius:30px;color:var(--muted);padding:.45rem .8rem;font:600 12px "DM Sans";cursor:pointer}.chip.active,.chip:hover{background:var(--mint);border-color:#b9ddcc;color:var(--green)}
 .directory,.how-it-works{padding:5.2rem 0 1rem}.directory-heading{margin-bottom:1.4rem}.vet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}.vet-card{position:relative;background:var(--glass-card);border:1px solid var(--glass-line);border-radius:18px;overflow:hidden;box-shadow:0 12px 30px #193d3516,inset 0 1px 0 var(--glass-inset);backdrop-filter:blur(16px) saturate(135%);-webkit-backdrop-filter:blur(16px) saturate(135%);transition:transform .2s,box-shadow .2s,border-color .2s}.vet-card::after{content:"";position:absolute;inset:1px 1px auto;height:34%;pointer-events:none;border-radius:17px 17px 40% 40%;background:linear-gradient(180deg,#fff5,transparent);opacity:.55}.vet-card:hover,.vet-card:focus-within{transform:translateY(-4px);border-color:#9bcbb5;box-shadow:0 18px 38px #193d3522,inset 0 1px 0 #fff9}.vet-card-head{height:125px;position:relative;padding:1rem}.vet-card-head.mint{background:linear-gradient(145deg,#dff3eacc,#b9dfcd99)}.vet-card-head.peach{background:linear-gradient(145deg,#f8e6d8cc,#efc9ad99)}.vet-card-head.lavender{background:linear-gradient(145deg,#e9e5f5cc,#c9c0e099)}.vet-card-head.blue{background:linear-gradient(145deg,#dfeef2cc,#b3d5dd99)}.vet-avatar{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#fff8;box-shadow:0 0 0 5px #fff5;color:var(--dark);font-weight:800}.verified-badge{position:absolute;right:10px;top:12px;background:#fff9;color:var(--green);font-size:10px;font-weight:800;padding:.3rem .5rem;border-radius:20px}.pet-silhouette{font-size:55px;position:absolute;right:14px;bottom:2px;opacity:.55}.vet-card-body{position:relative;z-index:1;padding:1rem;background:linear-gradient(180deg,#fff2,var(--glass-card) 28%)}.vet-name-row{display:flex;justify-content:space-between;gap:.4rem}.vet-name-row h3{font:700 15px "Manrope";margin:0}.vet-name-row p{color:var(--muted);font-size:11px;margin:.25rem 0}.vet-name-row .rating{font-size:11px}.clinic-line,.vet-meta{color:var(--muted);font-size:11px}.clinic-line{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:.7rem 0}.vet-meta{border-top:1px solid var(--line);padding:.7rem 0;display:flex;justify-content:space-between}.vet-card-foot{display:flex;justify-content:space-between;align-items:center}.fee{font-weight:800;font-size:14px}.fee small{font-weight:400;color:var(--muted);font-size:10px}.empty-state{text-align:center;color:var(--muted);padding:2rem}
-.steps-shell{position:relative}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.step-card{background:var(--glass-card);border:1px solid var(--glass-line);border-radius:18px;padding:1.5rem;min-height:230px;position:relative;overflow:hidden;box-shadow:0 12px 30px #193d3512,inset 0 1px 0 var(--glass-inset);transition:transform .28s,box-shadow .28s,border-color .28s,opacity .28s}.step-card::before{content:"";position:absolute;inset:0 0 auto;height:42%;background:linear-gradient(145deg,#fff5,transparent);pointer-events:none}.step-card:hover,.step-card:focus-within,.step-card.is-active{transform:translateY(-5px);border-color:#9bcbb5;box-shadow:0 18px 38px #193d3520,inset 0 1px 0 #fff9}.step-number{color:#83b79e;font:800 12px "Manrope";position:relative}.step-icon{display:block;font-size:25px;color:var(--green);margin:1rem 0 .7rem;position:relative}.steps h3{font:700 17px "Manrope";margin:.2rem 0}.steps p{color:var(--muted);font-size:13px;margin:0;max-width:250px}.step-arrow{position:absolute;right:1.25rem;bottom:1.2rem;color:var(--green);font-size:20px;opacity:.7}.steps-controls{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.15rem}.steps-control{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--ink);cursor:pointer}.steps-control:hover{background:var(--mint);border-color:var(--green)}.steps-dots{display:flex;gap:.45rem}.step-dot{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:var(--line);cursor:pointer;transition:width .2s,background .2s}.step-dot.is-active{width:22px;border-radius:10px;background:var(--green)}.vet-banner{margin-top:5rem;margin-bottom:4rem;background:var(--dark);border-radius:16px;padding:3.3rem 3.6rem;display:flex;align-items:center;justify-content:space-between;color:white;overflow:hidden;position:relative}.vet-banner:after{content:"✦";position:absolute;right:16%;font-size:210px;color:#ffffff0a;line-height:1}.vet-banner .eyebrow{color:#a7ddc6}.vet-banner h2{font-size:40px;margin-bottom:.8rem}.vet-banner p:not(.eyebrow){color:#b4ccc3;max-width:430px}.site-footer{border-top:1px solid var(--glass-line);padding:2rem 0;background:var(--glass-footer);color:#e7f2ed;box-shadow:inset 0 1px 0 var(--glass-inset)}.footer-inner{display:flex;align-items:center;gap:2rem}.footer-inner p{color:#b4ccc3;font-size:12px;margin-right:auto}.footer-inner>div{display:flex;gap:1.3rem;font-size:12px}.site-footer .footer-inner a{color:#c9e2d6}.site-footer .footer-inner a:hover{color:#fff}
+.steps-shell{position:relative}.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.step-card{background:var(--glass-card);border:1px solid var(--glass-line);border-radius:18px;padding:1.5rem;min-height:230px;position:relative;overflow:hidden;box-shadow:0 12px 30px #193d3512,inset 0 1px 0 var(--glass-inset);transition:transform .28s,box-shadow .28s,border-color .28s,opacity .28s}.step-card::before{content:"";position:absolute;inset:0 0 auto;height:42%;background:linear-gradient(145deg,#fff5,transparent);pointer-events:none}.step-card:hover,.step-card:focus-within,.step-card.is-active{transform:translateY(-5px);border-color:#9bcbb5;box-shadow:0 18px 38px #193d3520,inset 0 1px 0 #fff9}.step-number{color:#83b79e;font:800 12px "Manrope";position:relative}.step-icon{display:block;font-size:25px;color:var(--green);margin:1rem 0 .7rem;position:relative}.steps h3{font:700 17px "Manrope";margin:.2rem 0}.steps p{color:var(--muted);font-size:13px;margin:0;max-width:250px}.step-arrow{position:absolute;right:1.25rem;bottom:1.2rem;color:var(--green);font-size:20px;opacity:.7}.steps-controls{display:flex;justify-content:center;align-items:center;gap:1rem;margin-top:1.15rem}.steps-control{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--ink);cursor:pointer}.steps-control:hover{background:var(--mint);border-color:var(--green)}.steps-dots{display:flex;gap:.45rem}.step-dot{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:var(--line);cursor:pointer;transition:width .2s,background .2s}.step-dot.is-active{width:22px;border-radius:10px;background:var(--green)}.vet-banner{margin-top:5rem;margin-bottom:4rem;background:var(--dark);border-radius:16px;padding:3.3rem 3.6rem;display:flex;align-items:center;justify-content:space-between;color:white;overflow:hidden;position:relative}.vet-banner:after{content:"✦";position:absolute;right:16%;font-size:210px;color:#ffffff0a;line-height:1}.vet-banner .eyebrow{color:#a7ddc6}.vet-banner h2{font-size:40px;margin-bottom:.8rem}.vet-banner p:not(.eyebrow){color:#b4ccc3;max-width:430px}.site-footer{border-top:1px solid var(--line);padding:2.5rem 0 2rem;background:var(--glass-footer);color:var(--ink);box-shadow:none}.footer-inner{display:flex;align-items:center;gap:2rem}.footer-inner p{color:var(--muted);font-size:12px;margin-right:auto}.footer-inner>div{display:flex;gap:1.3rem;font-size:12px}.site-footer .footer-inner a{color:var(--muted);transition:color .16s ease}.site-footer .footer-inner a:hover{color:var(--ink)}
 .booking-dialog{border:0;border-radius:14px;padding:0;background:transparent;max-width:430px;width:calc(100% - 32px);box-shadow:0 20px 70px #19332f35}.booking-dialog::backdrop{background:#19332f88;backdrop-filter:blur(3px)}.dialog-card{background:var(--paper);padding:2rem;display:grid;gap:1rem;position:relative}.dialog-card h2{font:800 25px "Manrope";letter-spacing:-.05em;margin:-.3rem 0 0}.dialog-helper,.secure-note{color:var(--muted);font-size:12px;margin:0}.dialog-card label{display:grid;gap:.4rem;font-size:12px;font-weight:700}.dialog-card input,.dialog-card select{width:100%;border:1px solid var(--line);border-radius:7px;padding:.75rem;background:white;color:var(--ink);font:14px "DM Sans"}.dialog-close{position:absolute;right:1rem;top:1rem;border:0;background:none;font-size:24px;color:var(--muted);cursor:pointer}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:900px){.main-nav{gap:1rem}.hero{gap:2rem}.vet-grid{grid-template-columns:repeat(2,1fr)}.search-controls{grid-template-columns:1fr 1fr}.search-button{grid-column:span 2}.hero-art{height:330px}.hero-card-top{left:10px}.hero-card-bottom{right:10px}}
@@ -25,12 +25,12 @@
 :root[data-theme=dark] .steps article{background:var(--surface-soft)}
 :root[data-theme=dark] .vet-avatar{background:#ffffff18;box-shadow:0 0 0 5px #ffffff0d}
 :root[data-theme=dark] .verified-badge{background:#19332fcc}
-:root[data-theme=dark] .vet-banner{background:#dff3ea;color:#19332f}
-:root[data-theme=dark] .vet-banner p:not(.eyebrow){color:#46695d}
-:root[data-theme=dark] .vet-banner .eyebrow{color:#287d61}
+:root[data-theme=dark] .vet-banner{background:#121215;border:1px solid #27272a;color:#f4f4f5}
+:root[data-theme=dark] .vet-banner p:not(.eyebrow){color:#a1a1aa}
+:root[data-theme=dark] .vet-banner .eyebrow{color:#71717a}
 .reveal{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s cubic-bezier(.22,1,.36,1)}.reveal.revealed{opacity:1;transform:none}.hero-art.reveal{transition-delay:.08s}.directory.reveal{transition-delay:.06s}
 .dialog-open{position:fixed;width:100%;overflow:hidden}.booking-dialog{opacity:0;transform:translateY(10px) scale(.98);transition:opacity .18s ease,transform .18s cubic-bezier(.22,1,.36,1)}.booking-dialog.is-visible{opacity:1;transform:none}.booking-dialog::backdrop{opacity:0;transition:opacity .18s ease}.booking-dialog.is-visible::backdrop{opacity:1}.dialog-status{min-height:1.2em;margin:0;color:var(--green);font-size:12px;font-weight:700}.dialog-status.is-success{color:var(--green)}
-.footer-network{display:grid;grid-template-columns:.75fr 1.25fr;align-items:center;gap:2rem;padding:3rem 0;border-bottom:1px solid #ffffff22;background:linear-gradient(145deg,#ffffff0b,#ffffff03);box-shadow:inset 0 1px 0 #ffffff12}.footer-network-copy h2{font:800 28px/1.1 "Manrope";letter-spacing:-.05em;margin:.2rem 0 .6rem;color:#f2fbf6}.footer-network-copy>p:last-child{color:#b4ccc3;font-size:13px;margin:0;max-width:290px}.partner-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}.partner-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.7rem;padding:1rem;border:1px solid #ffffff24;border-radius:16px;background:#ffffff0b;color:#effaf4;text-decoration:none;box-shadow:inset 0 1px 0 #ffffff18,0 8px 22px #00000012;transition:transform .18s,background .18s,border-color .18s}.partner-card:hover,.partner-card:focus-visible{transform:translateY(-3px);background:#ffffff16;border-color:#9bd4b8;outline:none}.partner-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;font-size:17px}.partner-dog .partner-mark{background:#f8e6d8}.partner-cat .partner-mark{background:#e9e5f5}.partner-shop .partner-mark{background:#dff3ea;color:var(--green)}.partner-card strong,.partner-card small{display:block}.partner-card strong{font:700 13px "Manrope"}.partner-card small{color:#b4ccc3;font-size:10px;line-height:1.25;margin-top:.18rem}.external-mark{color:#9bd4b8;font-size:18px}
+.footer-network{display:grid;grid-template-columns:.75fr 1.25fr;align-items:center;gap:2rem;padding:2.5rem 0;border-bottom:1px solid var(--line);background:transparent}.footer-network-copy h2{font:800 28px/1.1 "Manrope";letter-spacing:-.05em;margin:.2rem 0 .6rem;color:var(--ink)}.footer-network-copy>p:last-child{color:var(--muted);font-size:13px;margin:0;max-width:290px}.partner-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}.partner-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.7rem;padding:1rem;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);text-decoration:none;box-shadow:0 2px 8px var(--shadow-color);transition:transform .18s,background .18s,border-color .18s,box-shadow .18s}.partner-card:hover,.partner-card:focus-visible{transform:translateY(-3px);background:var(--surface);border-color:var(--ink);box-shadow:0 8px 22px var(--shadow-color);outline:none}.partner-mark{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;font-size:17px;background:var(--surface-soft)}.partner-dog .partner-mark{background:var(--surface-soft)}.partner-cat .partner-mark{background:var(--surface-soft)}.partner-shop .partner-mark{background:var(--surface-soft);color:var(--ink)}.partner-card strong,.partner-card small{display:block}.partner-card strong{font:700 13px "Manrope";color:var(--ink)}.partner-card small{color:var(--muted);font-size:10px;line-height:1.25;margin-top:.18rem}.external-mark{color:var(--muted);font-size:18px}.partner-card:hover .external-mark{color:var(--ink)}
 .dashboard-card{max-width:760px}.dashboard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}.dashboard-grid h3,.pet-form h3{font:700 14px "Manrope";margin:.2rem 0 .6rem}.dashboard-list{color:var(--muted);font-size:12px;min-height:44px}.dashboard-item{display:grid;gap:.12rem;padding:.65rem 0;border-bottom:1px solid var(--line)}.dashboard-item strong{color:var(--ink)}.dashboard-item small{color:var(--green)}.pet-form{border-top:1px solid var(--line);padding-top:1rem;margin-top:.7rem}.pet-form-row{display:flex;gap:.5rem}.pet-form-row input,.pet-form-row select{min-width:0;flex:1;border:1px solid var(--line);border-radius:7px;padding:.65rem;background:var(--surface);color:var(--ink);font:13px "DM Sans"}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.reveal{opacity:1;transform:none;transition:none}.btn,.theme-toggle,.vet-card{transition:none}}
 @media(max-width:900px){.footer-network{grid-template-columns:1fr}.partner-grid{max-width:620px}}
@@ -643,13 +643,13 @@ body[data-view="find-care"] .vet-coming-soon .view-back-bar{display:flex!importa
 
 .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:2rem;flex-wrap:wrap;padding-top:1.5rem}
 .footer-brand-wrap{display:flex;flex-direction:column;gap:.35rem}
-.footer-brand-wrap p{margin:0;color:#b4ccc3;font-size:12px}
+.footer-brand-wrap p{margin:0;color:var(--muted);font-size:12px}
 .footer-links-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
 .footer-nav-row{display:flex;gap:1.2rem;font-size:13px;flex-wrap:wrap}
-.footer-legal-row{display:flex;align-items:center;gap:.55rem;font-size:12px;color:#9bb2aa}
-.legal-dot{color:rgba(255,255,255,.3)}
-.footer-policy-link{border:0;background:none;color:#b4ccc3;font:600 12px "DM Sans";cursor:pointer;padding:0;transition:color .16s ease}
-.footer-policy-link:hover{color:#fff;text-decoration:underline}
+.footer-legal-row{display:flex;align-items:center;gap:.55rem;font-size:12px;color:var(--muted)}
+.legal-dot{color:var(--line)}
+.footer-policy-link{border:0;background:none;color:var(--muted);font:600 12px "DM Sans";cursor:pointer;padding:0;transition:color .16s ease}
+.footer-policy-link:hover{color:var(--ink);text-decoration:underline}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Policy Dialog (Privacy, Terms & Community Guidelines)
@@ -716,9 +716,9 @@ button:active, .btn:active, .chip:active, .store-btn:active, .store-pill:active,
 }
 
 /* ── Footer Bottom Welfare Line (Final line of footer) ── */
-.footer-bottom-credit{text-align:center;padding:1.6rem 0 .4rem;margin-top:1.8rem;border-top:1px solid rgba(255,255,255,.12)}
-.footer-bottom-credit p{margin:0;font:700 13.5px "IBM Plex Sans","IBM Plex Sans Bengali",sans-serif;color:#d1e6dc;letter-spacing:.02em}
-.footer-bottom-credit strong{color:#fff;font-weight:800}
+.footer-bottom-credit{text-align:center;padding:1.6rem 0 .4rem;margin-top:1.8rem;border-top:1px solid var(--line)}
+.footer-bottom-credit p{margin:0;font:700 13.5px "IBM Plex Sans","IBM Plex Sans Bengali",sans-serif;color:var(--muted);letter-spacing:.02em}
+.footer-bottom-credit strong{color:var(--ink);font-weight:800}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Unified Adoption & Rehoming Portal Styles
@@ -1094,7 +1094,7 @@ button:active, .btn:active, .chip:active, .store-btn:active, .store-pill:active,
   --shadow-color: rgba(0, 0, 0, 0.04);
   --glass-nav: rgba(255, 255, 255, 0.88);
   --glass-card: #ffffff;
-  --glass-footer: #09090b;
+  --glass-footer: #ffffff;
   --glass-line: #e4e4e7;
   --glass-inset: rgba(255, 255, 255, 0.9);
 }
@@ -1169,7 +1169,73 @@ body:before {
   color: #71717a !important;
 }
 
-/* Dark mode x.ai theme */
+/* Light Mode Footer Harmonization */
+.site-footer {
+  background: #ffffff !important;
+  border-top: 1px solid #e4e4e7 !important;
+}
+
+.footer-network {
+  background: #fbfbfd !important;
+  border-bottom: 1px solid #e4e4e7 !important;
+}
+
+.footer-network-copy h2 {
+  color: #09090b !important;
+}
+
+.footer-network-copy p {
+  color: #71717a !important;
+}
+
+.partner-card {
+  background: #ffffff !important;
+  border: 1px solid #e4e4e7 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  color: #09090b !important;
+}
+
+.partner-card strong {
+  color: #09090b !important;
+}
+
+.partner-card small {
+  color: #71717a !important;
+}
+
+.partner-card:hover {
+  border-color: #09090b !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+.external-mark {
+  color: #71717a !important;
+}
+
+.footer-policy-link {
+  color: #71717a !important;
+}
+
+.footer-policy-link:hover {
+  color: #09090b !important;
+}
+
+.legal-dot {
+  color: #e4e4e7 !important;
+}
+
+.footer-bottom-credit {
+  border-top: 1px solid #e4e4e7 !important;
+  color: #71717a !important;
+}
+
+.footer-bottom-credit strong {
+  color: #09090b !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Dark Mode: Premium x.ai / SpaceX Bot Obsidian Overhaul
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root[data-theme=dark] {
   --ink: #f4f4f5;
   --muted: #a1a1aa;
@@ -1189,13 +1255,169 @@ body:before {
   --shadow-color: rgba(0, 0, 0, 0.5);
   --glass-nav: rgba(9, 9, 11, 0.88);
   --glass-card: #121215;
-  --glass-footer: #000000;
+  --glass-footer: #09090b;
   --glass-line: #27272a;
   --glass-inset: rgba(255, 255, 255, 0.05);
 }
 
 :root[data-theme=dark] body {
   background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+:root[data-theme=dark] body:before {
+  display: none !important;
+}
+
+/* Dark Mode Cards, Surfaces & Gradients */
+:root[data-theme=dark] .hero-card,
+:root[data-theme=dark] .alert-preview,
+:root[data-theme=dark] .example-copy,
+:root[data-theme=dark] .service-card,
+:root[data-theme=dark] .search-panel,
+:root[data-theme=dark] .vet-card,
+:root[data-theme=dark] .foster-card,
+:root[data-theme=dark] .donor-card,
+:root[data-theme=dark] .adoption-card,
+:root[data-theme=dark] .lost-report-card,
+:root[data-theme=dark] .step-card,
+:root[data-theme=dark] .feature-card-item,
+:root[data-theme=dark] .my-reports,
+:root[data-theme=dark] .dialog-card {
+  background: #121215 !important;
+  border-color: #27272a !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .hero-card strong,
+:root[data-theme=dark] .example-copy h3,
+:root[data-theme=dark] .example-copy strong,
+:root[data-theme=dark] .service-card h3,
+:root[data-theme=dark] .section-heading h2,
+:root[data-theme=dark] .steps h3,
+:root[data-theme=dark] .feature-card-item strong,
+:root[data-theme=dark] .vet-name-row h3,
+:root[data-theme=dark] .foster-card h3,
+:root[data-theme=dark] .donor-card h3,
+:root[data-theme=dark] .adoption-card h3,
+:root[data-theme=dark] .lost-report-card h3,
+:root[data-theme=dark] .dialog-card h2 {
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .hero-text,
+:root[data-theme=dark] .section-heading p,
+:root[data-theme=dark] .example-copy p,
+:root[data-theme=dark] .service-card p,
+:root[data-theme=dark] .steps p,
+:root[data-theme=dark] .feature-card-item p,
+:root[data-theme=dark] .foster-card p,
+:root[data-theme=dark] .donor-card p,
+:root[data-theme=dark] .adoption-card p,
+:root[data-theme=dark] .lost-report-card p,
+:root[data-theme=dark] .dialog-helper,
+:root[data-theme=dark] .secure-note {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .hero-art {
+  background: linear-gradient(145deg, #18181b, #121215) !important;
+  border: 1px solid #27272a !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+:root[data-theme=dark] .sun-shape {
+  background: #27272a !important;
+  opacity: 0.3 !important;
+}
+
+:root[data-theme=dark] .hero-pet-image {
+  border-color: #27272a !important;
+}
+
+:root[data-theme=dark] .service-icon {
+  background: #18181b !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .service-status {
+  color: #71717a !important;
+}
+
+:root[data-theme=dark] .safety-strip {
+  background: #121215 !important;
+  border-color: #27272a !important;
+}
+
+:root[data-theme=dark] .safety-strip p {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .safety-strip strong {
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .safety-icon {
+  background: #18181b !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .vet-banner {
+  background: #121215 !important;
+  border: 1px solid #27272a !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .vet-banner p:not(.eyebrow) {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .vet-banner .eyebrow {
+  color: #71717a !important;
+}
+
+:root[data-theme=dark] .vet-banner:after {
+  color: rgba(255, 255, 255, 0.04) !important;
+}
+
+:root[data-theme=dark] input,
+:root[data-theme=dark] select,
+:root[data-theme=dark] textarea,
+:root[data-theme=dark] .search-field,
+:root[data-theme=dark] .select-field {
+  background: #18181b !important;
+  border-color: #27272a !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] input::placeholder,
+:root[data-theme=dark] textarea::placeholder {
+  color: #71717a !important;
+}
+
+:root[data-theme=dark] .chip {
+  background: #18181b !important;
+  border-color: #27272a !important;
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .chip:hover,
+:root[data-theme=dark] .chip.active {
+  background: #ffffff !important;
+  color: #09090b !important;
+  border-color: #ffffff !important;
+}
+
+:root[data-theme=dark] .btn-outline {
+  border-color: #27272a !important;
+  color: #f4f4f5 !important;
+  background: transparent !important;
+}
+
+:root[data-theme=dark] .btn-outline:hover {
+  background: #18181b !important;
+  border-color: #ffffff !important;
 }
 
 :root[data-theme=dark] .btn-primary {
@@ -1210,30 +1432,195 @@ body:before {
 }
 
 :root[data-theme=dark] .store-pill {
-  background: #121215;
-  border-color: #27272a;
-  color: #f4f4f5;
+  background: #121215 !important;
+  border-color: #27272a !important;
+  color: #f4f4f5 !important;
 }
 
 :root[data-theme=dark] .store-pill:hover {
-  border-color: #ffffff;
-  background: #18181b;
+  border-color: #ffffff !important;
+  background: #18181b !important;
 }
 
 :root[data-theme=dark] .store-pill .pill-main {
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 :root[data-theme=dark] .store-pill .pill-sub {
-  color: #a1a1aa;
+  color: #a1a1aa !important;
 }
 
 :root[data-theme=dark] .app-download-bar {
-  background: #121215;
-  border-color: #27272a;
+  background: #121215 !important;
+  border-color: #27272a !important;
 }
 
 :root[data-theme=dark] .hero h1 em,
 :root[data-theme=dark] .vet-banner em {
+  color: #ffffff !important;
+}
+
+:root[data-theme=dark] .theme-toggle {
+  background: #18181b !important;
+  border-color: #27272a !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .site-nav-link {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .site-nav-link:hover,
+:root[data-theme=dark] .site-nav-link.is-active {
+  color: #ffffff !important;
+}
+
+/* Dark Mode Footer */
+:root[data-theme=dark] .site-footer {
+  background: #09090b !important;
+  border-top: 1px solid #27272a !important;
+}
+
+:root[data-theme=dark] .footer-network {
+  background: #0d0d10 !important;
+  border-bottom: 1px solid #27272a !important;
+}
+
+:root[data-theme=dark] .footer-network-copy h2 {
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .footer-network-copy p {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .partner-card {
+  background: #121215 !important;
+  border: 1px solid #27272a !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .partner-card strong {
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .partner-card small {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .partner-card:hover {
+  border-color: #ffffff !important;
+  background: #18181b !important;
+}
+
+:root[data-theme=dark] .partner-mark {
+  background: #18181b !important;
+}
+
+:root[data-theme=dark] .external-mark {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .partner-card:hover .external-mark {
+  color: #ffffff !important;
+}
+
+:root[data-theme=dark] .footer-policy-link {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .footer-policy-link:hover {
+  color: #ffffff !important;
+}
+
+:root[data-theme=dark] .legal-dot {
+  color: #27272a !important;
+}
+
+:root[data-theme=dark] .footer-bottom-credit {
+  border-top: 1px solid #27272a !important;
+  color: #71717a !important;
+}
+
+:root[data-theme=dark] .footer-bottom-credit strong {
+  color: #f4f4f5 !important;
+}
+
+/* Status Pills in Dark Mode */
+:root[data-theme=dark] .report-pill.lost,
+:root[data-theme=dark] .pill-alert {
+  background: #2d1515 !important;
+  color: #fca5a5 !important;
+  border: 1px solid #5c2525 !important;
+}
+
+:root[data-theme=dark] .report-pill.found,
+:root[data-theme=dark] .pill-foster,
+:root[data-theme=dark] .verified-badge {
+  background: #12281e !important;
+  color: #86efac !important;
+  border: 1px solid #1d4d38 !important;
+}
+
+:root[data-theme=dark] .pill-blood,
+:root[data-theme=dark] .btn-mockup-blood {
+  background: #331515 !important;
+  color: #fda4af !important;
+  border: 1px solid #5c2020 !important;
+}
+
+:root[data-theme=dark] .pill-secure {
+  background: #1a1a2e !important;
+  color: #a5b4fc !important;
+  border: 1px solid #2e2e54 !important;
+}
+
+/* Dark Mode Modals & Drawers */
+:root[data-theme=dark] .booking-dialog::backdrop,
+:root[data-theme=dark] .policy-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.75) !important;
+}
+
+:root[data-theme=dark] .menu-drawer {
+  background: #09090b !important;
+  border-left: 1px solid #27272a !important;
+}
+
+:root[data-theme=dark] .drawer-header {
+  background: #09090b !important;
+  border-bottom: 1px solid #27272a !important;
+}
+
+:root[data-theme=dark] .drawer-link {
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .drawer-link:hover {
+  background: #18181b !important;
+  border-color: #27272a !important;
+}
+
+:root[data-theme=dark] .drawer-link-icon {
+  background: #18181b !important;
+  border-color: #27272a !important;
+}
+
+:root[data-theme=dark] .drawer-link-text strong {
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .drawer-link-text small {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .drawer-footer {
+  border-top-color: #27272a !important;
+}
+
+:root[data-theme=dark] .drawer-legal-links a {
+  color: #a1a1aa !important;
+}
+
+:root[data-theme=dark] .drawer-legal-links a:hover {
   color: #ffffff !important;
 }
