@@ -47,7 +47,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Bengali:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261030-8" />
+    <link rel="stylesheet" href="/styles.css?v=20261030-9" />
   </head>
   <body data-view="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -56,16 +56,33 @@
         <a class="brand" href="#main" aria-label="PawNir home">
           <img class="brand-logo" src="/pawnir-logo.png?v=20261030-4" alt="PawNir" width="148" height="42" />
         </a>
+
+        <!-- Desktop Navigation Links matching Reference Image 2 -->
+        <nav class="site-nav-links" aria-label="Primary navigation">
+          <a href="#how-it-works" class="site-nav-link" data-i18n="nav.features">Features</a>
+          <a href="#lost-found" class="site-nav-link" data-i18n="nav.lost">Lost &amp; Found</a>
+          <a href="#mobile-app" class="site-nav-link" data-i18n="nav.screens">Screens</a>
+          <a href="#download-app" class="site-nav-link" data-i18n="nav.comingsoon">Coming soon</a>
+        </nav>
+
         <div class="nav-actions">
           <button class="language-switch" id="language-toggle" type="button" aria-label="Switch language">বাংলা</button>
           <button class="icon-action-btn" id="notifications-button" type="button" aria-label="Nearby alert notifications">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
             <span class="notif-badge" id="notifications-badge" hidden>0</span>
           </button>
-          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+          <!-- Circular Theme Toggle matching Reference Image 2 -->
+          <button class="theme-toggle circular-theme-toggle" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
             <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg>
             <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"></path></svg>
           </button>
+          <!-- Primary CTA Button matching Reference Image 2 -->
+          <a href="#download-app" class="btn btn-pill-violet header-store-cta" id="header-play-store-cta">
+            <span class="play-triangle-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+            </span>
+            <span data-i18n="nav.playcta">Get it on Google Play</span>
+          </a>
           <button class="btn btn-small btn-outline auth-header-btn" id="auth-nav-button" type="button" data-open-auth><span id="auth-nav-avatar" class="user-chip-avatar" hidden></span><span id="auth-nav-label" data-i18n="nav.signin">Sign in</span></button>
           <!-- Top Right 3-Bar Hamburger Menu Toggle -->
           <button class="menu-toggle-btn" id="menu-toggle-btn" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="menu-drawer">
@@ -710,47 +727,40 @@
           </div>
         </div>
 
-        <!-- Get on Google Play & App Store Coming Soon Section -->
+        <!-- Get on Google Play & App Store Dual Pill Section (Pre-Footer) matching Reference Image 1 -->
         <div class="app-download-bar" id="download-app">
           <div class="download-bar-header">
             <span class="store-eyebrow">PawNir for Android &amp; iOS</span>
             <h3>Get PawNir on your smartphone</h3>
-            <p>Download our official mobile app or install our instant Web App with one tap.</p>
+            <p>Direct mobile access for quick lost pet alerts, nearby blood donors, and foster shelters across Bangladesh.</p>
           </div>
-          <div class="store-buttons-cluster">
-            <!-- Google Play Store Button -->
-            <button type="button" class="store-btn play-store-btn" id="btn-google-play">
-              <span class="store-btn-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="#4285F4" d="M3.6 1.48v21.04c0 .54.34.99.82 1.13L15.35 12 4.42.35C3.94.49 3.6.94 3.6 1.48Z"/><path fill="#FBBC04" d="m18.73 8.63-3.38 3.37 3.38 3.37 3.82-2.18c1.09-.62 1.09-1.63 0-2.25l-3.82-2.31Z"/><path fill="#EA4335" d="m15.35 12-10.93 11.65c.29.08.62.03.9-.13l13.41-7.65-3.38-3.87Z"/><path fill="#34A853" d="m4.42.35 10.93 11.65 3.38-3.37L5.32.48c-.28-.16-.61-.21-.9-.13Z"/></svg>
+
+          <div class="store-pill-row">
+            <!-- Google Play Store Pill matching reference Image 1 -->
+            <button type="button" class="store-pill store-pill-play" id="btn-google-play" aria-label="Get it on Google Play">
+              <span class="store-pill-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="30" height="30"><path fill="#4285F4" d="M3.6 1.48v21.04c0 .54.34.99.82 1.13L15.35 12 4.42.35C3.94.49 3.6.94 3.6 1.48Z"/><path fill="#FBBC04" d="m18.73 8.63-3.38 3.37 3.38 3.37 3.82-2.18c1.09-.62 1.09-1.63 0-2.25l-3.82-2.31Z"/><path fill="#EA4335" d="m15.35 12-10.93 11.65c.29.08.62.03.9-.13l13.41-7.65-3.38-3.87Z"/><path fill="#34A853" d="m4.42.35 10.93 11.65 3.38-3.37L5.32.48c-.28-.16-.61-.21-.9-.13Z"/></svg>
               </span>
-              <div class="store-btn-text">
-                <small>GET IT ON</small>
-                <strong>Google Play</strong>
+              <div class="store-pill-text">
+                <span class="pill-sub">Get it on</span>
+                <strong class="pill-main">Google Play</strong>
               </div>
-              <span class="store-badge-tag tag-play">Coming Soon · Pre-register ↗</span>
             </button>
 
-            <!-- Apple App Store Button -->
-            <button type="button" class="store-btn app-store-btn" id="btn-app-store">
-              <span class="store-btn-icon" aria-hidden="true">
+            <!-- Apple App Store Pill matching reference Image 1 -->
+            <button type="button" class="store-pill store-pill-apple" id="btn-app-store" aria-label="Coming soon on the App Store">
+              <span class="store-pill-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.88c.64-.78 1.08-1.86.96-2.95-.93.04-2.05.62-2.71 1.4-.58.67-1.1 1.77-.96 2.83 1.04.08 2.08-.53 2.71-1.28Z"/></svg>
               </span>
-              <div class="store-btn-text">
-                <small>Download on the</small>
-                <strong>App Store</strong>
+              <div class="store-pill-text">
+                <span class="pill-sub">Coming soon on the</span>
+                <strong class="pill-main">App Store</strong>
               </div>
-              <span class="store-badge-tag tag-apple">Coming Soon · iOS Beta ↗</span>
             </button>
+          </div>
 
-            <!-- Instant PWA Install Button -->
-            <button type="button" class="store-btn pwa-store-btn" id="btn-pwa-install">
-              <span class="store-btn-icon" aria-hidden="true">⚡</span>
-              <div class="store-btn-text">
-                <small>Instant Install</small>
-                <strong>Web App (PWA)</strong>
-              </div>
-              <span class="store-badge-tag tag-instant">Ready now · Tap to install</span>
-            </button>
+          <div class="store-subtext">
+            <span>Or <button type="button" class="text-link" id="btn-pwa-install">install instant Web App (PWA)</button> on any smartphone browser</span>
           </div>
         </div>
       </section>
@@ -1460,6 +1470,6 @@
 
     <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
 
-    <script src="/app.js?v=20261030-8"></script>
+    <script src="/app.js?v=20261030-9"></script>
   </body>
 </html>

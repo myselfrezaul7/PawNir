@@ -64,6 +64,10 @@ const copy = {
     "nav.foster": "Fosters",
     "nav.find": "Find a vet",
     "nav.how": "How it works",
+    "nav.features": "Features",
+    "nav.screens": "Screens",
+    "nav.comingsoon": "Coming soon",
+    "nav.playcta": "Get it on Google Play",
     "nav.vets": "For vets",
     "nav.care": "My care",
     "nav.signin": "Sign in",
@@ -151,6 +155,10 @@ const copy = {
     "nav.foster": "ফস্টার কেয়ার",
     "nav.find": "জরুরি ভেট",
     "nav.how": "যেভাবে কাজ করে",
+    "nav.features": "ফিচারসমূহ",
+    "nav.screens": "স্ক্রিনশট",
+    "nav.comingsoon": "শীঘ্রই আসছে",
+    "nav.playcta": "গুগল প্লে স্টোরে পান",
     "nav.vets": "ভেটদের জন্য",
     "nav.care": "আমার যত্ন",
     "nav.signin": "সাইন ইন",
@@ -1388,6 +1396,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("mobile-app")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
+    if (rawHash === "download-app") {
+      document.body.dataset.view = "home";
+      document.getElementById("download-app")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (rawHash === "how-it-works") {
+      document.body.dataset.view = "home";
+      document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
     if (["privacy", "terms", "guidelines"].includes(rawHash)) {
       document.body.dataset.view = "home";
       showPolicyTab(rawHash);
@@ -1397,6 +1415,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dedicatedViews = ["foster-care", "lost-found", "blood-donors", "adoption", "find-care"];
     const view = dedicatedViews.includes(rawHash) ? rawHash : "home";
     document.body.dataset.view = view;
+
+    // Desktop top-bar navigation link active styling
+    document.querySelectorAll(".site-nav-links .site-nav-link").forEach((link) => {
+      const href = (link.getAttribute("href") || "").replace(/^#/, "");
+      link.classList.toggle("is-active", href === rawHash);
+    });
 
     // Desktop header active nav styling
     document.querySelectorAll(".main-nav a").forEach((link) => {
