@@ -1294,9 +1294,25 @@ function connectRealtimeStream() {
 }
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && activeDialog) {
-    event.preventDefault();
-    closeDialog(activeDialog);
+  if (event.key === "Escape") {
+    const menuDrawer = document.getElementById("menu-drawer");
+    if (menuDrawer?.classList.contains("is-open")) {
+      event.preventDefault();
+      menuDrawer.classList.remove("is-open");
+      menuDrawer.setAttribute("aria-hidden", "true");
+      document.getElementById("menu-toggle-btn")?.classList.remove("is-active");
+      document.getElementById("menu-toggle-btn")?.setAttribute("aria-expanded", "false");
+      const backdrop = document.getElementById("menu-drawer-backdrop");
+      if (backdrop) {
+        backdrop.classList.remove("is-open");
+        setTimeout(() => { backdrop.hidden = true; }, 280);
+      }
+      return;
+    }
+    if (activeDialog) {
+      event.preventDefault();
+      closeDialog(activeDialog);
+    }
   }
 });
 
@@ -1306,7 +1322,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   document.querySelectorAll(".booking-dialog").forEach(wireDialog);
-  wireDialog(document.getElementById("vet-profile-dialog"));
 
   setTheme(document.documentElement.dataset.theme || "light");
   applyLanguage(state.language);
@@ -1390,6 +1405,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       link.classList.toggle("is-active", (view === "home" && isHomeLink) || href === view);
     });
 
+    // Drawer active nav styling
+    document.querySelectorAll(".drawer-nav [data-drawer-link]").forEach((link) => {
+      const target = link.dataset.drawerLink;
+      const isHome = target === "home" && (view === "home");
+      link.classList.toggle("is-active", isHome || target === view);
+    });
+
     // Mobile bottom navigation active tab
     document.querySelectorAll(".mobile-nav [data-mobile-tab]").forEach((item) => {
       const tab = item.dataset.mobileTab;
@@ -1400,6 +1422,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Scroll smoothly to top on view change
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  // ── Top-Right 3-Bar Slide-Out Drawer Controls ──
+  const menuToggleBtn = document.getElementById("menu-toggle-btn");
+  const menuDrawer = document.getElementById("menu-drawer");
+  const menuBackdrop = document.getElementById("menu-drawer-backdrop");
+  const drawerCloseBtn = document.getElementById("drawer-close-btn");
+
+  function openMenuDrawer() {
+    if (!menuDrawer) return;
+    menuDrawer.classList.add("is-open");
+    menuDrawer.setAttribute("aria-hidden", "false");
+    menuToggleBtn?.classList.add("is-active");
+    menuToggleBtn?.setAttribute("aria-expanded", "true");
+    if (menuBackdrop) {
+      menuBackdrop.hidden = false;
+      requestAnimationFrame(() => menuBackdrop.classList.add("is-open"));
+    }
+  }
+
+  function closeMenuDrawer() {
+    if (!menuDrawer) return;
+    menuDrawer.classList.remove("is-open");
+    menuDrawer.setAttribute("aria-hidden", "true");
+    menuToggleBtn?.classList.remove("is-active");
+    menuToggleBtn?.setAttribute("aria-expanded", "false");
+    if (menuBackdrop) {
+      menuBackdrop.classList.remove("is-open");
+      setTimeout(() => {
+        if (!menuDrawer.classList.contains("is-open")) {
+          menuBackdrop.hidden = true;
+        }
+      }, 280);
+    }
+  }
+
+  menuToggleBtn?.addEventListener("click", () => {
+    const isOpen = menuDrawer?.classList.contains("is-open");
+    if (isOpen) {
+      closeMenuDrawer();
+    } else {
+      openMenuDrawer();
+    }
+  });
+
+  drawerCloseBtn?.addEventListener("click", closeMenuDrawer);
+  menuBackdrop?.addEventListener("click", closeMenuDrawer);
+
+  // Close drawer when clicking any link inside the drawer
+  menuDrawer?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      closeMenuDrawer();
+    });
+  });
+
+  // Wire drawer care button
+  menuDrawer?.querySelector("[data-open-dashboard]")?.addEventListener("click", (e) => {
+    closeMenuDrawer();
+    if (!localStorage.getItem("pawnir_token")) {
+      showAuthStep("credentials");
+      openDialog(document.getElementById("auth-dialog"), e.currentTarget);
+      return;
+    }
+    openDialog(document.getElementById("dashboard-dialog"), e.currentTarget);
+  });
 
   window.addEventListener("hashchange", updateViewFromHash);
   updateViewFromHash();

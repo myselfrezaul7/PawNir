@@ -47,7 +47,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Bengali:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261030-7" />
+    <link rel="stylesheet" href="/styles.css?v=20261030-8" />
   </head>
   <body data-view="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -56,14 +56,6 @@
         <a class="brand" href="#main" aria-label="PawNir home">
           <img class="brand-logo" src="/pawnir-logo.png?v=20261030-4" alt="PawNir" width="148" height="42" />
         </a>
-        <nav class="main-nav" aria-label="Main navigation">
-          <a href="#main" class="is-active" data-i18n="nav.home">Home</a>
-          <a href="#lost-found" data-i18n="nav.lost">Lost &amp; found</a>
-          <a href="#blood-donors" data-i18n="nav.donors">Blood donors</a>
-          <a href="#foster-care" data-i18n="nav.foster">Fosters &amp; Map</a>
-          <a href="#adoption" data-i18n="nav.adopt">Adopt</a>
-          <a href="#find-care" data-i18n="nav.find">Find a vet</a>
-        </nav>
         <div class="nav-actions">
           <button class="language-switch" id="language-toggle" type="button" aria-label="Switch language">বাংলা</button>
           <button class="icon-action-btn" id="notifications-button" type="button" aria-label="Nearby alert notifications">
@@ -74,11 +66,110 @@
             <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg>
             <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"></path></svg>
           </button>
-          <button class="btn btn-small btn-outline hide-mobile-xs" type="button" data-open-dashboard><span class="icon icon-heart" aria-hidden="true"></span><span data-i18n="nav.care">My care</span></button>
-          <button class="btn btn-small btn-outline" id="auth-nav-button" type="button" data-open-auth><span id="auth-nav-avatar" class="user-chip-avatar" hidden></span><span id="auth-nav-label" data-i18n="nav.signin">Sign in</span></button>
+          <button class="btn btn-small btn-outline auth-header-btn" id="auth-nav-button" type="button" data-open-auth><span id="auth-nav-avatar" class="user-chip-avatar" hidden></span><span id="auth-nav-label" data-i18n="nav.signin">Sign in</span></button>
+          <!-- Top Right 3-Bar Hamburger Menu Toggle -->
+          <button class="menu-toggle-btn" id="menu-toggle-btn" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="menu-drawer">
+            <span class="bar bar-1"></span>
+            <span class="bar bar-2"></span>
+            <span class="bar bar-3"></span>
+          </button>
         </div>
       </div>
     </header>
+
+    <!-- Sleek Right-Side Navigation Drawer Backdrop & Panel -->
+    <div class="menu-drawer-backdrop" id="menu-drawer-backdrop" hidden></div>
+    <aside class="menu-drawer" id="menu-drawer" aria-label="Main navigation menu" aria-hidden="true">
+      <div class="drawer-header">
+        <a class="brand" href="#main" aria-label="PawNir home">
+          <img class="brand-logo" src="/pawnir-logo.png?v=20261030-4" alt="PawNir" width="132" height="38" />
+        </a>
+        <button class="drawer-close-btn" id="drawer-close-btn" type="button" aria-label="Close navigation menu">×</button>
+      </div>
+
+      <div class="drawer-body">
+        <div class="drawer-section-title">Rescue &amp; Care Services</div>
+        <nav class="drawer-nav" aria-label="Services navigation">
+          <a href="#main" class="drawer-link is-active" data-drawer-link="home">
+            <span class="drawer-link-icon">🏠</span>
+            <span class="drawer-link-text">
+              <strong data-i18n="nav.home">Home</strong>
+              <small>Live network overview &amp; stats</small>
+            </span>
+          </a>
+          <a href="#lost-found" class="drawer-link" data-drawer-link="lost-found">
+            <span class="drawer-link-icon">🔔</span>
+            <span class="drawer-link-text">
+              <strong data-i18n="nav.lost">Lost &amp; found</strong>
+              <small>Nearby alerts &amp; sightings radar</small>
+            </span>
+          </a>
+          <a href="#blood-donors" class="drawer-link" data-drawer-link="blood-donors">
+            <span class="drawer-link-icon">🩸</span>
+            <span class="drawer-link-text">
+              <strong data-i18n="nav.donors">Blood donors</strong>
+              <small>Verified dog &amp; cat blood network</small>
+            </span>
+          </a>
+          <a href="#foster-care" class="drawer-link" data-drawer-link="foster-care">
+            <span class="drawer-link-icon">📍</span>
+            <span class="drawer-link-text">
+              <strong data-i18n="nav.foster">Fosters &amp; Map</strong>
+              <small>Google Maps verified shelters</small>
+            </span>
+          </a>
+          <a href="#adoption" class="drawer-link" data-drawer-link="adoption">
+            <span class="drawer-link-icon">♡</span>
+            <span class="drawer-link-text">
+              <strong data-i18n="nav.adopt">Adopt a pet</strong>
+              <small>Safe rehoming &amp; listings</small>
+            </span>
+          </a>
+          <a href="#find-care" class="drawer-link" data-drawer-link="find-care">
+            <span class="drawer-link-icon">✚</span>
+            <span class="drawer-link-text">
+              <strong data-i18n="nav.find">Find a vet</strong>
+              <small>Local veterinary network</small>
+            </span>
+          </a>
+        </nav>
+
+        <div class="drawer-section-title">Platform &amp; Community</div>
+        <nav class="drawer-nav" aria-label="Community navigation">
+          <a href="#how-it-works" class="drawer-link" data-drawer-link="how-it-works">
+            <span class="drawer-link-icon">✦</span>
+            <span class="drawer-link-text">
+              <strong data-i18n="nav.how">How it works</strong>
+              <small>Consent-based emergency care</small>
+            </span>
+          </a>
+          <a href="#mobile-app" class="drawer-link" data-drawer-link="mobile-app">
+            <span class="drawer-link-icon">📱</span>
+            <span class="drawer-link-text">
+              <strong>PawNir Mobile App</strong>
+              <small>Live radar &amp; push alerts</small>
+            </span>
+          </a>
+          <button type="button" class="drawer-link drawer-care-btn" data-open-dashboard>
+            <span class="drawer-link-icon">🐾</span>
+            <span class="drawer-link-text">
+              <strong data-i18n="nav.care">My Care &amp; Passports</strong>
+              <small>Pet passports, listings &amp; activity</small>
+            </span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="drawer-footer">
+        <div class="drawer-legal-links">
+          <button type="button" class="footer-policy-link" data-policy="privacy">Privacy</button>
+          <span>·</span>
+          <button type="button" class="footer-policy-link" data-policy="terms">Terms</button>
+          <span>·</span>
+          <button type="button" class="footer-policy-link" data-policy="guidelines">Guidelines</button>
+        </div>
+      </div>
+    </aside>
 
     <main id="main">
       <section class="hero shell">
@@ -1249,35 +1340,6 @@
       </form>
     </dialog>
 
-    <dialog class="booking-dialog" id="booking-dialog">
-      <form method="dialog" class="dialog-card" id="booking-form">
-        <div class="sheet-handle" aria-hidden="true"></div>
-        <button class="dialog-close" value="cancel" aria-label="Close booking dialog">×</button>
-        <p class="eyebrow">Book a consultation</p><h2 id="booking-title">Choose your veterinarian</h2>
-        <ol class="booking-steps" aria-label="Booking progress"><li class="is-current" data-step-label="1">Vet</li><li data-step-label="2">Time</li><li data-step-label="3">Pet</li><li data-step-label="4">Confirm</li></ol>
-        <div class="booking-step-panel is-current" data-step="1"><p class="step-kicker">Step 1 of 4</p><h3>Choose your veterinarian</h3><p class="dialog-helper" id="booking-vet-detail"></p><button class="btn btn-primary step-next" type="button">Choose a time <span aria-hidden="true">→</span></button></div>
-        <div class="booking-step-panel" data-step="2"><p class="step-kicker">Step 2 of 4</p><h3>Choose your time</h3><label>Your preferred date<input type="date" id="booking-date" required /></label><label>Available time<select id="booking-time" required><option>10:00 AM</option><option>12:30 PM</option><option>4:00 PM</option><option>7:30 PM</option></select></label><div class="step-actions"><button class="btn btn-ghost step-back" type="button">Back</button><button class="btn btn-primary step-next" type="button">Choose your pet <span aria-hidden="true">→</span></button></div></div>
-        <div class="booking-step-panel" data-step="3"><p class="step-kicker">Step 3 of 4</p><h3>Who is visiting?</h3><label>Your pet<select id="booking-pet" required><option value="">Sign in to load pets</option></select></label><label>Consultation type<select id="booking-mode"><option>Video consultation</option><option>In-clinic visit</option></select></label><div class="step-actions"><button class="btn btn-ghost step-back" type="button">Back</button><button class="btn btn-primary step-next" type="button">Review booking <span aria-hidden="true">→</span></button></div></div>
-        <div class="booking-step-panel" data-step="4"><p class="step-kicker">Step 4 of 4</p><h3>Review and request</h3><div class="booking-summary" id="booking-summary"></div><div class="step-actions"><button class="btn btn-ghost step-back" type="button">Back</button><button class="btn btn-primary" id="booking-submit" type="submit">Request appointment <span aria-hidden="true">→</span></button></div></div>
-        <p class="dialog-status" id="booking-status" role="status" aria-live="polite"></p>
-        <p class="secure-note">⌁ Your appointment is protected with secure, encrypted checkout.</p>
-      </form>
-    </dialog>
-
-    <dialog class="profile-sheet" id="vet-profile-dialog" aria-label="Veterinarian profile">
-      <section class="profile-sheet-card">
-        <div class="sheet-handle" aria-hidden="true"></div>
-        <button class="dialog-close" type="button" data-close-profile aria-label="Close veterinarian profile">×</button>
-        <div id="vet-profile-content"></div>
-        <button class="btn btn-primary profile-book-button" id="profile-book-button" type="button">Book a slot <span aria-hidden="true">→</span></button>
-      </section>
-    </dialog>
-
-    <div class="mobile-booking-bar" id="mobile-booking-bar" hidden>
-      <div><small>Selected veterinarian</small><strong id="mobile-booking-name"></strong></div>
-      <button class="btn btn-primary btn-small" id="mobile-book-button" type="button">Book now <span aria-hidden="true">→</span></button>
-    </div>
-
     <!-- Legal, Privacy & Community Guidelines Dialog -->
     <dialog class="booking-dialog policy-dialog" id="policy-dialog" aria-labelledby="policy-dialog-title">
       <div class="dialog-card policy-card">
@@ -1398,6 +1460,6 @@
 
     <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
 
-    <script src="/app.js?v=20261030-7"></script>
+    <script src="/app.js?v=20261030-8"></script>
   </body>
 </html>
