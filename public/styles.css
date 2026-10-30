@@ -396,6 +396,7 @@ body[data-view="home"] .how-it-works{padding:2.2rem 0 3.5rem}
 body[data-view="foster-care"] .hero,
 body[data-view="foster-care"] .mission-section,
 body[data-view="foster-care"] .home-snapshot-section,
+body[data-view="foster-care"] .mobile-app-showcase,
 body[data-view="foster-care"] .lost-found-section,
 body[data-view="foster-care"] .donor-section,
 body[data-view="foster-care"] .adoption-section,
@@ -409,6 +410,7 @@ body[data-view="foster-care"] .foster-section .view-back-bar{display:flex!import
 body[data-view="lost-found"] .hero,
 body[data-view="lost-found"] .mission-section,
 body[data-view="lost-found"] .home-snapshot-section,
+body[data-view="lost-found"] .mobile-app-showcase,
 body[data-view="lost-found"] .foster-section,
 body[data-view="lost-found"] .donor-section,
 body[data-view="lost-found"] .adoption-section,
@@ -422,6 +424,7 @@ body[data-view="lost-found"] .lost-found-section .view-back-bar{display:flex!imp
 body[data-view="blood-donors"] .hero,
 body[data-view="blood-donors"] .mission-section,
 body[data-view="blood-donors"] .home-snapshot-section,
+body[data-view="blood-donors"] .mobile-app-showcase,
 body[data-view="blood-donors"] .lost-found-section,
 body[data-view="blood-donors"] .foster-section,
 body[data-view="blood-donors"] .adoption-section,
@@ -435,6 +438,7 @@ body[data-view="blood-donors"] .donor-section .view-back-bar{display:flex!import
 body[data-view="adoption"] .hero,
 body[data-view="adoption"] .mission-section,
 body[data-view="adoption"] .home-snapshot-section,
+body[data-view="adoption"] .mobile-app-showcase,
 body[data-view="adoption"] .lost-found-section,
 body[data-view="adoption"] .donor-section,
 body[data-view="adoption"] .foster-section,
@@ -448,6 +452,7 @@ body[data-view="adoption"] .adoption-section .view-back-bar{display:flex!importa
 body[data-view="find-care"] .hero,
 body[data-view="find-care"] .mission-section,
 body[data-view="find-care"] .home-snapshot-section,
+body[data-view="find-care"] .mobile-app-showcase,
 body[data-view="find-care"] .lost-found-section,
 body[data-view="find-care"] .donor-section,
 body[data-view="find-care"] .foster-section,
@@ -456,3 +461,222 @@ body[data-view="find-care"] .how-it-works,
 body[data-view="find-care"] .vet-banner{display:none!important}
 body[data-view="find-care"] .vet-coming-soon{display:block!important;padding-top:1.25rem;animation:cardPopIn .32s ease both}
 body[data-view="find-care"] .vet-coming-soon .view-back-bar{display:flex!important}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Mobile App Showcase & Screenshots Experience
+   ═══════════════════════════════════════════════════════════════════════════ */
+.mobile-app-showcase{padding:3.8rem 0 3.2rem;position:relative}
+.text-center{text-align:center}
+.section-sub{max-width:620px;margin:.65rem auto 0;color:var(--muted);font-size:14.5px;line-height:1.55}
+
+/* Screen Switcher Tabs */
+.mockup-tab-nav{display:flex;justify-content:center;align-items:center;gap:.6rem;flex-wrap:wrap;margin:2rem 0 2.5rem}
+.mockup-tab{display:inline-flex;align-items:center;gap:.5rem;padding:.55rem 1.1rem;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:750 13px "Manrope";cursor:pointer;transition:all .18s cubic-bezier(.22,1,.36,1);box-shadow:0 2px 8px var(--shadow-color)}
+.mockup-tab:hover{border-color:var(--green);color:var(--green);background:var(--mint)}
+.mockup-tab.is-active{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 6px 18px rgba(40,125,97,.28);transform:translateY(-1px)}
+.tab-badge{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.08);font-size:10px;font-weight:800}
+.mockup-tab.is-active .tab-badge{background:rgba(255,255,255,.24);color:#fff}
+
+/* Showcase Stage Container */
+.mockup-stage-container{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:2rem;margin-bottom:3.2rem}
+.mockup-side-feature{display:flex;flex-direction:column;gap:1.25rem}
+.feature-card-item{background:var(--glass-card);border:1px solid var(--glass-line);border-radius:18px;padding:1.35rem 1.25rem;box-shadow:0 10px 24px var(--shadow-color);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;gap:1rem;align-items:flex-start;transition:transform .2s ease,border-color .2s ease}
+.feature-card-item:hover{transform:translateY(-3px);border-color:#087f6266}
+.feature-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--mint);color:var(--green);font-size:18px;font-weight:800;flex-shrink:0}
+.feature-card-item strong{display:block;font:800 15px "Manrope";color:var(--ink);margin-bottom:.25rem}
+.feature-card-item p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45}
+
+/* Realistic Smartphone Frame Mockup */
+.phone-frame-wrapper{display:flex;justify-content:center}
+.phone-frame{width:310px;height:610px;background:#0d1815;border-radius:44px;padding:9px;position:relative;box-shadow:0 30px 80px -15px rgba(10,38,30,.38),0 0 0 1px rgba(255,255,255,.14),inset 0 0 0 2px #263c34;user-select:none}
+.phone-rim{position:absolute;inset:0;border-radius:44px;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.25) 0%,transparent 30%,transparent 70%,rgba(255,255,255,.1) 100%)}
+.phone-island{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:92px;height:24px;background:#000;border-radius:999px;z-index:10;display:flex;align-items:center;justify-content:flex-end;padding-right:12px}
+.phone-lens{width:9px;height:9px;border-radius:50%;background:#09221b;border:1.5px solid #1c3d33;box-shadow:inset 0 0 2px #4ade80}
+
+/* Inside Screen */
+.phone-screen{width:100%;height:100%;border-radius:36px;background:var(--paper);overflow:hidden;position:relative;display:flex;flex-direction:column}
+:root[data-theme=dark] .phone-screen{background:#111a18}
+
+/* Status Bar */
+.mockup-status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 16px 2px;font:700 11px "DM Sans";color:var(--ink);z-index:5}
+.status-clock{font-weight:800;font-size:11.5px}
+.status-right-icons{display:flex;align-items:center;gap:5px;font-size:10px}
+.status-signal{letter-spacing:1px;font-size:7px;color:var(--ink)}
+.status-net{font-weight:800;font-size:9.5px;color:var(--green)}
+.status-battery{display:inline-block;width:18px;height:9px;border:1px solid currentColor;border-radius:3px;padding:1px;position:relative}
+.status-battery::after{content:"";position:absolute;right:-3px;top:2px;width:2px;height:3px;background:currentColor;border-radius:0 1px 1px 0}
+.battery-level{display:block;width:85%;height:100%;background:#22c55e;border-radius:1px}
+
+/* Screen Views */
+.mockup-screen-view{display:none;flex:1;padding:8px 12px 6px;flex-direction:column;gap:8px;overflow-y:auto;animation:cardPopIn .24s ease both}
+.mockup-screen-view.is-active{display:flex}
+
+.app-screen-header{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 4px}
+.app-screen-brand{font:800 13px "Manrope";color:var(--green)}
+.app-screen-brand small{font-weight:700;color:var(--muted);margin-left:3px}
+.app-screen-pill{font:800 9.5px "DM Sans";text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:999px}
+.pill-alert{background:#fee2e2;color:#b91c1c}
+.pill-blood{background:#fecaca;color:#991b1b}
+.pill-foster{background:var(--mint);color:var(--green)}
+.pill-secure{background:#e0e7ff;color:#3730a3}
+
+/* Push Notification Banner */
+.app-push-banner{background:linear-gradient(135deg,#fff5f5,#fff);border:1px solid #fecaca;border-radius:14px;padding:7px 9px;display:flex;gap:7px;align-items:flex-start;box-shadow:0 4px 12px rgba(239,68,68,.12)}
+:root[data-theme=dark] .app-push-banner{background:#2a1919;border-color:#5c2525}
+.push-icon{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:#ef4444;color:#fff;font-size:12px;flex-shrink:0}
+.push-text strong{display:block;font:800 10.5px "Manrope";color:#991b1b}
+:root[data-theme=dark] .push-text strong{color:#fca5a5}
+.push-text p{margin:0;font-size:9.5px;color:var(--muted);line-height:1.3}
+
+/* Pet Card Mockup */
+.app-pet-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px;box-shadow:0 6px 14px var(--shadow-color);display:grid;gap:6px}
+.app-pet-img-box{height:76px;border-radius:10px;background:linear-gradient(135deg,#fed7aa,#fde68a);position:relative;display:grid;place-items:center;overflow:hidden}
+.app-pet-emoji{font-size:38px}
+.app-pet-badge{position:absolute;top:5px;left:6px;background:rgba(0,0,0,.65);color:#fff;font:800 8.5px "DM Sans";padding:2px 6px;border-radius:999px;letter-spacing:.04em}
+.app-pet-info h4{margin:0;font:800 13px "Manrope";color:var(--ink)}
+.app-pet-meta{margin:2px 0 4px;font:700 9.5px "DM Sans";color:var(--green)}
+.app-pet-desc{margin:0 0 6px;font-size:10px;line-height:1.4;color:var(--muted)}
+
+.app-pet-actions{display:flex;gap:5px}
+.btn-mockup{flex:1;text-align:center;padding:5px 6px;border-radius:8px;font:750 10px "DM Sans";cursor:pointer}
+.btn-mockup-primary{background:var(--green);color:#fff}
+.btn-mockup-outline{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn-mockup-blood{background:#dc2626;color:#fff}
+
+.app-mini-radar{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;background:var(--surface-soft);font-size:9.5px;color:var(--muted)}
+.radar-ping{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(40,125,97,.2);animation:pulseDot 1.6s infinite}
+
+/* Donor Mockup Details */
+.app-urgent-callout{background:linear-gradient(135deg,#fef2f2,#fff1f2);border:1px solid #fecdd3;border-radius:12px;padding:8px 10px;text-align:center}
+:root[data-theme=dark] .app-urgent-callout{background:#301b1f;border-color:#5a232c}
+.app-urgent-callout strong{display:block;font:800 11.5px "Manrope";color:#b91c1c}
+:root[data-theme=dark] .app-urgent-callout strong{color:#f87171}
+.app-urgent-callout p{margin:2px 0 0;font-size:9.5px;color:var(--muted)}
+
+.app-donor-match-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:6px;box-shadow:0 6px 14px var(--shadow-color)}
+.donor-match-top{display:flex;align-items:center;gap:7px}
+.donor-avatar{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#fee2e2;font-size:18px;flex-shrink:0}
+.donor-match-top h4{margin:0;font:800 12.5px "Manrope";color:var(--ink)}
+.donor-blood-tag{display:inline-block;font:800 9.5px "DM Sans";color:#b91c1c}
+.match-dist{margin-left:auto;font:700 9.5px "DM Sans";color:var(--green);background:var(--mint);padding:2px 6px;border-radius:999px}
+.donor-match-details{display:flex;flex-direction:column;gap:2px;font:600 9.5px "DM Sans";color:var(--muted);border-top:1px solid var(--line);padding-top:5px}
+.app-vet-notice{text-align:center;font-size:9px;color:var(--muted);margin-top:auto;padding-bottom:2px}
+
+/* Foster Mockup Details */
+.app-map-mini-stage{height:90px;border-radius:12px;background:#e5f3eb;position:relative;overflow:hidden;border:1px solid var(--line)}
+.mockup-map-bg{position:absolute;inset:0;background-image:radial-gradient(#b2ddcb 1px,transparent 1px);background-size:12px 12px;padding:8px}
+.map-pin-pulse{position:absolute;font:800 9px "DM Sans";padding:3px 7px;border-radius:999px;background:#fff;color:var(--dark);box-shadow:0 3px 8px rgba(0,0,0,.18);border:1px solid var(--green)}
+.map-pin-pulse.pin-1{top:15px;left:18px}
+.map-pin-pulse.pin-2{bottom:15px;right:18px}
+
+.app-foster-preview-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:6px;box-shadow:0 6px 14px var(--shadow-color)}
+.foster-card-head{display:flex;justify-content:space-between;align-items:flex-start}
+.foster-card-head h4{margin:0;font:800 12.5px "Manrope";color:var(--ink)}
+.foster-card-head small{color:var(--muted);font-size:9.5px}
+.foster-score{font:800 11.5px "Manrope";color:#d97706;background:#fef3c7;padding:2px 6px;border-radius:999px}
+.foster-review-quote{margin:0;font-size:9.5px;font-style:italic;color:var(--muted);line-height:1.4}
+
+/* Passport Mockup Details */
+.app-passport-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:7px;box-shadow:0 6px 14px var(--shadow-color)}
+.passport-photo-row{display:flex;align-items:center;gap:8px}
+.passport-avatar{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:#fed7aa;font-size:20px;flex-shrink:0}
+.passport-photo-row h4{margin:0;font:800 13px "Manrope";color:var(--ink)}
+.passport-photo-row small{color:var(--muted);font-size:10px}
+.passport-id-tag{font:700 8.5px monospace;color:var(--green);margin-top:2px}
+.passport-vax-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;border-top:1px solid var(--line);padding-top:6px}
+.vax-item{background:var(--surface-soft);padding:4px 6px;border-radius:6px;font-size:9px}
+.vax-item strong{display:block;font-size:9.5px;color:var(--ink)}
+.vax-item span{color:var(--green);font-weight:700}
+
+.app-2fa-status-card{background:linear-gradient(135deg,var(--mint),var(--surface));border:1px solid #bbf0dc;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px}
+.twofa-icon{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;font-size:12px;flex-shrink:0}
+.app-2fa-status-card strong{display:block;font:800 10.5px "Manrope";color:var(--green)}
+.app-2fa-status-card p{margin:0;font-size:9px;color:var(--muted)}
+
+/* Mockup Bottom Navigation */
+.mockup-bottom-nav{margin-top:auto;border-top:1px solid var(--line);padding:5px 8px 3px;display:flex;justify-content:space-around;background:var(--surface)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--muted);font-size:8px;font-weight:700}
+.nav-item.is-active{color:var(--green)}
+.nav-icon{font-size:13px}
+.phone-home-bar{width:90px;height:3px;border-radius:999px;background:var(--ink);opacity:.35;margin:4px auto 6px}
+
+/* ── App Store & Google Play Download Section ── */
+.app-download-bar{margin-top:1rem;background:linear-gradient(145deg,var(--dark),#112822);border-radius:24px;padding:2.2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap;box-shadow:0 20px 50px rgba(25,61,53,.24);border:1px solid rgba(255,255,255,.1)}
+.download-bar-header{max-width:440px}
+.store-eyebrow{display:inline-block;font:800 11px "Manrope";text-transform:uppercase;letter-spacing:.08em;color:var(--mint);margin-bottom:.3rem}
+.download-bar-header h3{margin:0 0 .4rem;font:800 24px/1.2 "Manrope";color:#fff}
+.download-bar-header p{margin:0;font-size:13.5px;color:#b4ccc3;line-height:1.5}
+
+.store-buttons-cluster{display:flex;align-items:center;gap:.9rem;flex-wrap:wrap}
+.store-btn{display:inline-flex;align-items:center;gap:.75rem;padding:.7rem 1.15rem;border-radius:15px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#fff;text-align:left;cursor:pointer;position:relative;transition:all .2s cubic-bezier(.22,1,.36,1)}
+.store-btn:hover{transform:translateY(-3px);background:rgba(255,255,255,.16);border-color:#a7dec8;box-shadow:0 12px 28px rgba(0,0,0,.35)}
+.store-btn-icon{display:grid;place-items:center;flex-shrink:0}
+.store-btn-text small{display:block;font:600 10px "DM Sans";text-transform:uppercase;letter-spacing:.04em;color:#b4ccc3}
+.store-btn-text strong{display:block;font:800 15px "Manrope";letter-spacing:-.01em;line-height:1.2}
+
+.store-badge-tag{position:absolute;top:-8px;right:10px;font:800 8.5px "DM Sans";text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.tag-play{background:#fef08a;color:#854d0e}
+.tag-apple{background:#dbeafe;color:#1e40af}
+.tag-instant{background:var(--mint);color:var(--green)}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Footer Non-Profit Concern Strip & Legal Links
+   ═══════════════════════════════════════════════════════════════════════════ */
+.footer-concern-strip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:1.15rem 1.4rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.concern-flag{display:inline-flex;align-items:center;gap:.45rem;background:rgba(244,63,94,.16);border:1px solid rgba(244,63,94,.32);color:#fda4af;padding:.34rem .75rem;border-radius:999px;font:800 11.5px "Manrope";white-space:nowrap}
+.concern-heart{font-size:13px}
+.footer-concern-strip p{margin:0;font-size:13px;color:#d8ebe2;line-height:1.55;flex:1}
+.footer-concern-strip strong{color:#fff}
+
+.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:2rem;flex-wrap:wrap;padding-top:1.5rem}
+.footer-brand-wrap{display:flex;flex-direction:column;gap:.35rem}
+.footer-brand-wrap p{margin:0;color:#b4ccc3;font-size:12px}
+.footer-links-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+.footer-nav-row{display:flex;gap:1.2rem;font-size:13px;flex-wrap:wrap}
+.footer-legal-row{display:flex;align-items:center;gap:.55rem;font-size:12px;color:#9bb2aa}
+.legal-dot{color:rgba(255,255,255,.3)}
+.footer-policy-link{border:0;background:none;color:#b4ccc3;font:600 12px "DM Sans";cursor:pointer;padding:0;transition:color .16s ease}
+.footer-policy-link:hover{color:#fff;text-decoration:underline}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Policy Dialog (Privacy, Terms & Community Guidelines)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.policy-dialog{max-width:680px;width:calc(100% - 32px);max-height:calc(100dvh - 36px);border-radius:24px}
+.policy-card{padding:1.8rem 2.2rem;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.policy-eyebrow{color:var(--green);font:800 11px "Manrope";text-transform:uppercase;letter-spacing:.08em}
+.policy-card h2{font:800 24px "Manrope";letter-spacing:-.03em;margin:.2rem 0 .3rem}
+
+.policy-nav-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;background:var(--surface-soft);padding:4px;border-radius:12px;margin:1rem 0}
+.policy-nav-tab{border:0;background:transparent;padding:.6rem .4rem;border-radius:9px;font:750 12.5px "Manrope";color:var(--muted);cursor:pointer;transition:all .18s ease}
+.policy-nav-tab.is-active{background:var(--surface);color:var(--green);box-shadow:0 3px 10px var(--shadow-color)}
+
+.policy-body-scroller{overflow-y:auto;padding-right:.6rem;flex:1;min-height:260px}
+.policy-article{display:none;animation:cardPopIn .24s ease both}
+.policy-article.is-active{display:block}
+.policy-article h3{font:800 20px "Manrope";margin:0 0 .2rem;color:var(--ink)}
+.policy-meta{font:600 12px "DM Sans";color:var(--muted);margin-bottom:1.2rem}
+.policy-section{margin-bottom:1.4rem}
+.policy-section h4{font:800 14.5px "Manrope";color:var(--ink);margin:0 0 .4rem}
+.policy-section p{margin:0 0 .5rem;color:var(--muted);font-size:13px;line-height:1.6}
+.policy-section strong{color:var(--ink)}
+.policy-section ul{margin:.3rem 0;padding-left:1.2rem;color:var(--muted);font-size:13px;line-height:1.6}
+.policy-section li{margin-bottom:.4rem}
+.policy-footer-actions{display:flex;justify-content:flex-end;margin-top:1.2rem;padding-top:1rem;border-top:1px solid var(--line)}
+
+/* Responsive Rules for Mobile */
+@media(max-width:860px){
+  .mockup-stage-container{grid-template-columns:1fr;justify-items:center}
+  .mockup-side-feature{width:100%;max-width:440px}
+  .app-download-bar{flex-direction:column;text-align:center;padding:1.8rem 1.4rem}
+  .download-bar-header{max-width:100%}
+  .store-buttons-cluster{justify-content:center}
+  .footer-links-wrap{align-items:flex-start}
+}
+
+@media(max-width:640px){
+  .policy-card{padding:1.4rem 1.1rem}
+  .policy-nav-tab{font-size:11px;padding:.5rem .2rem}
+  .store-buttons-cluster{flex-direction:column;width:100%}
+  .store-btn{width:100%;justify-content:center}
+  .footer-concern-strip{flex-direction:column;align-items:flex-start}
+}

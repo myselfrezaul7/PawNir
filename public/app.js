@@ -1126,7 +1126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     openDialog(document.getElementById("auth-dialog"));
   }
 
-  document.querySelectorAll(".hero-copy, .hero-art, .mission-section, .lost-found-section, .donor-section, .adoption-section, .foster-section, .vet-coming-soon, .how-it-works, .vet-banner").forEach((element) => element.classList.add("reveal"));
+  document.querySelectorAll(".hero-copy, .hero-art, .mission-section, .lost-found-section, .donor-section, .adoption-section, .foster-section, .vet-coming-soon, .how-it-works, .mobile-app-showcase, .vet-banner").forEach((element) => element.classList.add("reveal"));
   const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
     if (entry.isIntersecting) {
       entry.target.classList.add("revealed");
@@ -1138,6 +1138,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Dynamic View Routing (Home vs Dedicated Fosters, Alerts, Donors)
   function updateViewFromHash() {
     const rawHash = (window.location.hash || "").replace(/^#/, "");
+    if (rawHash === "mobile-app") {
+      document.body.dataset.view = "home";
+      document.getElementById("mobile-app")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    if (["privacy", "terms", "guidelines"].includes(rawHash)) {
+      document.body.dataset.view = "home";
+      showPolicyTab(rawHash);
+      openDialog(document.getElementById("policy-dialog"));
+      return;
+    }
     const dedicatedViews = ["foster-care", "lost-found", "blood-donors", "adoption", "find-care"];
     const view = dedicatedViews.includes(rawHash) ? rawHash : "home";
     document.body.dataset.view = view;
@@ -1796,6 +1807,81 @@ document.addEventListener("DOMContentLoaded", async () => {
       await loadPets();
       showToast("Signed in!");
     }
+  });
+
+  // Interactive Mobile App Screens Switcher
+  const mockupTabs = document.querySelectorAll(".mockup-tab");
+  const mockupViews = document.querySelectorAll(".mockup-screen-view");
+  mockupTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const targetScreenId = tab.dataset.appScreen;
+      mockupTabs.forEach((t) => {
+        const isActive = t === tab;
+        t.classList.toggle("is-active", isActive);
+        t.setAttribute("aria-selected", String(isActive));
+      });
+      mockupViews.forEach((view) => {
+        view.classList.toggle("is-active", view.id === targetScreenId);
+      });
+    });
+  });
+
+  // App Store & Google Play Download & PWA Install Handlers
+  let deferredInstallPrompt = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+  });
+
+  document.getElementById("btn-google-play")?.addEventListener("click", () => {
+    showToast("Google Play release coming soon! Tap 'Web App (PWA)' to install directly on your Android phone.");
+  });
+
+  document.getElementById("btn-app-store")?.addEventListener("click", () => {
+    showToast("iOS App is in TestFlight Beta! On Safari, tap Share ↗ → 'Add to Home Screen' to install right now.");
+  });
+
+  document.getElementById("btn-pwa-install")?.addEventListener("click", async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      if (choice.outcome === "accepted") {
+        showToast("PawNir is installing to your home screen!");
+      }
+      deferredInstallPrompt = null;
+    } else {
+      showToast("To install PawNir: on Chrome tap menu ⋮ → 'Install App'; on iPhone Safari tap Share ↗ → 'Add to Home Screen'.");
+    }
+  });
+
+  // Legal Policies & Community Guidelines modal
+  function showPolicyTab(tabKey) {
+    const policyTabs = document.querySelectorAll("[data-policy-tab]");
+    const policyArticles = document.querySelectorAll(".policy-article");
+    policyTabs.forEach((t) => {
+      const isTarget = t.dataset.policyTab === tabKey;
+      t.classList.toggle("is-active", isTarget);
+      t.setAttribute("aria-selected", String(isTarget));
+    });
+    policyArticles.forEach((article) => {
+      article.classList.toggle("is-active", article.id === `policy-panel-${tabKey}`);
+    });
+  }
+
+  document.querySelectorAll("[data-policy-tab]").forEach((tab) => {
+    tab.addEventListener("click", () => showPolicyTab(tab.dataset.policyTab));
+  });
+
+  document.querySelectorAll("[data-policy]").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      const policyKey = btn.dataset.policy || "privacy";
+      showPolicyTab(policyKey);
+      openDialog(document.getElementById("policy-dialog"), event.currentTarget);
+    });
+  });
+
+  document.querySelectorAll("[data-close-policy]").forEach((btn) => {
+    btn.addEventListener("click", () => closeDialog(document.getElementById("policy-dialog")));
   });
 
   // Initial Data Load & Real-time Updates

@@ -47,7 +47,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261030-4" />
+    <link rel="stylesheet" href="/styles.css?v=20261030-5" />
   </head>
   <body data-view="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -345,10 +345,289 @@
         <div><p class="eyebrow" data-i18n="banner.eyebrow">For veterinary professionals</p><h2 data-i18n-html="banner.title">Make more time for<br /><em>what matters most.</em></h2><p data-i18n="banner.desc">Grow your practice, simplify your day, and give every patient a better care journey.</p></div>
         <button class="btn btn-light" type="button" data-open-auth><span data-i18n="banner.btn">Join PawNir</span> <span aria-hidden="true">↗</span></button>
       </section>
+
+      <!-- Mobile App Showcase & Screenshots -->
+      <section class="mobile-app-showcase shell" id="mobile-app" aria-labelledby="mobile-app-title">
+        <div class="section-heading text-center">
+          <div>
+            <p class="eyebrow"><span class="live-pulse" aria-hidden="true"></span> PawNir on Mobile</p>
+            <h2 id="mobile-app-title">Urgent animal rescue &amp; care,<br /><em>right in your pocket.</em></h2>
+            <p class="section-sub">Designed specifically for Bangladesh pet parents and rescuers. Get instant push alerts when a lost animal is nearby, match emergency blood donors in minutes, and explore verified Google Maps fosters.</p>
+          </div>
+        </div>
+
+        <!-- Interactive Screen Switcher Tabs -->
+        <div class="mockup-tab-nav" role="tablist" aria-label="Mobile app screens preview">
+          <button type="button" class="mockup-tab is-active" data-app-screen="screen-lost" role="tab" aria-selected="true">
+            <span class="tab-badge">01</span>
+            <span class="tab-label">Lost &amp; Found Radar</span>
+          </button>
+          <button type="button" class="mockup-tab" data-app-screen="screen-donor" role="tab" aria-selected="false">
+            <span class="tab-badge">02</span>
+            <span class="tab-label">Emergency Blood Match</span>
+          </button>
+          <button type="button" class="mockup-tab" data-app-screen="screen-foster" role="tab" aria-selected="false">
+            <span class="tab-badge">03</span>
+            <span class="tab-label">Google Maps Fosters</span>
+          </button>
+          <button type="button" class="mockup-tab" data-app-screen="screen-passport" role="tab" aria-selected="false">
+            <span class="tab-badge">04</span>
+            <span class="tab-label">Pet Passport &amp; 2FA</span>
+          </button>
+        </div>
+
+        <!-- Realistic Smartphone Mockup Display Stage -->
+        <div class="mockup-stage-container">
+          <!-- Side Feature 1 (Desktop) -->
+          <div class="mockup-side-feature feature-left">
+            <div class="feature-card-item">
+              <span class="feature-icon">⚡</span>
+              <div>
+                <strong>350m Geo-Alerts</strong>
+                <p>Broadcasting to nearby animal lovers without spamming unrelated social media groups.</p>
+              </div>
+            </div>
+            <div class="feature-card-item">
+              <span class="feature-icon">🩸</span>
+              <div>
+                <strong>Direct Donor Dispatch</strong>
+                <p>Filter registered cat &amp; dog blood donors by area, weight, and blood type in critical hours.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Central Hardware Mockup Frame -->
+          <div class="phone-frame-wrapper">
+            <div class="phone-frame">
+              <div class="phone-rim"></div>
+              <div class="phone-island">
+                <span class="phone-lens"></span>
+              </div>
+              <div class="phone-screen">
+                <!-- Status Bar -->
+                <div class="mockup-status-bar">
+                  <span class="status-clock">9:41</span>
+                  <div class="status-right-icons">
+                    <span class="status-signal" aria-hidden="true">●●●●</span>
+                    <span class="status-net">5G</span>
+                    <span class="status-battery" aria-label="100% battery"><span class="battery-level"></span></span>
+                  </div>
+                </div>
+
+                <!-- Screen 1: Lost & Found Radar -->
+                <div class="mockup-screen-view is-active" id="screen-lost" role="tabpanel">
+                  <div class="app-screen-header">
+                    <span class="app-screen-brand">PawNir <small>Alerts</small></span>
+                    <span class="app-screen-pill pill-alert"><span class="live-pulse"></span> Dhanmondi</span>
+                  </div>
+                  <div class="app-push-banner">
+                    <div class="push-icon">🔔</div>
+                    <div class="push-text">
+                      <strong>Lost Pet Nearby (350m away)</strong>
+                      <p>Golden Retriever "Rocky" reported missing near Dhanmondi Lake Park.</p>
+                    </div>
+                  </div>
+                  <div class="app-pet-card">
+                    <div class="app-pet-img-box">
+                      <span class="app-pet-badge">LOST · DOG</span>
+                      <div class="app-pet-emoji">🐕</div>
+                    </div>
+                    <div class="app-pet-info">
+                      <h4>Rocky (Golden Retriever)</h4>
+                      <p class="app-pet-meta">⌖ Dhanmondi 10A · 25 mins ago</p>
+                      <p class="app-pet-desc">Friendly male, wearing a red collar with bell. Please contact owner or share a live sighting.</p>
+                      <div class="app-pet-actions">
+                        <span class="btn-mockup btn-mockup-primary">📍 I spotted this pet</span>
+                        <span class="btn-mockup btn-mockup-outline">📞 Call owner</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="app-mini-radar">
+                    <span class="radar-ping"></span>
+                    <span><strong>124 pet lovers</strong> notified in your zone</span>
+                  </div>
+                </div>
+
+                <!-- Screen 2: Emergency Blood Match -->
+                <div class="mockup-screen-view" id="screen-donor" role="tabpanel">
+                  <div class="app-screen-header">
+                    <span class="app-screen-brand">PawNir <small>Blood Network</small></span>
+                    <span class="app-screen-pill pill-blood">🩸 Urgent</span>
+                  </div>
+                  <div class="app-urgent-callout">
+                    <strong>Critical Need · Cat Type A</strong>
+                    <p>Central Veterinary Hospital, Dhaka · Cross-match ready</p>
+                  </div>
+                  <div class="app-donor-match-card">
+                    <div class="donor-match-top">
+                      <div class="donor-avatar">🐱</div>
+                      <div>
+                        <h4>Milo (Persian Cat)</h4>
+                        <span class="donor-blood-tag">Type A · 4.8 kg</span>
+                      </div>
+                      <span class="match-dist">1.6 km away</span>
+                    </div>
+                    <div class="donor-match-details">
+                      <span>✓ Fully Vaccinated (Rabies, FPV)</span>
+                      <span>✓ Owner Consented: Nafis R.</span>
+                    </div>
+                    <div class="app-pet-actions">
+                      <span class="btn-mockup btn-mockup-blood">🩸 Request Emergency Blood</span>
+                    </div>
+                  </div>
+                  <div class="app-vet-notice">
+                    <small>⚖ Licensed veterinarian must cross-match blood before transfusion.</small>
+                  </div>
+                </div>
+
+                <!-- Screen 3: Google Maps Fosters -->
+                <div class="mockup-screen-view" id="screen-foster" role="tabpanel">
+                  <div class="app-screen-header">
+                    <span class="app-screen-brand">PawNir <small>Foster Map</small></span>
+                    <span class="app-screen-pill pill-foster">📍 Google Maps</span>
+                  </div>
+                  <div class="app-map-mini-stage">
+                    <div class="mockup-map-bg">
+                      <span class="map-pin-pulse pin-1">📍 Paws &amp; Care</span>
+                      <span class="map-pin-pulse pin-2">📍 Furry Havens</span>
+                    </div>
+                  </div>
+                  <div class="app-foster-preview-card">
+                    <div class="foster-card-head">
+                      <div>
+                        <h4>Paws &amp; Care Sanctuary</h4>
+                        <small>⌖ Dhanmondi Road 10 · Verified Shelter</small>
+                      </div>
+                      <span class="foster-score">★ 4.9 <small>(38)</small></span>
+                    </div>
+                    <p class="foster-review-quote">“Took caring custody of our rescued street cat for 2 weeks. Clean environment and daily video check-ins!”</p>
+                    <div class="app-pet-actions">
+                      <span class="btn-mockup btn-mockup-primary">Book Foster Care</span>
+                      <span class="btn-mockup btn-mockup-outline">Directions ↗</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Screen 4: Pet Passport & 2FA -->
+                <div class="mockup-screen-view" id="screen-passport" role="tabpanel">
+                  <div class="app-screen-header">
+                    <span class="app-screen-brand">PawNir <small>Passport</small></span>
+                    <span class="app-screen-pill pill-secure">🛡️ 2FA Active</span>
+                  </div>
+                  <div class="app-passport-card">
+                    <div class="passport-photo-row">
+                      <div class="passport-avatar">🐶</div>
+                      <div>
+                        <h4>Bagha</h4>
+                        <small>Deshi Rescue Mix · 1.5 yrs</small>
+                        <div class="passport-id-tag">PawNir ID: #BD-90412</div>
+                      </div>
+                    </div>
+                    <div class="passport-vax-grid">
+                      <div class="vax-item"><strong>Rabies</strong><span>Vaccinated ✓</span></div>
+                      <div class="vax-item"><strong>DHPP</strong><span>Up to date ✓</span></div>
+                      <div class="vax-item"><strong>Weight</strong><span>14.5 kg</span></div>
+                      <div class="vax-item"><strong>Microchip</strong><span>Available</span></div>
+                    </div>
+                  </div>
+                  <div class="app-2fa-status-card">
+                    <div class="twofa-icon">✓</div>
+                    <div>
+                      <strong>2-Step Math 2FA Enabled</strong>
+                      <p>Account protected with zero SMS-interception risk.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Virtual Phone Bottom Navigation -->
+                <div class="mockup-bottom-nav">
+                  <span class="nav-item is-active"><span class="nav-icon">🏠</span><small>Home</small></span>
+                  <span class="nav-item"><span class="nav-icon">⌖</span><small>Alerts</small></span>
+                  <span class="nav-item"><span class="nav-icon">+</span><small>Donors</small></span>
+                  <span class="nav-item"><span class="nav-icon">📍</span><small>Fosters</small></span>
+                  <span class="nav-item"><span class="nav-icon">👤</span><small>Passport</small></span>
+                </div>
+                <div class="phone-home-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Side Feature 2 (Desktop) -->
+          <div class="mockup-side-feature feature-right">
+            <div class="feature-card-item">
+              <span class="feature-icon">🛡️</span>
+              <div>
+                <strong>Zero Contact Scraping</strong>
+                <p>Private phone numbers and addresses are protected behind screened volunteer requests.</p>
+              </div>
+            </div>
+            <div class="feature-card-item">
+              <span class="feature-icon">📍</span>
+              <div>
+                <strong>Google Maps Verified</strong>
+                <p>Live neighborhood pins with authentic community reviews from real pet parents.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Get on Google Play & App Store Coming Soon Section -->
+        <div class="app-download-bar" id="download-app">
+          <div class="download-bar-header">
+            <span class="store-eyebrow">PawNir for Android &amp; iOS</span>
+            <h3>Get PawNir on your smartphone</h3>
+            <p>Download our official mobile app or install our instant Web App with one tap.</p>
+          </div>
+          <div class="store-buttons-cluster">
+            <!-- Google Play Store Button -->
+            <button type="button" class="store-btn play-store-btn" id="btn-google-play">
+              <span class="store-btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="28" height="28"><path fill="#4285F4" d="M3.6 1.48v21.04c0 .54.34.99.82 1.13L15.35 12 4.42.35C3.94.49 3.6.94 3.6 1.48Z"/><path fill="#FBBC04" d="m18.73 8.63-3.38 3.37 3.38 3.37 3.82-2.18c1.09-.62 1.09-1.63 0-2.25l-3.82-2.31Z"/><path fill="#EA4335" d="m15.35 12-10.93 11.65c.29.08.62.03.9-.13l13.41-7.65-3.38-3.87Z"/><path fill="#34A853" d="m4.42.35 10.93 11.65 3.38-3.37L5.32.48c-.28-.16-.61-.21-.9-.13Z"/></svg>
+              </span>
+              <div class="store-btn-text">
+                <small>GET IT ON</small>
+                <strong>Google Play</strong>
+              </div>
+              <span class="store-badge-tag tag-play">Coming Soon · Pre-register ↗</span>
+            </button>
+
+            <!-- Apple App Store Button -->
+            <button type="button" class="store-btn app-store-btn" id="btn-app-store">
+              <span class="store-btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.88c.64-.78 1.08-1.86.96-2.95-.93.04-2.05.62-2.71 1.4-.58.67-1.1 1.77-.96 2.83 1.04.08 2.08-.53 2.71-1.28Z"/></svg>
+              </span>
+              <div class="store-btn-text">
+                <small>Download on the</small>
+                <strong>App Store</strong>
+              </div>
+              <span class="store-badge-tag tag-apple">Coming Soon · iOS Beta ↗</span>
+            </button>
+
+            <!-- Instant PWA Install Button -->
+            <button type="button" class="store-btn pwa-store-btn" id="btn-pwa-install">
+              <span class="store-btn-icon" aria-hidden="true">⚡</span>
+              <div class="store-btn-text">
+                <small>Instant Install</small>
+                <strong>Web App (PWA)</strong>
+              </div>
+              <span class="store-badge-tag tag-instant">Ready now · Tap to install</span>
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">
       <div class="shell">
+        <!-- Prominent Non-Profit Animal Welfare Concern Banner -->
+        <div class="footer-concern-strip">
+          <div class="concern-flag">
+            <span class="concern-heart" aria-hidden="true">❤️</span>
+            <strong>Non-Profit Welfare Initiative</strong>
+          </div>
+          <p>A concern of <strong>Kuttawaala &amp; Catwaala Animal Welfare, Bangladesh</strong> · Dedicated to street animal rescue, community foster homes, humane treatment &amp; zero pet abandonment across Bangladesh.</p>
+        </div>
+
         <div class="footer-network">
           <div class="footer-network-copy"><p class="eyebrow">The PawNir family</p><h2>One kinder world for every pet.</h2><p>Meet the people and places helping Bangladesh care a little more.</p></div>
           <div class="partner-grid" aria-label="PawNir family partners">
@@ -363,7 +642,30 @@
             </a>
           </div>
         </div>
-        <div class="footer-inner"><a class="brand" href="#main" aria-label="PawNir home"><img class="brand-logo footer-logo" src="/pawnir-logo.png?v=20261030-4" alt="PawNir" width="132" height="38" /></a><p>Trusted care for every little life.</p><div><a href="#lost-found">Lost &amp; found</a><a href="#blood-donors">Blood donors</a><a href="#foster-care">Fosters</a><a href="#find-care">Find a vet</a><a href="mailto:hello@pawnir.com">Contact</a></div></div>
+
+        <div class="footer-inner">
+          <div class="footer-brand-wrap">
+            <a class="brand" href="#main" aria-label="PawNir home"><img class="brand-logo footer-logo" src="/pawnir-logo.png?v=20261030-4" alt="PawNir" width="132" height="38" /></a>
+            <p>Trusted care for every little life across Bangladesh.</p>
+          </div>
+          <div class="footer-links-wrap">
+            <div class="footer-nav-row">
+              <a href="#lost-found">Lost &amp; found</a>
+              <a href="#blood-donors">Blood donors</a>
+              <a href="#foster-care">Fosters &amp; Map</a>
+              <a href="#find-care">Find a vet</a>
+              <a href="#mobile-app">Mobile app</a>
+              <a href="mailto:hello@pawnir.com">Contact</a>
+            </div>
+            <div class="footer-legal-row">
+              <button type="button" class="footer-policy-link" data-policy="privacy">Privacy Policy</button>
+              <span class="legal-dot">·</span>
+              <button type="button" class="footer-policy-link" data-policy="terms">Terms of Service</button>
+              <span class="legal-dot">·</span>
+              <button type="button" class="footer-policy-link" data-policy="guidelines">Community Guidelines</button>
+            </div>
+          </div>
+        </div>
       </div>
     </footer>
 
@@ -733,8 +1035,126 @@
       <button class="btn btn-primary btn-small" id="mobile-book-button" type="button">Book now <span aria-hidden="true">→</span></button>
     </div>
 
+    <!-- Legal, Privacy & Community Guidelines Dialog -->
+    <dialog class="booking-dialog policy-dialog" id="policy-dialog" aria-labelledby="policy-dialog-title">
+      <div class="dialog-card policy-card">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" data-close-policy aria-label="Close legal documents">×</button>
+
+        <div class="policy-header">
+          <span class="policy-eyebrow">PawNir Legal &amp; Welfare Framework</span>
+          <h2 id="policy-dialog-title">Community &amp; Legal Policies</h2>
+          <p class="dialog-helper">A non-profit welfare platform under Kuttawaala &amp; Catwaala Animal Welfare, Bangladesh.</p>
+        </div>
+
+        <!-- Policy Navigation Tabs -->
+        <div class="policy-nav-tabs" role="tablist" aria-label="Policy tabs">
+          <button type="button" class="policy-nav-tab is-active" data-policy-tab="privacy" role="tab" aria-selected="true">
+            <span>Privacy Policy</span>
+          </button>
+          <button type="button" class="policy-nav-tab" data-policy-tab="terms" role="tab" aria-selected="false">
+            <span>Terms of Service</span>
+          </button>
+          <button type="button" class="policy-nav-tab" data-policy-tab="guidelines" role="tab" aria-selected="false">
+            <span>Community Guidelines</span>
+          </button>
+        </div>
+
+        <div class="policy-body-scroller">
+          <!-- Privacy Policy Panel -->
+          <article class="policy-article is-active" id="policy-panel-privacy" role="tabpanel">
+            <h3>Privacy Policy</h3>
+            <p class="policy-meta">Last updated: October 2026 · Built for Bangladesh Animal Welfare</p>
+
+            <section class="policy-section">
+              <h4>1. Our Ethical Commitment</h4>
+              <p>PawNir is operated as a non-profit community initiative under <strong>Kuttawaala &amp; Catwaala Animal Welfare, Bangladesh</strong>. We collect only minimal, purposeful data required to reunite lost pets, connect verified blood donors, and foster homeless animals. We never sell, monetize, or expose personal user data to third-party advertisers.</p>
+            </section>
+
+            <section class="policy-section">
+              <h4>2. Location Privacy &amp; Phone Number Shielding</h4>
+              <p>To safeguard pet parents and rescuers against extortion, harassment, or animal theft:</p>
+              <ul>
+                <li><strong>Broad Area Only:</strong> Lost pet reports and blood donor profiles only display general locality (e.g. <em>Dhanmondi 10A</em> or <em>Mirpur DOHS</em>). Exact home addresses are never published.</li>
+                <li><strong>Screened Contact Sharing:</strong> Private phone numbers are never publicly indexed or accessible to web scrapers. Contact details are shared strictly upon consented mutual actions (e.g. verified sighting tip or emergency blood request).</li>
+              </ul>
+            </section>
+
+            <section class="policy-section">
+              <h4>3. 2-Step Math Authentication Security</h4>
+              <p>PawNir utilizes a client-side 2-step mathematical verification backed by cryptographic HMAC-SHA256 stateless tokens. This eliminates the vulnerability of SMS OTP hijacking and ensures that accounts remain accessible without telecom dependency across Bangladesh.</p>
+            </section>
+
+            <section class="policy-section">
+              <h4>4. Data Retention &amp; Pet De-identification</h4>
+              <p>Once a lost pet is marked as "Reunited / Safe", contact associations on the public feed are archived immediately. Pet parents can update or delete pet profiles and blood donor availability at any time through their account dashboard.</p>
+            </section>
+          </article>
+
+          <!-- Terms of Service Panel -->
+          <article class="policy-article" id="policy-panel-terms" role="tabpanel">
+            <h3>Terms of Service</h3>
+            <p class="policy-meta">Effective: October 2026 · Governing Law: People's Republic of Bangladesh</p>
+
+            <section class="policy-section">
+              <h4>1. Strict Prohibition of Commercial Animal Trade</h4>
+              <p>In accordance with the <strong>Bangladesh Animal Welfare Act 2019 (প্রাণিকল্যাণ আইন, ২০১৯)</strong> and our founding ethics, <strong>PawNir strictly prohibits any buying, selling, commercial breeding, or trading of live animals</strong>. Any listing offering animals for sale, asking for purchase money, or promoting commercial puppy/kitten mills will result in immediate permanent account termination and referral to animal welfare authorities.</p>
+            </section>
+
+            <section class="policy-section">
+              <h4>2. Medical &amp; Veterinary Cross-Matching Disclaimer</h4>
+              <p>PawNir serves as an emergency communication facilitator connecting consented animal blood donors with families in urgent need. <strong>PawNir is not a veterinary hospital and does not perform clinical procedures.</strong> Prior to any blood transfusion, a registered, licensed veterinary surgeon must perform physical assessment, feline/canine blood cross-matching, and disease screening. Transfusions take place solely under clinical veterinary oversight.</p>
+            </section>
+
+            <section class="policy-section">
+              <h4>3. Foster Care &amp; Google Maps Directory</h4>
+              <p>Foster care listings and shelter locations on Google Maps are submitted and verified by community members. While PawNir conducts screening and collects real community reviews, pet parents are encouraged to inspect facilities and establish mutual written consent for foster durations.</p>
+            </section>
+
+            <section class="policy-section">
+              <h4>4. Limitation of Liability</h4>
+              <p>PawNir and its parent non-profit organizations (Kuttawaala &amp; Catwaala Animal Welfare) facilitate mutual animal welfare assistance in good faith and shall not be held liable for third-party veterinary outcomes or independent agreements made outside the platform.</p>
+            </section>
+          </article>
+
+          <!-- Community Guidelines Panel -->
+          <article class="policy-article" id="policy-panel-guidelines" role="tabpanel">
+            <h3>Community Guidelines</h3>
+            <p class="policy-meta">Rules of Kindness &amp; Accountability for Every PawNir Member</p>
+
+            <section class="policy-section">
+              <h4>1. Animal Welfare First</h4>
+              <p>Every alert, foster entry, and blood donation pledge must put the physical safety and psychological well-being of the animal first. Treat all volunteers, rescuers, and fosters with dignity and kindness.</p>
+            </section>
+
+            <section class="policy-section">
+              <h4>2. Keep the Live Feed Clean &amp; Truthful</h4>
+              <ul>
+                <li><strong>No False Alerts:</strong> Do not submit prank sightings, exaggerated medical emergencies, or fraudulent reports.</li>
+                <li><strong>Mark Reunited Promptly:</strong> When your pet returns home safely, mark the report as resolved within 24 hours so rescue volunteers can refocus on active emergencies.</li>
+              </ul>
+            </section>
+
+            <section class="policy-section">
+              <h4>3. Honest, Constructive Community Reviews</h4>
+              <p>Reviews for local foster centers on Google Maps must reflect authentic firsthand experiences. Retaliatory reviews, hate speech, or extortion attempts are strictly prohibited and will be removed following review audits.</p>
+            </section>
+
+            <section class="policy-section">
+              <h4>4. Zero Tolerance for Exploitation</h4>
+              <p>Any user attempting to solicit adoption fees, extort pet owners for lost pet return, or harvest numbers for unsolicited marketing will be banned immediately with their IP and device logged.</p>
+            </section>
+          </article>
+        </div>
+
+        <div class="policy-footer-actions">
+          <button class="btn btn-primary" type="button" data-close-policy>I understand &amp; agree</button>
+        </div>
+      </div>
+    </dialog>
+
     <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
 
-    <script src="/app.js?v=20261030-4"></script>
+    <script src="/app.js?v=20261030-5"></script>
   </body>
 </html>
