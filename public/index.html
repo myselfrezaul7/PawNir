@@ -47,7 +47,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Bengali:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Manrope:wght@700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=20261030-6" />
+    <link rel="stylesheet" href="/styles.css?v=20261030-7" />
   </head>
   <body data-view="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -307,19 +307,40 @@
           <a href="#main" class="view-back-link"><span aria-hidden="true">←</span> <span>Back to Home</span></a>
           <span class="view-badge-pill">Safe Animal Adoption &amp; Rehoming</span>
         </div>
+
+        <!-- Sleek Adoption Section Header -->
         <div class="section-heading adoption-heading-wrap">
           <div>
-            <p class="eyebrow" data-i18n="adopt.eyebrow">A safer next home</p>
+            <div class="eyebrow-row">
+              <p class="eyebrow" data-i18n="adopt.eyebrow">A safer next home</p>
+              <span class="adoption-live-count" id="adoption-live-count"><span class="live-pulse"></span> Free &amp; verified</span>
+            </div>
             <h2 id="adoption-title" data-i18n="adopt.title">Adopt or rehome responsibly</h2>
           </div>
           <div class="adoption-header-actions">
-            <button class="btn btn-primary btn-small" id="list-adoption-button" type="button" data-i18n="adopt.btnList">+ List a pet for adoption</button>
+            <button class="btn btn-primary adoption-list-cta" id="list-adoption-button" type="button" data-i18n="adopt.btnList">
+              <span class="plus-icon" aria-hidden="true">+</span> <span>List a pet for adoption</span>
+            </button>
           </div>
         </div>
 
-        <div class="lost-found-toolbar adoption-toolbar">
-          <label class="search-field"><span aria-hidden="true">⌖</span><input id="adoption-area-input" type="search" placeholder="Search area or breed (e.g. Dhanmondi, Uttara, Persian)…" aria-label="Search adoption listings by area" /></label>
-          <select id="adoption-species-filter" aria-label="Filter adoption listings by species">
+        <!-- Sleek Unified Filter & Search Bar -->
+        <div class="adoption-filter-bar">
+          <div class="filter-pills-row" id="adoption-species-pills" role="group" aria-label="Filter adoption listings by species">
+            <button type="button" class="chip active" data-adoption-species="" data-i18n="adopt.filterAll">All animals</button>
+            <button type="button" class="chip" data-adoption-species="cat" data-i18n="adopt.filterCats">🐱 Cats</button>
+            <button type="button" class="chip" data-adoption-species="dog" data-i18n="adopt.filterDogs">🐶 Dogs</button>
+            <button type="button" class="chip" data-adoption-species="bird" data-i18n="adopt.filterBirds">🦜 Birds</button>
+            <button type="button" class="chip" data-adoption-species="rabbit" data-i18n="adopt.filterRabbits">🐰 Rabbits</button>
+          </div>
+
+          <div class="adoption-search-wrap">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="adoption-area-input" type="search" placeholder="Search area or breed (e.g. Dhanmondi, Persian)…" aria-label="Search adoption listings by area" />
+          </div>
+
+          <!-- Hidden select preserved for programmatic sync and accessibility -->
+          <select id="adoption-species-filter" class="sr-only" aria-label="Filter adoption listings by species">
             <option value="">All animals</option>
             <option value="cat">🐱 Cats</option>
             <option value="dog">🐶 Dogs</option>
@@ -328,19 +349,13 @@
           </select>
         </div>
 
-        <div class="filter-pills-row" id="adoption-species-pills" role="group" aria-label="Filter adoption listings by species">
-          <button type="button" class="chip active" data-adoption-species="" data-i18n="adopt.filterAll">All animals</button>
-          <button type="button" class="chip" data-adoption-species="cat" data-i18n="adopt.filterCats">🐱 Cats</button>
-          <button type="button" class="chip" data-adoption-species="dog" data-i18n="adopt.filterDogs">🐶 Dogs</button>
-          <button type="button" class="chip" data-adoption-species="bird" data-i18n="adopt.filterBirds">🦜 Birds</button>
-          <button type="button" class="chip" data-adoption-species="rabbit" data-i18n="adopt.filterRabbits">🐰 Rabbits</button>
+        <!-- Sleek Trust & Legal Welfare Strip -->
+        <div class="adoption-trust-strip">
+          <span class="trust-shield" aria-hidden="true">🛡️</span>
+          <p><strong>100% Free &amp; Non-Commercial Adoption:</strong> Selling or trading animals is strictly prohibited under Bangladesh Animal Welfare Act 2019. Every rehoming listing is vetted with transparent applicant screening.</p>
         </div>
 
-        <div class="safety-strip adoption-safety-note">
-          <span class="safety-icon">✓</span>
-          <p><strong>Strictly Non-Commercial Adoption:</strong> Selling or trading live animals is strictly banned under Bangladesh law. All listings on PawNir are 100% free adoptions requiring screened application and follow-up consent.</p>
-        </div>
-
+        <!-- Modern Sleek Adoption Grid -->
         <div class="adoption-grid" id="adoption-grid"><p class="inline-state">Loading verified adoption listings…</p></div>
       </section>
 
@@ -1383,6 +1398,6 @@
 
     <div class="app-toast" id="app-toast" role="status" aria-live="polite" hidden></div>
 
-    <script src="/app.js?v=20261030-6"></script>
+    <script src="/app.js?v=20261030-7"></script>
   </body>
 </html>

@@ -1011,39 +1011,72 @@ async function loadAdoptions() {
       homeCountAdopt.textContent = `${listings.length} pet${listings.length === 1 ? "" : "s"} ready ↗`;
     }
 
+    const liveCountEl = document.getElementById("adoption-live-count");
+    if (liveCountEl) {
+      liveCountEl.innerHTML = `<span class="live-pulse"></span> ${listings.length} verified pet${listings.length === 1 ? "" : "s"} ready`;
+    }
+
     const grid = document.getElementById("adoption-grid");
     if (!grid) return;
 
     if (!listings.length) {
-      grid.innerHTML = '<p class="inline-state">No adoption listings match your filter right now. Have an animal needing a safe home? Click <strong>+ List a pet for adoption</strong> above.</p>';
+      grid.innerHTML = `
+        <div class="adoption-empty-card">
+          <div class="empty-icon">🐾</div>
+          <h4>No pets found matching this filter</h4>
+          <p>Try clearing your species or location filter, or be the first to list a rescue pet needing a loving home.</p>
+          <div class="empty-actions">
+            <button class="btn btn-small btn-outline" id="adoption-reset-filters-btn" type="button">Reset all filters</button>
+            <button class="btn btn-small btn-primary" id="adoption-empty-list-btn" type="button">+ List a pet for adoption</button>
+          </div>
+        </div>
+      `;
+      document.getElementById("adoption-reset-filters-btn")?.addEventListener("click", () => {
+        adoptionSpeciesFilter = "";
+        if (areaInput) areaInput.value = "";
+        document.querySelectorAll("#adoption-species-pills [data-adoption-species]").forEach((p) => {
+          p.classList.toggle("active", !p.dataset.adoptionSpecies);
+        });
+        const select = document.getElementById("adoption-species-filter");
+        if (select) select.value = "";
+        loadAdoptions();
+      });
+      document.getElementById("adoption-empty-list-btn")?.addEventListener("click", () => {
+        document.getElementById("list-adoption-button")?.click();
+      });
       return;
     }
 
     grid.innerHTML = listings.map((listing) => {
       const isOwner = Boolean(listing.isOwner || (state.user && listing.ownerId === state.user.id));
       const speciesEmoji = listing.species === "cat" ? "🐱" : listing.species === "dog" ? "🐶" : listing.species === "bird" ? "🦜" : listing.species === "rabbit" ? "🐰" : "🐾";
+      const speciesLabel = listing.species ? listing.species.charAt(0).toUpperCase() + listing.species.slice(1) : "Rescue";
       const statusPill = listing.status === "adopted"
-        ? '<span class="adoption-badge-pill adopted">Rehomed ✓</span>'
-        : (isOwner ? '<span class="adoption-badge-pill owner">Your Listing</span>' : '<span class="adoption-badge-pill open">Open for Adoption</span>');
-      const vaxBadge = listing.vaccinated !== false ? '<span class="adoption-tag">💉 Vaccinated</span>' : '';
-      const neuteredBadge = listing.neutered ? '<span class="adoption-tag">✂ Neutered</span>' : '';
-      const indoorBadge = listing.indoorOnly ? '<span class="adoption-tag">🏠 Indoor</span>' : '';
+        ? '<span class="sleek-status-pill pill-adopted">✓ Rehomed</span>'
+        : (isOwner ? '<span class="sleek-status-pill pill-owner">Your Listing</span>' : '<span class="sleek-status-pill pill-open">Open for Adoption</span>');
+      const vaxBadge = listing.vaccinated !== false ? '<span class="sleek-tag tag-vax">💉 Vaccinated</span>' : '';
+      const neuteredBadge = listing.neutered ? '<span class="sleek-tag tag-neutered">✂ Neutered</span>' : '';
+      const indoorBadge = listing.indoorOnly ? '<span class="sleek-tag tag-indoor">🏠 Indoor Only</span>' : '';
 
       return `
         <article class="adoption-card ${isOwner ? 'is-my-listing' : ''}">
-          <div class="adoption-card-header">
-            <span class="adoption-species-avatar">${speciesEmoji}</span>
+          <div class="sleek-card-header">
+            <span class="sleek-species-chip">
+              <span class="chip-emoji" aria-hidden="true">${speciesEmoji}</span>
+              <span>${escapeHtml(speciesLabel)}</span>
+            </span>
             ${statusPill}
           </div>
           <h3>${escapeHtml(listing.name)}</h3>
-          <div class="adoption-meta-row">
+          <div class="sleek-meta-row">
             <span>⌖ ${escapeHtml(listing.area || "Dhaka")}</span>
+            <span class="sleek-meta-dot" aria-hidden="true">•</span>
             <span>🎂 ${escapeHtml(listing.age || "Young")}</span>
-            ${listing.gender ? `<span>${escapeHtml(listing.gender)}</span>` : ""}
-            ${listing.breed ? `<span>${escapeHtml(listing.breed)}</span>` : ""}
+            ${listing.gender ? `<span class="sleek-meta-dot" aria-hidden="true">•</span><span>${escapeHtml(listing.gender)}</span>` : ""}
+            ${listing.breed ? `<span class="sleek-meta-dot" aria-hidden="true">•</span><span>${escapeHtml(listing.breed)}</span>` : ""}
           </div>
-          <p class="adoption-desc">${escapeHtml(listing.description || "")}</p>
-          <div class="adoption-tags-row">
+          <p class="sleek-card-bio">${escapeHtml(listing.description || "")}</p>
+          <div class="sleek-tags-row">
             ${vaxBadge}
             ${neuteredBadge}
             ${indoorBadge}

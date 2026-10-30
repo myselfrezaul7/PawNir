@@ -1,4 +1,4 @@
-const CACHE_NAME = "pawnir-shell-v6";
+const CACHE_NAME = "pawnir-shell-v7";
 const SHELL_ASSETS = [
   "/",
   "/styles.css",
