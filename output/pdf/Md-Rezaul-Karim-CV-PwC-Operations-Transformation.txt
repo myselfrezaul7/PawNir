@@ -1,0 +1,53 @@
+Md Rezaul Karim
+Master's Student, International Management & Information Systems
+Operations Transformation | Process Optimization | Data & Analytics
+Soest, Germany | myselfrezaul@gmail.com | +49 1577 3855748 | LinkedIn | Portfolio: https://myselfkarim.vercel.app/
+
+PROFILE
+Master's student in International Management & Information Systems with two years of operational leadership experience and current project work across process optimization, SAP-based analytics, Agile coordination, and workflow automation. Comfortable translating business requirements into structured processes, KPI views, and implementation tasks for cross-functional teams. Seeking to contribute to PwC's Operations Transformation projects in areas such as Data & Analytics, Supply Chain, Procurement, Manufacturing & Service, and Operations Strategy.
+
+PWC OPERATIONS TRANSFORMATION FIT
+- Operations and process improvement: daily operations coordination, budget tracking, purchase orders, resource allocation, documentation, and workflow improvement.
+- Data, analytics, and ERP: SAP BW/4HANA data warehousing, KPI reporting, Power BI, KNIME, data analysis, and SAP-integrated management coursework.
+- Project work and consulting mindset: academic and consultancy projects using Jira, BPMN 2.0, and scalable tracking models to improve execution and stakeholder visibility.
+- Communication and delivery tools: Microsoft Office 365, Excel, PowerPoint, Jira, Confluence, documentation, presentations, and bilingual English working capability; German A1, currently learning A2.
+
+EXPERIENCE
+Assistant Manager | Renaissance Diagnostic Care | 07/2022 - 05/2024
+- Coordinated day-to-day administrative operations and cross-functional communication to keep service workflows structured and reliable.
+- Supported budget tracking, purchase order handling, and resource allocation, strengthening operational transparency and cost discipline.
+- Organized internal documentation and operational assets in line with company guidelines, improving consistency and audit readiness.
+- Identified recurring operational trends and supported management in implementing practical process improvements.
+
+SELECTED PROJECTS
+SAP BW/4HANA: End-to-End Data Warehousing Project | 08/2025
+- Built a multi-layer Enterprise Data Warehouse structure in SAP HANA Studio, including DataSources, transformations, and ADSOs.
+- Designed BW queries for KPI and sales trend analysis and configured master data hierarchies to support reliable business reporting.
+- Connected technical data modeling with management decision needs, aligning with operations transformation and analytics use cases.
+
+NexTep Edu | Consultancy | 05/2025 - Present | https://www.nextepedu.com
+- Mapped admission workflows with BPMN 2.0 and automated standard tasks, reducing manual processing time by 40%.
+- Designed a self-service tracking model for student applications, lowering the need for repeated manual status updates.
+- Created a scalable digital framework to handle, track, and organize client inquiries with lower maintenance effort.
+
+Agile Event Coordination | Academic Project | 03/2026 - Present
+- Set up and managed Jira Kanban boards for large-scale university events, including alumni gatherings and IMIS Sports Day.
+- Converted complex event logistics into actionable tickets and tracked progress from backlog to completion.
+- Applied Agile routines to coordinate catering, team sign-ups, equipment sourcing, and stakeholder communication.
+
+EDUCATION
+Fachhochschule Suedwestfalen | M.A. International Management & Information Systems | 03/2025 - Present
+Focus: SAP-integrated management, data analysis, digital transformation, information systems.
+
+Govt. Haraganga College, Munshiganj | Bachelor of Business Administration (BBA), grade 2.1 | 10/2016 - 05/2022
+Focus: Business Statistics, IT, Operations & Supply Chain Management, Marketing, Financial Management.
+
+SKILLS
+Operations & Transformation: Process optimization, KPI analysis, budget tracking, asset organization, campaign monitoring, supply chain coursework
+Process & Project Tools: SAP Signavio, BPMN 2.0, Jira, Confluence, Agile/Kanban coordination
+Data & ERP: SAP BW/4HANA, SAP HANA Studio, Power BI, KNIME, data analysis, BW queries
+Productivity & Presentation: Microsoft Office 365, Excel, PowerPoint, structured documentation and presentation preparation
+Technical: GitHub, Vercel CI/CD, HTML5, CSS, Bootstrap
+
+LANGUAGES
+Bengali: Native | English: Proficient (IELTS 7.0) | German: A1, currently learning A2
