@@ -1686,3 +1686,714 @@ body:before {
   content: url('/pawnir-logo-dark.png?v=20261031-1');
   filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.6));
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Android Studio WebView, Safe Areas & 48x48px Native Touch Targets
+   ═══════════════════════════════════════════════════════════════════════════ */
+html,
+body {
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.modal-open {
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
+}
+
+.site-header {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.booking-dialog[open],
+.booking-dialog.is-visible {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.booking-dialog[open]::backdrop,
+.booking-dialog.is-visible::backdrop {
+  opacity: 1 !important;
+}
+
+.dialog-card,
+.menu-drawer {
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.menu-drawer-backdrop:not([hidden]),
+.menu-drawer-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Minimum 44-48px touch targets across interactive controls */
+.btn,
+.btn-small,
+.chip,
+.gps-near-btn,
+.dialog-close,
+.drawer-close-btn,
+.theme-toggle,
+.language-switch,
+.icon-bell,
+.menu-toggle-btn,
+.star-btn {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.dialog-close,
+.drawer-close-btn,
+.theme-toggle,
+.icon-bell,
+.menu-toggle-btn {
+  min-width: 44px;
+  display: inline-grid;
+  place-items: center;
+}
+
+@media (max-width: 768px) {
+  .btn,
+  .btn-small,
+  .chip,
+  .gps-near-btn,
+  .dialog-close,
+  .drawer-close-btn,
+  .theme-toggle,
+  .language-switch,
+  .icon-bell,
+  .menu-toggle-btn,
+  .star-btn,
+  .lost-found-toolbar input,
+  .lost-found-toolbar select,
+  .donor-toolbar input,
+  .donor-toolbar select,
+  .foster-toolbar input,
+  .foster-toolbar select {
+    min-height: 48px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Real-Time SSE Status Pill ("Live" / "Syncing…" / "Offline")
+   ═══════════════════════════════════════════════════════════════════════════ */
+.realtime-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: 700 11.5px "IBM Plex Sans", sans-serif;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.realtime-dot,
+.realtime-status-pill .live-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.realtime-status-pill.is-live .realtime-dot,
+.realtime-status-pill.is-live .live-pulse {
+  background: #10b981;
+  animation: pulseRealtime 2s infinite;
+}
+
+.realtime-status-pill.is-syncing .realtime-dot,
+.realtime-status-pill.is-syncing .live-pulse {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+  animation: none;
+}
+
+.realtime-status-pill.is-offline .realtime-dot,
+.realtime-status-pill.is-offline .live-pulse {
+  background: #ef4444;
+  box-shadow: none;
+  animation: none;
+}
+
+@keyframes pulseRealtime {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.22); }
+  50% { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.06); }
+}
+
+@media (max-width: 480px) {
+  .realtime-status-pill span:last-child {
+    display: none;
+  }
+  .realtime-status-pill {
+    padding: 6px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   One-Tap GPS "📍 Near Me" Controls & Input Group
+   ═══════════════════════════════════════════════════════════════════════════ */
+.gps-near-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 12px "IBM Plex Sans", "IBM Plex Sans Bengali", sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.gps-near-btn:hover {
+  background: var(--surface-soft);
+  border-color: var(--ink);
+}
+
+.input-with-gps {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
+}
+
+.input-with-gps input {
+  flex: 1;
+  min-width: 0;
+}
+
+.lost-found-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.lost-found-toolbar > input {
+  flex: 1 1 220px;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 0.85rem;
+  background: var(--surface);
+  color: var(--ink);
+  font: 14px "IBM Plex Sans", sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Dynamic Cards: Lost & Found, Blood Donors, Fosters, Adoptions & Vets
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lost-card,
+.donor-card,
+.foster-card,
+.adoption-card,
+.vet-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  box-shadow: 0 6px 20px var(--shadow-color);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.lost-card:hover,
+.donor-card:hover,
+.foster-card:hover,
+.adoption-card:hover,
+.vet-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--ink);
+}
+
+.lost-card-top,
+.donor-card-top,
+.foster-card-top,
+.adoption-card-top,
+.vet-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status-pill,
+.verified-pill,
+.blood-badge,
+.readiness-pill,
+.compat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.24rem 0.65rem;
+  border-radius: 999px;
+  font: 800 11px "IBM Plex Sans", sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.status-pill.badge-lost {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.status-pill.badge-found {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.blood-badge {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.verified-pill {
+  background: var(--surface-soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.donor-badges-row,
+.foster-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.readiness-pill.is-ready {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.readiness-pill.is-resting {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.compat-pill {
+  background: #e0e7ff;
+  color: #1e40af;
+  border: 1px solid #c7d2fe;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.6rem;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font: 600 11.5px "IBM Plex Sans", sans-serif;
+}
+
+.card-location {
+  margin: 0;
+  font: 600 12.5px "IBM Plex Sans", sans-serif;
+  color: var(--ink);
+}
+
+.card-desc {
+  margin: 0;
+  font: 400 13px/1.55 "IBM Plex Sans", sans-serif;
+  color: var(--muted);
+}
+
+.card-meta {
+  font: 600 11.5px "IBM Plex Sans", sans-serif;
+  color: var(--muted);
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.card-actions .btn {
+  flex: 1 1 auto;
+}
+
+.report-card-photo,
+.adoption-card-photo {
+  width: 100%;
+  height: 170px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+
+.report-card-photo img,
+.adoption-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sightings-box {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.65rem 0.8rem;
+  font-size: 12px;
+}
+
+.sighting-item p {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+}
+
+.donor-specs {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.foster-review-snippet {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 3px solid var(--ink);
+  background: var(--surface-soft);
+  border-radius: 0 10px 10px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.foster-review-snippet cite {
+  display: block;
+  margin-top: 0.25rem;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rating-pill-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  font: 800 11.5px "IBM Plex Sans", sans-serif;
+  cursor: pointer;
+}
+
+.my-report-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.my-report-row strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.my-report-row small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.resolved-tag {
+  font: 700 12px "IBM Plex Sans", sans-serif;
+  color: #10b981;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Verified Veterinarians & 24/7 Emergency Directory (#find-care)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.vet-coming-soon {
+  display: block !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 12px 32px var(--shadow-color) !important;
+  padding: 2.25rem !important;
+}
+
+.vet-coming-copy h2 em {
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: var(--ink) !important;
+}
+
+.vet-coming-copy > p:not(.eyebrow) {
+  color: var(--muted) !important;
+}
+
+.vet-directory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.vet-toolbar {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 0.7rem;
+  margin-bottom: 1.25rem;
+}
+
+.vet-toolbar input,
+.vet-toolbar select {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 0.85rem;
+  background: var(--surface);
+  color: var(--ink);
+  font: 14px "IBM Plex Sans", sans-serif;
+}
+
+.vet-directory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .vet-directory-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .vet-toolbar {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .vet-directory-grid {
+    grid-template-columns: 1fr;
+  }
+  .vet-coming-soon {
+    padding: 1.35rem !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Foster Reviews Modal, Star Picker & Breakdown Bars
+   ═══════════════════════════════════════════════════════════════════════════ */
+.star-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: #a1a1aa;
+  border-radius: 10px;
+  font-size: 20px;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.star-btn.is-lit {
+  color: #f59e0b !important;
+  border-color: #f59e0b;
+}
+
+.rating-bar-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 28px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.rating-bar-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.rating-bar-fill {
+  height: 100%;
+  background: #f59e0b;
+  border-radius: 999px;
+}
+
+.review-item {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: var(--surface);
+  margin-bottom: 0.65rem;
+}
+
+.review-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.review-stars {
+  color: #f59e0b;
+  font-weight: 800;
+}
+
+.review-item-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Skeleton Shimmer Loaders & Actionable Empty States
+   ═══════════════════════════════════════════════════════════════════════════ */
+.skeleton-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 210px;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--surface-soft) 25%, var(--line) 50%, var(--surface-soft) 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.3s infinite linear;
+}
+
+.skeleton-badge { width: 38%; height: 20px; border-radius: 999px; }
+.skeleton-title { width: 72%; height: 22px; }
+.skeleton-body { width: 95%; }
+.skeleton-body-short { width: 60%; }
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.empty-state-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  border: 1.5px dashed var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.empty-state-box p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Dark Mode Contrast & Theme Completeness Fixes
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root[data-theme=dark] .lost-card,
+:root[data-theme=dark] .donor-card,
+:root[data-theme=dark] .foster-card,
+:root[data-theme=dark] .adoption-card,
+:root[data-theme=dark] .vet-card,
+:root[data-theme=dark] .my-report-row,
+:root[data-theme=dark] .review-item,
+:root[data-theme=dark] .empty-state-box,
+:root[data-theme=dark] .skeleton-card {
+  background: #121215 !important;
+  border-color: #27272a !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .card-icon,
+:root[data-theme=dark] .twofa-icon,
+:root[data-theme=dark] .user-avatar-circle,
+:root[data-theme=dark] .user-chip-avatar {
+  background: #fafafa !important;
+  color: #09090b !important;
+}
+
+:root[data-theme=dark] .map-pin-chip.is-active,
+:root[data-theme=dark] .mockup-tab.is-active,
+:root[data-theme=dark] .btn-mockup-primary,
+:root[data-theme=dark] .gps-near-btn:hover {
+  background: #fafafa !important;
+  color: #09090b !important;
+  border-color: #fafafa !important;
+}
+
+:root[data-theme=dark] .app-toast {
+  background: #18181b !important;
+  color: #fafafa !important;
+  border: 1px solid #3f3f46 !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75) !important;
+}
+
+:root[data-theme=dark] .vet-coming-soon {
+  background: #0c0c0e !important;
+  border: 1px solid #27272a !important;
+}
+
+:root[data-theme=dark] .status-pill.badge-lost,
+:root[data-theme=dark] .blood-badge {
+  background: #331515 !important;
+  color: #fca5a5 !important;
+  border-color: #5c2525 !important;
+}
+
+:root[data-theme=dark] .status-pill.badge-found,
+:root[data-theme=dark] .readiness-pill.is-ready {
+  background: #12281e !important;
+  color: #86efac !important;
+  border-color: #1d4d38 !important;
+}
+
+:root[data-theme=dark] .readiness-pill.is-resting {
+  background: #2e2111 !important;
+  color: #fcd34d !important;
+  border-color: #573d1c !important;
+}
+
+:root[data-theme=dark] .compat-pill {
+  background: #1a1f36 !important;
+  color: #93c5fd !important;
+  border-color: #2e3b66 !important;
+}
+

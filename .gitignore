@@ -6,3 +6,5 @@ npm-debug.log*
 server_out.log
 server_err.log
 data/tenants/
+data/.token_secret
+

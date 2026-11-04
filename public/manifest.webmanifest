@@ -2,12 +2,13 @@
   "name": "PawNir — Animal Safety & Care Network",
   "short_name": "PawNir",
   "description": "Bangladesh's local animal safety and care network for nearby lost-pet alerts, responsible adoption, blood donors, foster care, and veterinary support.",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#f7f8f4",
-  "theme_color": "#087f62",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
   "lang": "en-BD",
   "categories": ["lifestyle", "medical", "social"],
   "icons": [
@@ -15,13 +16,25 @@
       "src": "/favicon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/favicon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/favicon.png",
@@ -40,6 +53,11 @@
       "name": "Blood Donor Network",
       "short_name": "Donors",
       "url": "/#blood-donors"
+    },
+    {
+      "name": "Emergency Vets",
+      "short_name": "Vets",
+      "url": "/#find-care"
     },
     {
       "name": "Adopt Responsibly",

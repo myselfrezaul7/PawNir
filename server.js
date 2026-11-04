@@ -2,6 +2,7 @@ const http = require("http");
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const zlib = require("zlib");
 const { readEvents, aggregate } = require("./src/analytics");
 const { createRecommendations } = require("./src/recommendations");
 const { buildRossmannReport } = require("./src/buildRossmannReport");
@@ -67,14 +68,34 @@ const DATA_DIR = process.env.DATA_DIR
     ? SEED_DATA_DIR
     : TMP_DATA_DIR;
 const IS_SERVERLESS = DATA_DIR !== SEED_DATA_DIR || Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
-const TOKEN_SECRET = process.env.AUTH_TOKEN_SECRET || crypto.randomBytes(32).toString("hex");
+
+function resolveTokenSecret() {
+  if (process.env.AUTH_TOKEN_SECRET) return process.env.AUTH_TOKEN_SECRET;
+  const secretFile = path.join(DATA_DIR, ".token_secret");
+  try {
+    if (fs.existsSync(secretFile)) {
+      const saved = fs.readFileSync(secretFile, "utf8").trim();
+      if (saved.length >= 32) return saved;
+    }
+    const generated = crypto.randomBytes(32).toString("hex");
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(secretFile, generated, { encoding: "utf8", mode: 0o600 });
+    return generated;
+  } catch (err) {
+    return crypto.randomBytes(32).toString("hex");
+  }
+}
+
+const TOKEN_SECRET = resolveTokenSecret();
 const AUTH_REQUIRED = String(process.env.AUTH_REQUIRED || "false").toLowerCase() === "true";
 const REPORT_CACHE_TTL_MS = Number(process.env.REPORT_CACHE_TTL_MS || 8000);
 const DIGEST_INTERVAL_MS = Number(process.env.DIGEST_INTERVAL_MS || 15 * 60 * 1000);
 const MAX_BODY_BYTES = 7 * 1024 * 1024;
 const MAX_LOST_FOUND_IMAGE_BYTES = 5 * 1024 * 1024;
 const RATE_WINDOW_MS = 60 * 1000;
-const RATE_LIMIT = 120;
+const RATE_LIMIT_READ = 180;
+const RATE_LIMIT_WRITE = 40;
+const RATE_LIMIT_AUTH = 20;
 const requestBuckets = new Map();
 const googleStates = new Map();
 const GOOGLE_STATE_TTL_MS = 10 * 60 * 1000;
@@ -122,21 +143,55 @@ const appState = {
   }
 };
 
+function acceptsGzip(res) {
+  const encoding = res && res.req && res.req.headers ? String(res.req.headers["accept-encoding"] || "") : "";
+  return encoding.includes("gzip");
+}
+
 function sendJson(res, code, payload) {
+  const body = JSON.stringify(payload, null, 2);
+  if (acceptsGzip(res) && Buffer.byteLength(body, "utf8") > 1024) {
+    const compressed = zlib.gzipSync(Buffer.from(body, "utf8"));
+    res.writeHead(code, {
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Encoding": "gzip",
+      "Vary": "Accept-Encoding",
+      "Cache-Control": "no-store"
+    });
+    res.end(compressed);
+    return;
+  }
   res.writeHead(code, {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store"
   });
-  res.end(JSON.stringify(payload, null, 2));
+  res.end(body);
 }
 
 function sendText(res, code, payload, contentType = "text/plain; charset=utf-8") {
+  const text = String(payload || "");
+  if (acceptsGzip(res) && Buffer.byteLength(text, "utf8") > 1024) {
+    const compressed = zlib.gzipSync(Buffer.from(text, "utf8"));
+    res.writeHead(code, {
+      "Content-Type": contentType,
+      "Content-Encoding": "gzip",
+      "Vary": "Accept-Encoding"
+    });
+    res.end(compressed);
+    return;
+  }
   res.writeHead(code, { "Content-Type": contentType });
-  res.end(payload);
+  res.end(text);
 }
 
 function sendFile(res, filepath) {
-  if (!fs.existsSync(filepath)) {
+  let stat;
+  try {
+    stat = fs.statSync(filepath);
+  } catch {
+    stat = null;
+  }
+  if (!stat || !stat.isFile()) {
     sendText(res, 404, "Not found");
     return;
   }
@@ -157,11 +212,20 @@ function sendFile(res, filepath) {
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg"
   };
-  res.writeHead(200, {
+  const compressibleExts = new Set([".html", ".js", ".css", ".json", ".webmanifest", ".svg", ".txt", ".xml"]);
+  const headers = {
     "Content-Type": contentTypes[ext] || "application/octet-stream",
     "X-Content-Type-Options": "nosniff",
     "Cache-Control": ext === ".html" || filepath.endsWith("sw.js") ? "no-cache" : "public, max-age=3600"
-  });
+  };
+  if (acceptsGzip(res) && compressibleExts.has(ext)) {
+    headers["Content-Encoding"] = "gzip";
+    headers["Vary"] = "Accept-Encoding";
+    res.writeHead(200, headers);
+    fs.createReadStream(filepath).pipe(zlib.createGzip()).pipe(res);
+    return;
+  }
+  res.writeHead(200, headers);
   fs.createReadStream(filepath).pipe(res);
 }
 
@@ -266,7 +330,7 @@ function areaKey(value) {
   return cleanText(value, 80).toLowerCase().replace(/[^a-z0-9\u0980-\u09ff]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function publicLostReport(report) {
+function publicLostReport(report, userId = null) {
   const sightings = Array.isArray(report.sightings) ? report.sightings : [];
   const mapQuery = `${report.area || ""}, ${report.city || "Bangladesh"}`.trim();
   return {
@@ -279,8 +343,11 @@ function publicLostReport(report) {
     city: report.city,
     status: report.status,
     createdAt: report.createdAt,
+    updatedAt: report.updatedAt || null,
     expiresAt: report.expiresAt,
+    ownerId: report.ownerId || null,
     ownerName: report.ownerName,
+    isOwner: Boolean(userId && report.ownerId === userId),
     photoUrl: report.photoUrl || null,
     photoData: report.photoData || null,
     sightingsCount: sightings.length,
@@ -298,8 +365,9 @@ function validateLostFoundPhoto(value) {
   return value;
 }
 
-function publicReview(review) {
+function publicReview(review, userId = null) {
   const displayName = review.authorName || review.userName || "PawNir Member";
+  const voterIds = Array.isArray(review.helpfulVoterIds) ? review.helpfulVoterIds : [];
   return {
     id: review.id,
     fosterId: review.fosterId,
@@ -310,12 +378,13 @@ function publicReview(review) {
     petSpecies: review.petSpecies || null,
     badge: review.badge || "Verified Member",
     helpfulCount: Number(review.helpfulCount || 0),
+    voted: Boolean(userId && voterIds.includes(userId)),
     createdAt: review.createdAt,
     updatedAt: review.updatedAt || null
   };
 }
 
-function publicFoster(foster, reviews) {
+function publicFoster(foster, reviews, userId = null, totalVerifiedCount = null) {
   const items = reviews
     .filter((review) => review.fosterId === foster.id && review.status === "published")
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -326,19 +395,119 @@ function publicFoster(foster, reviews) {
     ratingBreakdown[r] = (ratingBreakdown[r] || 0) + 1;
   });
   const query = foster.mapQuery || `${foster.name} ${foster.area} ${foster.city} Bangladesh`;
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  const embedMapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
   return {
     ...foster,
+    isOwner: Boolean(userId && foster.ownerId === userId),
     reviewCount: items.length,
     rating: average,
+    averageRating: average,
     ratingBreakdown,
-    recentReviews: items.slice(0, 2).map(publicReview),
-    mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`,
-    embedMapUrl: `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=14&ie=UTF8&iwloc=&output=embed`
+    recentReviews: items.slice(0, 2).map((rev) => publicReview(rev, userId)),
+    mapUrl,
+    mapExternalUrl: mapUrl,
+    embedMapUrl,
+    mapEmbedUrl: embedMapUrl,
+    ...(totalVerifiedCount !== null ? { totalVerifiedCount } : {})
   };
 }
 
-function publicDonor(donor) {
+function normalizeBloodGroup(raw) {
+  const s = String(raw || "").trim().toLowerCase();
+  if (!s || s === "unknown") return "unknown";
+  if (s.includes("type ab") || s === "ab") return "type ab";
+  if (s.includes("type a") || s === "a") return "type a";
+  if (s.includes("type b") || s === "b") return "type b";
+  if (s.includes("dea 1.1-") || s.includes("universal")) return "dea 1.1-";
+  if (s.includes("dea 1.1+")) return "dea 1.1+";
+  if (s.includes("dea 4")) return "dea 4";
+  return s;
+}
+
+function checkBloodCompatibility(donorBloodRaw, requestedBloodRaw, donorSpecies) {
+  const reqNorm = normalizeBloodGroup(requestedBloodRaw);
+  const donorNorm = normalizeBloodGroup(donorBloodRaw);
+  if (!requestedBloodRaw || !String(requestedBloodRaw).trim()) {
+    const isUniversal = donorNorm === "dea 1.1-";
+    return {
+      matches: true,
+      matchType: isUniversal ? "universal" : "standard",
+      compatibilityLabel: isUniversal ? "Universal Dog Donor (DEA 1.1-)" : null,
+      score: isUniversal ? 95 : 80
+    };
+  }
+  if (donorNorm === reqNorm) {
+    return {
+      matches: true,
+      matchType: "exact",
+      compatibilityLabel: "Exact Blood Match",
+      score: 100
+    };
+  }
+  // Canine universal donor compatibility: DEA 1.1- can donate to DEA 1.1+ and DEA 4
+  if (donorSpecies === "dog" && donorNorm === "dea 1.1-" && ["dea 1.1+", "dea 4"].includes(reqNorm)) {
+    return {
+      matches: true,
+      matchType: "compatible",
+      compatibilityLabel: "Compatible Universal Donor (DEA 1.1-)",
+      score: 90
+    };
+  }
+  // Feline Type AB recipient can receive Type A packed cells with vet cross-match
+  if (donorSpecies === "cat" && reqNorm === "type ab" && donorNorm === "type a") {
+    return {
+      matches: true,
+      matchType: "compatible",
+      compatibilityLabel: "Compatible Donor for Type AB (Vet Cross-Match)",
+      score: 85
+    };
+  }
+  return {
+    matches: false,
+    matchType: "incompatible",
+    compatibilityLabel: null,
+    score: 0
+  };
+}
+
+function evaluateBloodDonorReadiness(donor) {
+  const COOLDOWN_DAYS = 56;
+  if (!donor.lastDonationAt) {
+    return {
+      readyToDonate: true,
+      readinessStatus: "ready",
+      readinessLabel: "Ready to donate",
+      daysSinceLastDonation: null,
+      daysUntilReady: 0
+    };
+  }
+  const lastDate = new Date(donor.lastDonationAt);
+  if (Number.isNaN(lastDate.getTime())) {
+    return {
+      readyToDonate: true,
+      readinessStatus: "ready",
+      readinessLabel: "Ready to donate",
+      daysSinceLastDonation: null,
+      daysUntilReady: 0
+    };
+  }
+  const daysSince = Math.max(0, Math.floor((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24)));
+  const ready = daysSince >= COOLDOWN_DAYS;
+  const daysUntilReady = ready ? 0 : Math.max(1, COOLDOWN_DAYS - daysSince);
+  return {
+    readyToDonate: ready,
+    readinessStatus: ready ? "ready" : "resting",
+    readinessLabel: ready ? `Ready (${daysSince}d since last)` : `Resting (${daysUntilReady}d left)`,
+    daysSinceLastDonation: daysSince,
+    daysUntilReady
+  };
+}
+
+function publicDonor(donor, compatibility = null) {
   const mapQuery = `${donor.area || ""}, ${donor.city || "Bangladesh"}`.trim();
+  const readiness = evaluateBloodDonorReadiness(donor);
+  const compat = compatibility || checkBloodCompatibility(donor.bloodType, "", donor.species);
   return {
     id: donor.id,
     petName: donor.petName || (donor.species === "cat" ? "Cat Donor" : "Dog Donor"),
@@ -354,11 +523,25 @@ function publicDonor(donor) {
     badge: donor.badge || (donor.verified ? "Verified Donor" : "Pending"),
     consent: donor.consent,
     lastDonationAt: donor.lastDonationAt || null,
+    readyToDonate: readiness.readyToDonate,
+    readinessStatus: readiness.readinessStatus,
+    readinessLabel: readiness.readinessLabel,
+    daysSinceLastDonation: readiness.daysSinceLastDonation,
+    daysUntilReady: readiness.daysUntilReady,
+    matchType: compat.matchType,
+    compatibilityLabel: compat.compatibilityLabel,
     mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
   };
 }
 
 function buildAdoptionPdf(application, listing, user) {
+  const safeListing = listing || {
+    name: "Rescue Animal",
+    species: "Companion",
+    area: "Bangladesh",
+    description: "Compassionate adoption listing on PawNir"
+  };
+  const safeUser = user || { name: "Pet Parent", email: "", area: "Bangladesh" };
   const esc = (value) => String(value || "").replace(/([\\()])/g, "\\$1").replace(/\r?\n/g, " ");
   const lines = [
     "PawNir  |  RESPONSIBLE ADOPTION APPLICATION",
@@ -368,12 +551,12 @@ function buildAdoptionPdf(application, listing, user) {
     `Date: ${new Date(application.createdAt).toLocaleDateString("en-BD")}`,
     "",
     "ANIMAL",
-    `Name: ${listing.name}   Species: ${listing.species}   Area: ${listing.area}`,
-    `About: ${listing.description}`,
+    `Name: ${safeListing.name}   Species: ${safeListing.species}   Area: ${safeListing.area}`,
+    `About: ${safeListing.description}`,
     "",
     "APPLICANT",
-    `Name: ${user.name || "Pet parent"}   Email: ${user.email}`,
-    `Area: ${user.area || "Not provided"}`,
+    `Name: ${safeUser.name || "Pet parent"}   Email: ${safeUser.email || "Not provided"}`,
+    `Area: ${safeUser.area || "Not provided"}`,
     "",
     "CARE COMMITMENT",
     "I confirm that I can provide safe housing, food, veterinary care,",
@@ -415,16 +598,45 @@ function availableVetSlots(vet, date, mode, bookings) {
   return vetSlotsForDate(vet, date).filter((slot) => !booked.has(slot));
 }
 
-function isRateLimited(req) {
-  const key = req.socket.remoteAddress || "unknown";
+let lastBucketCleanupAt = Date.now();
+function pruneExpiredRateBuckets(now) {
+  if (now - lastBucketCleanupAt < RATE_WINDOW_MS) return;
+  lastBucketCleanupAt = now;
+  for (const [k, b] of requestBuckets.entries()) {
+    if (now - b.startedAt >= RATE_WINDOW_MS) requestBuckets.delete(k);
+  }
+  for (const [k, st] of googleStates.entries()) {
+    if (now - st.createdAt >= GOOGLE_STATE_TTL_MS) googleStates.delete(k);
+  }
+}
+
+function clientIpFromRequest(req) {
+  const forwarded = req.headers && req.headers["x-forwarded-for"];
+  if (forwarded) {
+    const first = String(forwarded).split(",")[0].trim();
+    if (first) return first;
+  }
+  return (req.socket && req.socket.remoteAddress) || "unknown";
+}
+
+function isRateLimited(req, pathname = "") {
+  if (!pathname.startsWith("/api/") && !pathname.startsWith("/auth/")) return false;
+  if (pathname === "/api/stream") return false;
   const now = Date.now();
+  pruneExpiredRateBuckets(now);
+  const ip = clientIpFromRequest(req);
+  const isAuthRoute = pathname.startsWith("/api/auth/") || pathname.startsWith("/auth/");
+  const isWriteMethod = ["POST", "PATCH", "PUT", "DELETE"].includes(req.method);
+  const tier = isAuthRoute ? "auth" : isWriteMethod ? "write" : "read";
+  const limit = isAuthRoute ? RATE_LIMIT_AUTH : isWriteMethod ? RATE_LIMIT_WRITE : RATE_LIMIT_READ;
+  const key = `${ip}:${tier}`;
   const bucket = requestBuckets.get(key);
   if (!bucket || now - bucket.startedAt >= RATE_WINDOW_MS) {
     requestBuckets.set(key, { startedAt: now, count: 1 });
     return false;
   }
   bucket.count += 1;
-  return bucket.count > RATE_LIMIT;
+  return bucket.count > limit;
 }
 
 function cacheKey(prefix, tenantId) {
@@ -468,6 +680,41 @@ function pushSse(tenantId, eventName, payload) {
       // ignore stale clients
     }
   });
+}
+
+async function saveAndPushNotifications(tenantId, newItems) {
+  const itemsToSave = Array.isArray(newItems) ? newItems : [newItems];
+  if (!itemsToSave.length) return;
+  const notifications = await appState.storage.readCollection(tenantId, "notifications");
+  await appState.storage.writeCollection(tenantId, "notifications", [...itemsToSave, ...notifications].slice(0, 1000));
+  itemsToSave.forEach((item) => {
+    pushSse(tenantId, "notification_update", {
+      id: item.id,
+      userId: item.userId,
+      type: item.type,
+      title: item.title,
+      message: item.message,
+      createdAt: item.createdAt
+    });
+  });
+}
+
+async function getCommunityCounts(tenantId) {
+  const now = Date.now();
+  const [lostReports, donors, fosters, adoptions, vets] = await Promise.all([
+    appState.storage.readCollection(tenantId, "lostReports"),
+    appState.storage.readCollection(tenantId, "donors"),
+    appState.storage.readCollection(tenantId, "fosters"),
+    appState.storage.readCollection(tenantId, "adoptionListings"),
+    appState.storage.readVets(tenantId)
+  ]);
+  return {
+    openLostCount: lostReports.filter((r) => r.status === "open" && (!r.expiresAt || new Date(r.expiresAt).getTime() > now)).length,
+    verifiedDonorCount: donors.filter((d) => d.verified && d.consent && d.available).length,
+    verifiedFosterCount: fosters.filter((f) => f.verified).length,
+    openAdoptionCount: adoptions.filter((a) => a.status === "open" && a.verified).length,
+    verifiedVetCount: vets.filter((v) => v.verified).length
+  };
 }
 
 async function appendAudit(tenantId, actor, action, detail = {}) {
@@ -907,11 +1154,15 @@ function startRealtimeBroadcast() {
       const clients = sseSet(tenantId);
       if (!clients.size) continue;
       try {
-        const report = await getReport(tenantId);
+        const [report, community] = await Promise.all([
+          getReport(tenantId),
+          getCommunityCounts(tenantId)
+        ]);
         const payload = {
           live: buildLiveSnapshot(report),
           pipeline: getPipelineStatus(tenantId),
-          anomalyCount: detectAnomalies(report).length
+          anomalyCount: detectAnomalies(report).length,
+          community
         };
         pushSse(tenantId, "snapshot", payload);
       } catch (err) {
@@ -923,18 +1174,25 @@ function startRealtimeBroadcast() {
 
 async function routeApi(req, res, urlObj, tenantId, user) {
   const pathname = urlObj.pathname;
-  const report = await getReport(tenantId);
 
   if (pathname === "/api/health") {
+    const community = await getCommunityCounts(tenantId);
     sendJson(res, 200, {
       ok: true,
       service: "pawnir-veterinary-portal",
-      dataset: report.dataset || "unknown",
+      dataset: "pawnir-live",
       uptimeSec: Math.round((Date.now() - appState.startedAt) / 1000),
       memoryMb: Math.round(process.memoryUsage().rss / (1024 * 1024)),
       authRequired: AUTH_REQUIRED,
-      tenant: tenantId
+      tenant: tenantId,
+      community
     });
+    return;
+  }
+
+  if (pathname === "/api/community-stats" && req.method === "GET") {
+    const community = await getCommunityCounts(tenantId);
+    sendJson(res, 200, community);
     return;
   }
 
@@ -999,6 +1257,16 @@ async function routeApi(req, res, urlObj, tenantId, user) {
       return;
     }
 
+    const userSummary = {
+      id: principal.id,
+      email: principal.email,
+      role: principal.role,
+      name: principal.name,
+      avatarUrl: principal.avatarUrl || null,
+      area: principal.area || null,
+      bio: principal.bio || ""
+    };
+
     if (body.require2fa) {
       const pendingToken = issuePending2faToken(principal, TOKEN_SECRET, tenantId);
       const challenge = createMathChallenge(TOKEN_SECRET);
@@ -1007,14 +1275,14 @@ async function routeApi(req, res, urlObj, tenantId, user) {
         requires2fa: true,
         pendingToken,
         challenge,
-        user: { email: principal.email, role: principal.role, name: principal.name }
+        user: userSummary
       });
       return;
     }
 
     const token = issueToken(principal, TOKEN_SECRET, tenantId);
     await appendAudit(tenantId, principal.email, "auth.login.success", { role: principal.role });
-    sendJson(res, 200, { token, user: { email: principal.email, role: principal.role, name: principal.name } });
+    sendJson(res, 200, { token, user: userSummary });
     return;
   }
 
@@ -1058,742 +1326,844 @@ async function routeApi(req, res, urlObj, tenantId, user) {
   }
 
   if (pathname === "/api/auth/register" && req.method === "POST") {
-      const body = await readBodyJson(req);
-      const principal = await registerUser(appState.storage, tenantId, body.email, body.password, body.name);
-      if (!principal) {
-        sendJson(res, 400, { error: "Use a unique email and a password of at least 8 characters" });
-        return;
-      }
-      if (body.require2fa) {
-        const pendingToken = issuePending2faToken(principal, TOKEN_SECRET, tenantId);
-        const challenge = createMathChallenge(TOKEN_SECRET);
-        await appendAudit(tenantId, principal.email, "auth.register.2fa_challenge", { role: principal.role });
-        sendJson(res, 201, {
-          requires2fa: true,
-          pendingToken,
-          challenge,
-          user: { email: principal.email, role: principal.role, name: principal.name }
-        });
-        return;
-      }
-      const token = issueToken(principal, TOKEN_SECRET, tenantId);
-      await appendAudit(tenantId, principal.email, "auth.register.success", { role: principal.role });
-      sendJson(res, 201, { token, user: { email: principal.email, role: principal.role, name: principal.name } });
+    const body = await readBodyJson(req);
+    const principal = await registerUser(appState.storage, tenantId, body.email, body.password, body.name);
+    if (!principal) {
+      sendJson(res, 400, { error: "Use a unique email and a password of at least 8 characters" });
       return;
+    }
+    const userSummary = {
+      id: principal.id,
+      email: principal.email,
+      role: principal.role,
+      name: principal.name,
+      avatarUrl: principal.avatarUrl || null,
+      area: principal.area || null,
+      bio: principal.bio || ""
+    };
+    if (body.require2fa) {
+      const pendingToken = issuePending2faToken(principal, TOKEN_SECRET, tenantId);
+      const challenge = createMathChallenge(TOKEN_SECRET);
+      await appendAudit(tenantId, principal.email, "auth.register.2fa_challenge", { role: principal.role });
+      sendJson(res, 201, {
+        requires2fa: true,
+        pendingToken,
+        challenge,
+        user: userSummary
+      });
+      return;
+    }
+    const token = issueToken(principal, TOKEN_SECRET, tenantId);
+    await appendAudit(tenantId, principal.email, "auth.register.success", { role: principal.role });
+    sendJson(res, 201, { token, user: userSummary });
+    return;
   }
 
   if (pathname === "/api/lost-found" && req.method === "GET") {
-      const rawArea = cleanText(urlObj.searchParams.get("area") || "", 80).toLowerCase();
-      const requestedAreaKey = areaKey(rawArea);
-      const requestedType = urlObj.searchParams.get("type") || "all";
-      const requestedSpecies = cleanText(urlObj.searchParams.get("species") || "", 20).toLowerCase();
-      const reports = await appState.storage.readCollection(tenantId, "lostReports");
-      const now = Date.now();
-      const visible = reports.filter((report) => {
-        if (report.status !== "open") return false;
-        if (report.expiresAt && new Date(report.expiresAt).getTime() <= now) return false;
-        if (requestedType !== "all" && report.type !== requestedType) return false;
-        if (requestedSpecies && requestedSpecies !== "all" && report.species !== requestedSpecies) return false;
-        if (rawArea) {
-          const haystack = `${report.area || ""} ${report.city || ""} ${report.title || ""} ${report.description || ""} ${report.areaKey || ""}`.toLowerCase();
-          return haystack.includes(rawArea) || (requestedAreaKey && String(report.areaKey || "").includes(requestedAreaKey));
-        }
-        return true;
-      }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      const mine = user ? reports.filter((report) => report.ownerId === user.sub).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : [];
-      sendJson(res, 200, { reports: visible.slice(0, 100).map(publicLostReport), mine: mine.slice(0, 50).map(publicLostReport) });
-      return;
+    const rawArea = cleanText(urlObj.searchParams.get("area") || "", 80).toLowerCase();
+    const requestedAreaKey = areaKey(rawArea);
+    const requestedType = urlObj.searchParams.get("type") || "all";
+    const requestedSpecies = cleanText(urlObj.searchParams.get("species") || "", 20).toLowerCase();
+    const reports = await appState.storage.readCollection(tenantId, "lostReports");
+    const now = Date.now();
+    const openReports = reports.filter(
+      (report) => report.status === "open" && (!report.expiresAt || new Date(report.expiresAt).getTime() > now)
+    );
+    const totalOpenCount = openReports.length;
+    const visible = openReports.filter((report) => {
+      if (requestedType !== "all" && report.type !== requestedType) return false;
+      if (requestedSpecies && requestedSpecies !== "all" && report.species !== requestedSpecies) return false;
+      if (rawArea) {
+        const haystack = `${report.area || ""} ${report.city || ""} ${report.title || ""} ${report.description || ""} ${report.areaKey || ""}`.toLowerCase();
+        return haystack.includes(rawArea) || (requestedAreaKey && String(report.areaKey || "").includes(requestedAreaKey));
+      }
+      return true;
+    }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const mine = user ? reports.filter((report) => report.ownerId === user.sub).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : [];
+    sendJson(res, 200, {
+      reports: visible.slice(0, 100).map((r) => publicLostReport(r, user?.sub)),
+      mine: mine.slice(0, 50).map((r) => publicLostReport(r, user?.sub)),
+      totalOpenCount
+    });
+    return;
   }
 
   const lostSightingMatch = pathname.match(/^\/api\/lost-found\/([^/]+)\/sightings$/);
   if (lostSightingMatch && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to share a sighting tip" });
-      const reportId = decodeURIComponent(lostSightingMatch[1]);
-      const body = await readBodyJson(req);
-      const location = cleanText(body.location, 120);
-      const note = cleanText(body.note, 500);
-      if (!location || note.length < 6) {
-        return sendJson(res, 400, { error: "Sighting location and a helpful note are required" });
-      }
-      const reports = await appState.storage.readCollection(tenantId, "lostReports");
-      const idx = reports.findIndex((item) => item.id === reportId && item.status === "open");
-      if (idx < 0) return sendJson(res, 404, { error: "Open report not found" });
-      const sighting = {
-        id: `sight-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        reporterId: user.sub,
-        reporterName: cleanText(user.name || user.email.split("@")[0], 80),
-        location,
-        note,
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to share a sighting tip" });
+    const reportId = decodeURIComponent(lostSightingMatch[1]);
+    const body = await readBodyJson(req);
+    const location = cleanText(body.location, 120);
+    const note = cleanText(body.note, 500);
+    const contact = cleanText(body.contact, 80) || null;
+    if (!location || note.length < 6) {
+      return sendJson(res, 400, { error: "Sighting location and a helpful note are required" });
+    }
+    const reports = await appState.storage.readCollection(tenantId, "lostReports");
+    const idx = reports.findIndex((item) => item.id === reportId && item.status === "open");
+    if (idx < 0) return sendJson(res, 404, { error: "Open report not found" });
+    const sighting = {
+      id: `sight-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      reporterId: user.sub,
+      reporterName: cleanText(user.name || user.email.split("@")[0], 80),
+      location,
+      note,
+      contact,
+      createdAt: new Date().toISOString()
+    };
+    const existingSightings = Array.isArray(reports[idx].sightings) ? reports[idx].sightings : [];
+    reports[idx] = {
+      ...reports[idx],
+      sightings: [sighting, ...existingSightings],
+      updatedAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "lostReports", reports);
+    if (reports[idx].ownerId && reports[idx].ownerId !== user.sub) {
+      await saveAndPushNotifications(tenantId, {
+        id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        userId: reports[idx].ownerId,
+        type: "lost_found_sighting",
+        reportId,
+        title: `New sighting tip for: ${reports[idx].title}`,
+        message: `${sighting.reporterName} spotted near ${location}: "${note}"${contact ? ` (${contact})` : ""}`,
+        read: false,
         createdAt: new Date().toISOString()
-      };
-      const existingSightings = Array.isArray(reports[idx].sightings) ? reports[idx].sightings : [];
-      reports[idx] = {
-        ...reports[idx],
-        sightings: [sighting, ...existingSightings],
-        updatedAt: new Date().toISOString()
-      };
-      await appState.storage.writeCollection(tenantId, "lostReports", reports);
-      if (reports[idx].ownerId && reports[idx].ownerId !== user.sub) {
-        const notifications = await appState.storage.readCollection(tenantId, "notifications");
-        const alertItem = {
-          id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-          userId: reports[idx].ownerId,
-          type: "lost_found_sighting",
-          reportId,
-          title: `New sighting tip for: ${reports[idx].title}`,
-          message: `${sighting.reporterName} spotted near ${location}: "${note}"`,
-          read: false,
-          createdAt: new Date().toISOString()
-        };
-        await appState.storage.writeCollection(tenantId, "notifications", [alertItem, ...notifications].slice(0, 1000));
-      }
-      await appendAudit(tenantId, user.email, "lost_found.sighting.created", { reportId, sightingId: sighting.id });
-      pushSse(tenantId, "lost_found_update", { action: "sighting", reportId });
-      sendJson(res, 201, { report: publicLostReport(reports[idx]), sighting });
-      return;
+      });
+    }
+    await appendAudit(tenantId, user.email, "lost_found.sighting.created", { reportId, sightingId: sighting.id });
+    pushSse(tenantId, "lost_found_update", { action: "sighting", reportId });
+    sendJson(res, 201, { report: publicLostReport(reports[idx], user.sub), sighting });
+    return;
   }
 
   if (pathname === "/api/lost-found" && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to report a lost or found animal" });
-      const body = await readBodyJson(req);
-      const type = body.type === "found" ? "found" : body.type === "lost" ? "lost" : "";
-      const species = ["cat", "dog", "bird", "rabbit", "other"].includes(body.species) ? body.species : "";
-      const area = cleanText(body.area, 80);
-      const city = cleanText(body.city, 60);
-      const title = cleanText(body.title, 120);
-      const description = cleanText(body.description, 1000);
-      let photoData;
-      try {
-        photoData = validateLostFoundPhoto(body.photoData);
-      } catch (error) {
-        return sendJson(res, 400, { error: error.message });
-      }
-      if (!type || !species || !area || !city || !title || description.length < 10) {
-        return sendJson(res, 400, { error: "Type, species, area, city, title, and a useful description are required" });
-      }
-      const reports = await appState.storage.readCollection(tenantId, "lostReports");
-      const duplicate = reports.find((report) => report.ownerId === user.sub && report.status === "open" && report.type === type && report.areaKey === areaKey(area) && report.title.toLowerCase() === title.toLowerCase());
-      if (duplicate) return sendJson(res, 409, { error: "You already have an open report with these details" });
-      const report = {
-        id: `lost-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        ownerId: user.sub,
-        ownerName: cleanText(user.name || user.email.split("@")[0], 80),
-        type,
-        species,
-        title,
-        description,
-        photoData,
-        area,
-        areaKey: areaKey(area),
-        city,
-        photoUrl: cleanText(body.photoUrl, 500) || null,
-        status: "open",
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-      };
-      await appState.storage.writeCollection(tenantId, "lostReports", [report, ...reports]);
-      const subscriptions = await appState.storage.readCollection(tenantId, "areaSubscriptions");
-      const notifications = await appState.storage.readCollection(tenantId, "notifications");
-      const recipients = subscriptions.filter((subscription) => subscription.areaKey === report.areaKey && subscription.userId !== user.sub);
-      const newNotifications = recipients.map((recipient) => ({
-        id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        userId: recipient.userId,
-        type: "lost_found_nearby",
-        reportId: report.id,
-        title: `${type === "lost" ? "Lost" : "Found"} ${species} near you`,
-        message: `${title} · ${area}`,
-        read: false,
-        createdAt: new Date().toISOString()
-      }));
-      if (newNotifications.length) await appState.storage.writeCollection(tenantId, "notifications", [...newNotifications, ...notifications].slice(0, 1000));
-      await appendAudit(tenantId, user.email, "lost_found.report.created", { reportId: report.id, type, areaKey: report.areaKey, notifiedCount: newNotifications.length });
-      pushSse(tenantId, "lost_found_update", { action: "created", reportId: report.id, area: report.area, type: report.type, notifiedCount: newNotifications.length });
-      sendJson(res, 201, { report: publicLostReport(report), notifiedCount: newNotifications.length });
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to report a lost or found animal" });
+    const body = await readBodyJson(req);
+    const type = body.type === "found" ? "found" : body.type === "lost" ? "lost" : "";
+    const species = ["cat", "dog", "bird", "rabbit", "other"].includes(body.species) ? body.species : "";
+    const area = cleanText(body.area, 80);
+    const city = cleanText(body.city, 60);
+    const title = cleanText(body.title, 120);
+    const description = cleanText(body.description, 1000);
+    let photoData;
+    try {
+      photoData = validateLostFoundPhoto(body.photoData);
+    } catch (error) {
+      return sendJson(res, 400, { error: error.message });
+    }
+    if (!type || !species || !area || !city || !title || description.length < 10) {
+      return sendJson(res, 400, { error: "Type, species, area, city, title, and a useful description are required" });
+    }
+    const reports = await appState.storage.readCollection(tenantId, "lostReports");
+    const duplicate = reports.find((report) => report.ownerId === user.sub && report.status === "open" && report.type === type && report.areaKey === areaKey(area) && report.title.toLowerCase() === title.toLowerCase());
+    if (duplicate) return sendJson(res, 409, { error: "You already have an open report with these details" });
+    const report = {
+      id: `lost-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      ownerId: user.sub,
+      ownerName: cleanText(user.name || user.email.split("@")[0], 80),
+      type,
+      species,
+      title,
+      description,
+      photoData,
+      area,
+      areaKey: areaKey(area),
+      city,
+      photoUrl: cleanText(body.photoUrl, 500) || null,
+      status: "open",
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "lostReports", [report, ...reports]);
+    const subscriptions = await appState.storage.readCollection(tenantId, "areaSubscriptions");
+    const recipients = subscriptions.filter((subscription) => subscription.areaKey === report.areaKey && subscription.userId !== user.sub);
+    const newNotifications = recipients.map((recipient) => ({
+      id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      userId: recipient.userId,
+      type: "lost_found_nearby",
+      reportId: report.id,
+      title: `${type === "lost" ? "Lost" : "Found"} ${species} near you`,
+      message: `${title} · ${area}`,
+      read: false,
+      createdAt: new Date().toISOString()
+    }));
+    if (newNotifications.length) await saveAndPushNotifications(tenantId, newNotifications);
+    await appendAudit(tenantId, user.email, "lost_found.report.created", { reportId: report.id, type, areaKey: report.areaKey, notifiedCount: newNotifications.length });
+    pushSse(tenantId, "lost_found_update", { action: "created", reportId: report.id, area: report.area, type: report.type, notifiedCount: newNotifications.length });
+    sendJson(res, 201, { report: publicLostReport(report, user.sub), notifiedCount: newNotifications.length });
+    return;
   }
 
   const lostReportMatch = pathname.match(/^\/api\/lost-found\/([^/]+)$/);
   if (lostReportMatch && req.method === "PATCH") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to update a report" });
-      const reportId = decodeURIComponent(lostReportMatch[1]);
-      const body = await readBodyJson(req);
-      const reports = await appState.storage.readCollection(tenantId, "lostReports");
-      const index = reports.findIndex((report) => report.id === reportId && report.ownerId === user.sub);
-      if (index < 0) return sendJson(res, 404, { error: "Report not found" });
-      if (!["open", "resolved", "closed"].includes(body.status)) return sendJson(res, 400, { error: "Status must be open, resolved, or closed" });
-      reports[index] = { ...reports[index], status: body.status, updatedAt: new Date().toISOString() };
-      await appState.storage.writeCollection(tenantId, "lostReports", reports);
-      await appendAudit(tenantId, user.email, "lost_found.report.updated", { reportId, status: body.status });
-      pushSse(tenantId, "lost_found_update", { action: "updated", reportId, status: body.status });
-      sendJson(res, 200, publicLostReport(reports[index]));
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to update a report" });
+    const reportId = decodeURIComponent(lostReportMatch[1]);
+    const body = await readBodyJson(req);
+    const reports = await appState.storage.readCollection(tenantId, "lostReports");
+    const index = reports.findIndex((report) => report.id === reportId && report.ownerId === user.sub);
+    if (index < 0) return sendJson(res, 404, { error: "Report not found" });
+    if (!["open", "resolved", "closed"].includes(body.status)) return sendJson(res, 400, { error: "Status must be open, resolved, or closed" });
+    reports[index] = { ...reports[index], status: body.status, updatedAt: new Date().toISOString() };
+    await appState.storage.writeCollection(tenantId, "lostReports", reports);
+    await appendAudit(tenantId, user.email, "lost_found.report.updated", { reportId, status: body.status });
+    pushSse(tenantId, "lost_found_update", { action: "updated", reportId, status: body.status });
+    sendJson(res, 200, publicLostReport(reports[index], user.sub));
+    return;
   }
 
   if (pathname === "/api/lost-found/subscribe" && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required for nearby alerts" });
-      const body = await readBodyJson(req);
-      const area = cleanText(body.area, 80);
-      const city = cleanText(body.city, 60);
-      if (!area || !city) return sendJson(res, 400, { error: "Area and city are required" });
-      const subscriptions = await appState.storage.readCollection(tenantId, "areaSubscriptions");
-      const existing = subscriptions.find((item) => item.userId === user.sub && item.areaKey === areaKey(area));
-      if (!existing) subscriptions.unshift({ id: `area-${Date.now()}-${Math.floor(Math.random() * 10000)}`, userId: user.sub, area, areaKey: areaKey(area), city, createdAt: new Date().toISOString() });
-      await appState.storage.writeCollection(tenantId, "areaSubscriptions", subscriptions);
-      await appendAudit(tenantId, user.email, "lost_found.area.subscribed", { areaKey: areaKey(area) });
-      sendJson(res, 201, { area, city, subscribed: true });
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required for nearby alerts" });
+    const body = await readBodyJson(req);
+    const area = cleanText(body.area, 80);
+    const city = cleanText(body.city, 60);
+    if (!area || !city) return sendJson(res, 400, { error: "Area and city are required" });
+    const subscriptions = await appState.storage.readCollection(tenantId, "areaSubscriptions");
+    const existing = subscriptions.find((item) => item.userId === user.sub && item.areaKey === areaKey(area));
+    if (!existing) subscriptions.unshift({ id: `area-${Date.now()}-${Math.floor(Math.random() * 10000)}`, userId: user.sub, area, areaKey: areaKey(area), city, createdAt: new Date().toISOString() });
+    await appState.storage.writeCollection(tenantId, "areaSubscriptions", subscriptions);
+    await appendAudit(tenantId, user.email, "lost_found.area.subscribed", { areaKey: areaKey(area) });
+    sendJson(res, 201, { area, city, subscribed: true });
+    return;
   }
 
   if (pathname === "/api/notifications" && req.method === "GET") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to view notifications" });
-      const notifications = await appState.storage.readCollection(tenantId, "notifications");
-      sendJson(res, 200, notifications.filter((item) => item.userId === user.sub).slice(0, 100));
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to view notifications" });
+    const notifications = await appState.storage.readCollection(tenantId, "notifications");
+    sendJson(res, 200, notifications.filter((item) => item.userId === user.sub).slice(0, 100));
+    return;
   }
   if (pathname === "/api/notifications/read" && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to update notifications" });
-      const notifications = await appState.storage.readCollection(tenantId, "notifications");
-      const updated = notifications.map((item) => item.userId === user.sub ? { ...item, read: true } : item);
-      await appState.storage.writeCollection(tenantId, "notifications", updated);
-      sendJson(res, 200, { updated: notifications.filter((item) => item.userId === user.sub).length });
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to update notifications" });
+    const notifications = await appState.storage.readCollection(tenantId, "notifications");
+    const updated = notifications.map((item) => item.userId === user.sub ? { ...item, read: true } : item);
+    await appState.storage.writeCollection(tenantId, "notifications", updated);
+    sendJson(res, 200, { updated: notifications.filter((item) => item.userId === user.sub).length });
+    return;
   }
 
   if (pathname === "/api/donors" && req.method === "GET") {
-      const area = cleanText(urlObj.searchParams.get("area"), 80).toLowerCase();
-      const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
-      const bloodType = cleanText(urlObj.searchParams.get("bloodType"), 30).toLowerCase();
-      const includeMine = urlObj.searchParams.get("includeMine") === "1";
-      const [donors, donorRequests] = await Promise.all([
-        appState.storage.readCollection(tenantId, "donors"),
-        includeMine && user ? appState.storage.readCollection(tenantId, "donorRequests") : Promise.resolve([])
-      ]);
-      const visible = donors.filter((donor) => {
-        if (!donor.verified || !donor.consent || !donor.available) return false;
-        if (species && donor.species !== species) return false;
-        if (bloodType && !String(donor.bloodType || "").toLowerCase().includes(bloodType)) return false;
-        if (area) {
-          const hay = `${donor.area || ""} ${donor.city || ""} ${donor.petName || ""} ${donor.bloodType || ""}`.toLowerCase();
-          if (!hay.includes(area)) return false;
-        }
-        return true;
-      }).map(publicDonor);
-      if (includeMine) {
-        const myDonors = user ? donors.filter((d) => d.ownerId === user.sub).map(publicDonor) : [];
-        const incomingRequests = user ? donorRequests.filter((r) => r.donorOwnerId === user.sub).slice(0, 30) : [];
-        const mySentRequests = user ? donorRequests.filter((r) => r.requesterId === user.sub).slice(0, 30) : [];
-        sendJson(res, 200, { donors: visible, myDonors, incomingRequests, mySentRequests });
-        return;
+    const area = cleanText(urlObj.searchParams.get("area"), 80).toLowerCase();
+    const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
+    const bloodType = cleanText(urlObj.searchParams.get("bloodType"), 30);
+    const includeMine = urlObj.searchParams.get("includeMine") === "1";
+    const [donors, donorRequests] = await Promise.all([
+      appState.storage.readCollection(tenantId, "donors"),
+      includeMine && user ? appState.storage.readCollection(tenantId, "donorRequests") : Promise.resolve([])
+    ]);
+    const activeVerifiedDonors = donors.filter((donor) => donor.verified && donor.consent && donor.available);
+    const totalVerifiedCount = activeVerifiedDonors.length;
+    const matched = [];
+    for (const donor of activeVerifiedDonors) {
+      if (species && donor.species !== species) continue;
+      if (area) {
+        const hay = `${donor.area || ""} ${donor.city || ""} ${donor.petName || ""} ${donor.bloodType || ""}`.toLowerCase();
+        if (!hay.includes(area)) continue;
       }
-      sendJson(res, 200, visible);
+      const compat = checkBloodCompatibility(donor.bloodType, bloodType, donor.species);
+      if (!compat.matches) continue;
+      matched.push({ donor: publicDonor(donor, compat), compatScore: compat.score });
+    }
+    matched.sort((a, b) => {
+      if (b.compatScore !== a.compatScore) return b.compatScore - a.compatScore;
+      if (a.donor.readyToDonate !== b.donor.readyToDonate) return a.donor.readyToDonate ? -1 : 1;
+      const daysA = a.donor.daysSinceLastDonation === null ? 999 : a.donor.daysSinceLastDonation;
+      const daysB = b.donor.daysSinceLastDonation === null ? 999 : b.donor.daysSinceLastDonation;
+      return daysB - daysA;
+    });
+    const visible = matched.map((item) => item.donor);
+    if (includeMine) {
+      const myDonors = user ? donors.filter((d) => d.ownerId === user.sub).map((d) => publicDonor(d)) : [];
+      const incomingRequests = user ? donorRequests.filter((r) => r.donorOwnerId === user.sub).slice(0, 30) : [];
+      const mySentRequests = user ? donorRequests.filter((r) => r.requesterId === user.sub).slice(0, 30) : [];
+      sendJson(res, 200, { donors: visible, myDonors, incomingRequests, mySentRequests, totalVerifiedCount });
       return;
+    }
+    sendJson(res, 200, visible);
+    return;
   }
   if (pathname === "/api/donors" && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to register a donor" });
-      const body = await readBodyJson(req);
-      const species = ["cat", "dog"].includes(body.species) ? body.species : "";
-      const petName = cleanText(body.petName, 60) || (species === "cat" ? "Cat Donor" : "Dog Donor");
-      const area = cleanText(body.area, 80);
-      const city = cleanText(body.city, 60);
-      const weightKg = body.weightKg ? Math.max(1, Math.min(90, Number(body.weightKg) || 0)) : null;
-      if (!species || !area || !city || body.consent !== true || body.eligibilityAcknowledged !== true) {
-        return sendJson(res, 400, { error: "Species, area, city, donor consent, and eligibility acknowledgement are required" });
-      }
-      const donors = await appState.storage.readCollection(tenantId, "donors");
-      const existing = donors.find((donor) => donor.ownerId === user.sub && (donor.petName || "").toLowerCase() === petName.toLowerCase());
-      const donor = {
-        id: existing?.id || `donor-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        ownerId: user.sub,
-        ownerName: cleanText(user.name || user.email.split("@")[0], 80),
-        petName,
-        species,
-        bloodType: cleanText(body.bloodType, 30) || "Unknown",
-        weightKg,
-        vaccinated: body.vaccinated !== false,
-        area,
-        city,
-        available: true,
-        consent: true,
-        eligibilityAcknowledged: true,
-        verified: true,
-        badge: "Community Verified",
-        lastDonationAt: cleanText(body.lastDonationAt, 20) || null,
-        createdAt: existing?.createdAt || new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      await appState.storage.writeCollection(tenantId, "donors", [donor, ...donors.filter((item) => item.id !== donor.id)]);
-      await appendAudit(tenantId, user.email, "donor.registered", { donorId: donor.id });
-      pushSse(tenantId, "donor_update", { action: "registered", donorId: donor.id });
-      sendJson(res, 201, { donor: publicDonor(donor), status: "verified_active" });
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to register a donor" });
+    const body = await readBodyJson(req);
+    const species = ["cat", "dog"].includes(body.species) ? body.species : "";
+    const petName = cleanText(body.petName, 60) || (species === "cat" ? "Cat Donor" : "Dog Donor");
+    const area = cleanText(body.area, 80);
+    const city = cleanText(body.city, 60);
+    const weightKg = body.weightKg ? Math.max(1, Math.min(90, Number(body.weightKg) || 0)) : null;
+    if (!species || !area || !city || body.consent !== true || body.eligibilityAcknowledged !== true) {
+      return sendJson(res, 400, { error: "Species, area, city, donor consent, and eligibility acknowledgement are required" });
+    }
+    const donors = await appState.storage.readCollection(tenantId, "donors");
+    const existing = donors.find((donor) => donor.ownerId === user.sub && (donor.petName || "").toLowerCase() === petName.toLowerCase());
+    const donor = {
+      id: existing?.id || `donor-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      ownerId: user.sub,
+      ownerName: cleanText(user.name || user.email.split("@")[0], 80),
+      petName,
+      species,
+      bloodType: cleanText(body.bloodType, 30) || "Unknown",
+      weightKg,
+      vaccinated: body.vaccinated !== false,
+      area,
+      city,
+      available: true,
+      consent: true,
+      eligibilityAcknowledged: true,
+      verified: true,
+      badge: "Community Verified",
+      lastDonationAt: cleanText(body.lastDonationAt, 20) || null,
+      createdAt: existing?.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "donors", [donor, ...donors.filter((item) => item.id !== donor.id)]);
+    await appendAudit(tenantId, user.email, "donor.registered", { donorId: donor.id });
+    pushSse(tenantId, "donor_update", { action: "registered", donorId: donor.id });
+    sendJson(res, 201, { donor: publicDonor(donor), status: "verified_active" });
+    return;
   }
   const donorUpdateMatch = pathname.match(/^\/api\/donors\/([^/]+)$/);
   if (donorUpdateMatch && req.method === "PATCH") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to update donor status" });
-      const donorId = decodeURIComponent(donorUpdateMatch[1]);
-      const body = await readBodyJson(req);
-      const donors = await appState.storage.readCollection(tenantId, "donors");
-      const idx = donors.findIndex((item) => item.id === donorId && item.ownerId === user.sub);
-      if (idx < 0) return sendJson(res, 404, { error: "Donor record not found" });
-      donors[idx] = {
-        ...donors[idx],
-        available: typeof body.available === "boolean" ? body.available : !donors[idx].available,
-        updatedAt: new Date().toISOString()
-      };
-      await appState.storage.writeCollection(tenantId, "donors", donors);
-      pushSse(tenantId, "donor_update", { action: "availability", donorId });
-      sendJson(res, 200, { donor: publicDonor(donors[idx]) });
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to update donor status" });
+    const donorId = decodeURIComponent(donorUpdateMatch[1]);
+    const body = await readBodyJson(req);
+    const donors = await appState.storage.readCollection(tenantId, "donors");
+    const idx = donors.findIndex((item) => item.id === donorId && item.ownerId === user.sub);
+    if (idx < 0) return sendJson(res, 404, { error: "Donor record not found" });
+    donors[idx] = {
+      ...donors[idx],
+      available: typeof body.available === "boolean" ? body.available : !donors[idx].available,
+      updatedAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "donors", donors);
+    pushSse(tenantId, "donor_update", { action: "availability", donorId });
+    sendJson(res, 200, { donor: publicDonor(donors[idx]) });
+    return;
   }
   const donorRequestMatch = pathname.match(/^\/api\/donors\/([^/]+)\/requests$/);
   if (donorRequestMatch && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to request a donor" });
-      const donorId = decodeURIComponent(donorRequestMatch[1]);
-      const donors = await appState.storage.readCollection(tenantId, "donors");
-      const donor = donors.find((item) => item.id === donorId && item.verified && item.consent && item.available);
-      if (!donor) return sendJson(res, 404, { error: "Available verified donor not found" });
-      const body = await readBodyJson(req);
-      const reason = cleanText(body.reason, 500);
-      const clinic = cleanText(body.clinic, 120);
-      const contactPhone = cleanText(body.contactPhone, 40);
-      if (reason.length < 10) return sendJson(res, 400, { error: "Please describe the urgent need" });
-      const requests = await appState.storage.readCollection(tenantId, "donorRequests");
-      if (requests.some((item) => item.donorId === donorId && item.requesterId === user.sub && item.status === "pending")) return sendJson(res, 409, { error: "You already have a pending request for this donor" });
-      const request = {
-        id: `donor-request-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to request a donor" });
+    const donorId = decodeURIComponent(donorRequestMatch[1]);
+    const donors = await appState.storage.readCollection(tenantId, "donors");
+    const donor = donors.find((item) => item.id === donorId && item.verified && item.consent && item.available);
+    if (!donor) return sendJson(res, 404, { error: "Available verified donor not found" });
+    const body = await readBodyJson(req);
+    const reason = cleanText(body.reason, 500);
+    const clinic = cleanText(body.clinic, 120);
+    const contactPhone = cleanText(body.contactPhone, 40);
+    if (reason.length < 10) return sendJson(res, 400, { error: "Please describe the urgent need" });
+    const requests = await appState.storage.readCollection(tenantId, "donorRequests");
+    if (requests.some((item) => item.donorId === donorId && item.requesterId === user.sub && item.status === "pending")) return sendJson(res, 409, { error: "You already have a pending request for this donor" });
+    const request = {
+      id: `donor-request-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      donorId,
+      donorPetName: donor.petName || donor.species,
+      donorBloodType: donor.bloodType,
+      donorOwnerId: donor.ownerId,
+      requesterId: user.sub,
+      requesterName: cleanText(user.name || user.email.split("@")[0], 80),
+      clinic: clinic || donor.area,
+      contactPhone: contactPhone || null,
+      reason,
+      status: "pending",
+      createdAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "donorRequests", [request, ...requests]);
+    if (donor.ownerId && donor.ownerId !== user.sub) {
+      await saveAndPushNotifications(tenantId, {
+        id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        userId: donor.ownerId,
+        type: "blood_donor_request",
         donorId,
-        donorPetName: donor.petName || donor.species,
-        donorBloodType: donor.bloodType,
-        donorOwnerId: donor.ownerId,
-        requesterId: user.sub,
-        requesterName: cleanText(user.name || user.email.split("@")[0], 80),
-        clinic: clinic || donor.area,
-        contactPhone: contactPhone || null,
-        reason,
-        status: "pending",
+        title: `Urgent blood request for ${donor.petName || donor.species}`,
+        message: `${request.requesterName} (${request.clinic}): ${reason}`,
+        read: false,
         createdAt: new Date().toISOString()
-      };
-      await appState.storage.writeCollection(tenantId, "donorRequests", [request, ...requests]);
-      if (donor.ownerId && donor.ownerId !== user.sub) {
-        const notifications = await appState.storage.readCollection(tenantId, "notifications");
-        await appState.storage.writeCollection(tenantId, "notifications", [{
-          id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-          userId: donor.ownerId,
-          type: "blood_donor_request",
-          donorId,
-          title: `Urgent blood request for ${donor.petName || donor.species}`,
-          message: `${request.requesterName} (${request.clinic}): ${reason}`,
-          read: false,
-          createdAt: new Date().toISOString()
-        }, ...notifications].slice(0, 1000));
-      }
-      await appendAudit(tenantId, user.email, "donor.request.created", { requestId: request.id, donorId });
-      pushSse(tenantId, "donor_update", { action: "request_created", donorId });
-      sendJson(res, 201, { id: request.id, status: request.status, note: "The donor owner has been notified through PawNir." });
-      return;
+      });
+    }
+    await appendAudit(tenantId, user.email, "donor.request.created", { requestId: request.id, donorId });
+    pushSse(tenantId, "donor_update", { action: "request_created", donorId });
+    sendJson(res, 201, { id: request.id, status: request.status, note: "The donor owner has been notified through PawNir." });
+    return;
   }
   const donorRequestActionMatch = pathname.match(/^\/api\/donor-requests\/([^/]+)$/);
   if (donorRequestActionMatch && req.method === "PATCH") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required" });
-      const reqId = decodeURIComponent(donorRequestActionMatch[1]);
-      const body = await readBodyJson(req);
-      if (!["accepted", "declined", "fulfilled"].includes(body.status)) {
-        return sendJson(res, 400, { error: "Invalid request status" });
-      }
-      const requests = await appState.storage.readCollection(tenantId, "donorRequests");
-      const idx = requests.findIndex((item) => item.id === reqId && (item.donorOwnerId === user.sub || item.requesterId === user.sub));
-      if (idx < 0) return sendJson(res, 404, { error: "Donor request not found" });
-      requests[idx] = {
-        ...requests[idx],
-        status: body.status,
-        responseNote: cleanText(body.responseNote, 240) || null,
-        updatedAt: new Date().toISOString()
-      };
-      await appState.storage.writeCollection(tenantId, "donorRequests", requests);
-      pushSse(tenantId, "donor_update", { action: "request_updated", requestId: reqId });
-      sendJson(res, 200, requests[idx]);
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required" });
+    const reqId = decodeURIComponent(donorRequestActionMatch[1]);
+    const body = await readBodyJson(req);
+    if (!["accepted", "declined", "fulfilled"].includes(body.status)) {
+      return sendJson(res, 400, { error: "Invalid request status" });
+    }
+    const requests = await appState.storage.readCollection(tenantId, "donorRequests");
+    const idx = requests.findIndex((item) => item.id === reqId && (item.donorOwnerId === user.sub || item.requesterId === user.sub));
+    if (idx < 0) return sendJson(res, 404, { error: "Donor request not found" });
+    requests[idx] = {
+      ...requests[idx],
+      status: body.status,
+      responseNote: cleanText(body.responseNote, 240) || null,
+      updatedAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "donorRequests", requests);
+    const targetUserId = requests[idx].donorOwnerId === user.sub ? requests[idx].requesterId : requests[idx].donorOwnerId;
+    if (targetUserId && targetUserId !== user.sub) {
+      await saveAndPushNotifications(tenantId, {
+        id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        userId: targetUserId,
+        type: "blood_donor_response",
+        donorId: requests[idx].donorId,
+        title: `Blood donor request ${body.status}: ${requests[idx].donorPetName || "Donor"}`,
+        message: `Status updated to ${body.status.toUpperCase()}${requests[idx].responseNote ? ` — "${requests[idx].responseNote}"` : ""}.`,
+        read: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+    pushSse(tenantId, "donor_update", { action: "request_updated", requestId: reqId, status: body.status });
+    sendJson(res, 200, requests[idx]);
+    return;
   }
 
   if (pathname === "/api/adoptions" && req.method === "GET") {
-      const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
-      const area = cleanText(urlObj.searchParams.get("area"), 60).toLowerCase();
-      const includeMine = urlObj.searchParams.get("includeMine") === "1";
-      const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
-      const openListings = listings.filter((item) => {
-        if (item.status !== "open" || !item.verified) return false;
-        if (species && (item.species || "").toLowerCase() !== species) return false;
-        if (area && !((item.area || "").toLowerCase().includes(area) || (item.name || "").toLowerCase().includes(area))) return false;
-        return true;
-      });
-      const myListings = (user && includeMine)
-        ? listings.filter((item) => item.ownerId === user.sub)
-        : [];
-      sendJson(res, 200, includeMine ? { listings: openListings, myListings } : openListings);
-      return;
+    const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
+    const area = cleanText(urlObj.searchParams.get("area"), 60).toLowerCase();
+    const includeMine = urlObj.searchParams.get("includeMine") === "1";
+    const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
+    const allOpenVerified = listings.filter((item) => item.status === "open" && item.verified);
+    const totalOpenCount = allOpenVerified.length;
+    const openListings = allOpenVerified.filter((item) => {
+      if (species && (item.species || "").toLowerCase() !== species) return false;
+      if (area && !((item.area || "").toLowerCase().includes(area) || (item.name || "").toLowerCase().includes(area) || (item.breed || "").toLowerCase().includes(area))) return false;
+      return true;
+    }).map((item) => ({ ...item, isOwner: Boolean(user && item.ownerId === user.sub) }));
+    const myListings = (user && includeMine)
+      ? listings.filter((item) => item.ownerId === user.sub).map((item) => ({ ...item, isOwner: true }))
+      : [];
+    sendJson(res, 200, includeMine ? { listings: openListings, myListings, totalOpenCount } : openListings);
+    return;
   }
   if (pathname === "/api/adoptions/listings" && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to list an animal for adoption" });
-      const body = await readBodyJson(req);
-      const name = cleanText(body.name, 60);
-      const species = cleanText(body.species, 20).toLowerCase();
-      const breed = cleanText(body.breed, 60) || "Mixed Breed";
-      const age = cleanText(body.age, 40) || "Young";
-      const gender = cleanText(body.gender, 20) || "Unknown";
-      const area = cleanText(body.area, 80);
-      const description = cleanText(body.description, 500);
-      const vaccinated = body.vaccinated !== false;
-      const neutered = body.neutered === true;
-      const indoorOnly = body.indoorOnly !== false;
-      const photo = body.photo && typeof body.photo === "string" && body.photo.startsWith("data:image/") ? body.photo : null;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to list an animal for adoption" });
+    const body = await readBodyJson(req);
+    const name = cleanText(body.name, 60);
+    const species = cleanText(body.species, 20).toLowerCase();
+    const breed = cleanText(body.breed, 60) || "Deshi Mix";
+    const age = cleanText(body.age, 40) || "Young";
+    const gender = cleanText(body.gender, 20) || "Unknown";
+    const area = cleanText(body.area, 80);
+    const description = cleanText(body.description, 500);
+    const vaccinated = body.vaccinated !== false;
+    const neutered = body.neutered === true;
+    const indoorOnly = body.indoorOnly !== false;
+    let photo = null;
+    try {
+      photo = validateLostFoundPhoto(body.photo);
+    } catch (err) {
+      return sendJson(res, 400, { error: err.message });
+    }
 
-      if (!name || !species || !area || description.length < 10) {
-        return sendJson(res, 400, { error: "Pet name, species, area, and a clear description are required." });
-      }
+    if (!name || !species || !area || description.length < 10) {
+      return sendJson(res, 400, { error: "Pet name, species, area, and a clear description are required." });
+    }
 
-      const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
-      const listing = {
-        id: `adoption-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        ownerId: user.sub,
-        ownerName: cleanText(user.name || "PawNir pet parent", 80),
-        name,
-        species,
-        breed,
-        age,
-        gender,
-        area,
-        vaccinated,
-        neutered,
-        indoorOnly,
-        description,
-        photo,
-        status: "open",
-        verified: true,
-        createdAt: new Date().toISOString()
-      };
-      await appState.storage.writeCollection(tenantId, "adoptionListings", [listing, ...listings]);
-      await appendAudit(tenantId, user.email, "adoption.listing.created", { listingId: listing.id, name });
-      pushSse(tenantId, "adoption_update", { action: "listing_created", listingId: listing.id });
-      sendJson(res, 201, listing);
-      return;
+    const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
+    const listing = {
+      id: `adoption-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      ownerId: user.sub,
+      ownerName: cleanText(user.name || "PawNir pet parent", 80),
+      name,
+      species,
+      breed,
+      age,
+      gender,
+      area,
+      vaccinated,
+      neutered,
+      indoorOnly,
+      description,
+      photo,
+      status: "open",
+      verified: true,
+      createdAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "adoptionListings", [listing, ...listings]);
+    await appendAudit(tenantId, user.email, "adoption.listing.created", { listingId: listing.id, name });
+    pushSse(tenantId, "adoption_update", { action: "listing_created", listingId: listing.id });
+    sendJson(res, 201, { ...listing, isOwner: true });
+    return;
   }
   const adoptionListingMatch = pathname.match(/^\/api\/adoptions\/listings\/([^/]+)$/);
   if (adoptionListingMatch && req.method === "PATCH") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to update an adoption listing" });
-      const listingId = decodeURIComponent(adoptionListingMatch[1]);
-      const body = await readBodyJson(req);
-      const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
-      const idx = listings.findIndex((item) => item.id === listingId);
-      if (idx < 0) return sendJson(res, 404, { error: "Adoption listing not found" });
-      if (listings[idx].ownerId !== user.sub && user.role !== "admin") {
-        return sendJson(res, 403, { error: "You can only update your own adoption listings" });
-      }
-      const allowedStatuses = ["open", "adopted", "closed"];
-      const nextStatus = allowedStatuses.includes(body.status) ? body.status : listings[idx].status;
-      listings[idx] = { ...listings[idx], status: nextStatus, updatedAt: new Date().toISOString() };
-      await appState.storage.writeCollection(tenantId, "adoptionListings", listings);
-      await appendAudit(tenantId, user.email, "adoption.listing.updated", { listingId, status: nextStatus });
-      pushSse(tenantId, "adoption_update", { action: "listing_updated", listingId, status: nextStatus });
-      sendJson(res, 200, listings[idx]);
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to update an adoption listing" });
+    const listingId = decodeURIComponent(adoptionListingMatch[1]);
+    const body = await readBodyJson(req);
+    const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
+    const idx = listings.findIndex((item) => item.id === listingId);
+    if (idx < 0) return sendJson(res, 404, { error: "Adoption listing not found" });
+    if (listings[idx].ownerId !== user.sub && user.role !== "admin") {
+      return sendJson(res, 403, { error: "You can only update your own adoption listings" });
+    }
+    const allowedStatuses = ["open", "adopted", "closed"];
+    const nextStatus = allowedStatuses.includes(body.status) ? body.status : listings[idx].status;
+    listings[idx] = { ...listings[idx], status: nextStatus, updatedAt: new Date().toISOString() };
+    await appState.storage.writeCollection(tenantId, "adoptionListings", listings);
+    await appendAudit(tenantId, user.email, "adoption.listing.updated", { listingId, status: nextStatus });
+    pushSse(tenantId, "adoption_update", { action: "listing_updated", listingId, status: nextStatus });
+    sendJson(res, 200, { ...listings[idx], isOwner: true });
+    return;
   }
   if (pathname === "/api/adoptions" && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to apply for adoption" });
-      const body = await readBodyJson(req);
-      const listingId = cleanText(body.listingId, 100);
-      const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
-      const listing = listings.find((item) => item.id === listingId && item.status === "open" && item.verified);
-      if (!listing) return sendJson(res, 404, { error: "Open verified adoption listing not found" });
-      const applications = await appState.storage.readCollection(tenantId, "adoptionApplications");
-      if (applications.some((item) => item.listingId === listingId && item.applicantId === user.sub && ["submitted", "screening"].includes(item.status))) return sendJson(res, 409, { error: "You already have an active application for this animal" });
-      const application = { id: `adoption-${Date.now()}-${Math.floor(Math.random() * 10000)}`, listingId, applicantId: user.sub, answers: { housing: cleanText(body.housing, 300), experience: cleanText(body.experience, 300), household: cleanText(body.household, 300), vetPlan: cleanText(body.vetPlan, 300) }, status: "submitted", createdAt: new Date().toISOString() };
-      await appState.storage.writeCollection(tenantId, "adoptionApplications", [application, ...applications]);
-      await appendAudit(tenantId, user.email, "adoption.application.created", { applicationId: application.id, listingId });
-      sendJson(res, 201, { applicationId: application.id, status: application.status });
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to apply for adoption" });
+    const body = await readBodyJson(req);
+    const listingId = cleanText(body.listingId, 100);
+    const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
+    const listing = listings.find((item) => item.id === listingId && item.status === "open" && item.verified);
+    if (!listing) return sendJson(res, 404, { error: "Open verified adoption listing not found" });
+    const applications = await appState.storage.readCollection(tenantId, "adoptionApplications");
+    if (applications.some((item) => item.listingId === listingId && item.applicantId === user.sub && ["submitted", "screening"].includes(item.status))) return sendJson(res, 409, { error: "You already have an active application for this animal" });
+    const application = {
+      id: `adoption-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      listingId,
+      applicantId: user.sub,
+      applicantName: cleanText(user.name || user.email.split("@")[0], 80),
+      answers: {
+        housing: cleanText(body.housing, 300),
+        experience: cleanText(body.experience, 300),
+        household: cleanText(body.household, 300),
+        vetPlan: cleanText(body.vetPlan, 300)
+      },
+      status: "submitted",
+      createdAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "adoptionApplications", [application, ...applications]);
+    if (listing.ownerId && listing.ownerId !== user.sub) {
+      await saveAndPushNotifications(tenantId, {
+        id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        userId: listing.ownerId,
+        type: "adoption_application",
+        listingId: listing.id,
+        title: `New adoption application for ${listing.name}`,
+        message: `${application.applicantName} applied to adopt ${listing.name}.`,
+        read: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+    await appendAudit(tenantId, user.email, "adoption.application.created", { applicationId: application.id, listingId });
+    pushSse(tenantId, "adoption_update", { action: "application_created", listingId, applicationId: application.id });
+    sendJson(res, 201, { applicationId: application.id, status: application.status });
+    return;
   }
   const adoptionPdfMatch = pathname.match(/^\/api\/adoptions\/([^/]+)\/pdf$/);
   if (adoptionPdfMatch && req.method === "GET") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to download an adoption form" });
-      const applicationId = decodeURIComponent(adoptionPdfMatch[1]);
-      const applications = await appState.storage.readCollection(tenantId, "adoptionApplications");
-      const application = applications.find((item) => item.id === applicationId && item.applicantId === user.sub);
-      if (!application) return sendJson(res, 404, { error: "Adoption application not found" });
-      const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
-      const listing = listings.find((item) => item.id === application.listingId);
-      const users = await appState.storage.readUsers(tenantId);
-      const applicant = users.find((item) => item.id === user.sub);
-      const pdf = buildAdoptionPdf(application, listing, applicant || user);
-      res.writeHead(200, { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="pawnir-adoption-${application.id}.pdf"`, "Cache-Control": "no-store" });
-      res.end(pdf);
-      await appendAudit(tenantId, user.email, "adoption.application.pdf_downloaded", { applicationId });
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to download an adoption form" });
+    const applicationId = decodeURIComponent(adoptionPdfMatch[1]);
+    const applications = await appState.storage.readCollection(tenantId, "adoptionApplications");
+    const application = applications.find((item) => item.id === applicationId && item.applicantId === user.sub);
+    if (!application) return sendJson(res, 404, { error: "Adoption application not found" });
+    const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
+    const listing = listings.find((item) => item.id === application.listingId);
+    const users = await appState.storage.readUsers(tenantId);
+    const applicant = users.find((item) => item.id === user.sub);
+    const pdf = buildAdoptionPdf(application, listing, applicant || user);
+    res.writeHead(200, { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="pawnir-adoption-${application.id}.pdf"`, "Cache-Control": "no-store" });
+    res.end(pdf);
+    await appendAudit(tenantId, user.email, "adoption.application.pdf_downloaded", { applicationId });
+    return;
   }
 
   if (pathname === "/api/fosters" && req.method === "GET") {
-      const city = cleanText(urlObj.searchParams.get("city"), 60).toLowerCase();
-      const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
-      const q = cleanText(urlObj.searchParams.get("q"), 80).toLowerCase();
-      const [fosters, reviews] = await Promise.all([
-        appState.storage.readCollection(tenantId, "fosters"),
-        appState.storage.readCollection(tenantId, "reviews")
-      ]);
-      const visible = fosters.filter((foster) => {
-        if (!foster.verified) return false;
-        if (city && foster.city.toLowerCase() !== city) return false;
-        if (species && (!Array.isArray(foster.species) || !foster.species.includes(species))) return false;
-        if (q) {
-          const hay = `${foster.name || ""} ${foster.area || ""} ${foster.city || ""} ${foster.description || ""}`.toLowerCase();
-          if (!hay.includes(q)) return false;
-        }
-        return true;
-      });
-      sendJson(res, 200, visible.map((foster) => publicFoster(foster, reviews)));
-      return;
+    const city = cleanText(urlObj.searchParams.get("city"), 60).toLowerCase();
+    const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
+    const q = cleanText(urlObj.searchParams.get("q"), 80).toLowerCase();
+    const [fosters, reviews] = await Promise.all([
+      appState.storage.readCollection(tenantId, "fosters"),
+      appState.storage.readCollection(tenantId, "reviews")
+    ]);
+    const verifiedFosters = fosters.filter((foster) => foster.verified);
+    const totalVerifiedCount = verifiedFosters.length;
+    const visible = verifiedFosters.filter((foster) => {
+      if (city && foster.city.toLowerCase() !== city) return false;
+      if (species && (!Array.isArray(foster.species) || !foster.species.includes(species))) return false;
+      if (q) {
+        const hay = `${foster.name || ""} ${foster.area || ""} ${foster.city || ""} ${foster.description || ""}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    sendJson(res, 200, visible.map((foster) => publicFoster(foster, reviews, user?.sub, totalVerifiedCount)));
+    return;
   }
 
   if (pathname === "/api/fosters" && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to suggest or register a local foster" });
-      const body = await readBodyJson(req);
-      const name = cleanText(body.name, 90);
-      const area = cleanText(body.area, 80);
-      const city = cleanText(body.city, 60) || "Dhaka";
-      const capacity = cleanText(body.capacity, 80) || "Home foster care";
-      const description = cleanText(body.description, 400);
-      const mapQuery = cleanText(body.mapQuery, 140) || `${name} ${area} ${city} Bangladesh`;
-      const rawSpecies = Array.isArray(body.species) ? body.species : String(body.species || "cat,dog").split(",");
-      const species = rawSpecies.map((s) => s.trim().toLowerCase()).filter((s) => ["cat", "dog", "bird", "rabbit"].includes(s));
-      if (!name || !area || description.length < 10) {
-        return sendJson(res, 400, { error: "Foster name, area, and a clear description are required" });
-      }
-      const fosters = await appState.storage.readCollection(tenantId, "fosters");
-      const foster = {
-        id: `foster-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        ownerId: user.sub,
-        name,
-        area,
-        city,
-        species: species.length ? species : ["cat", "dog"],
-        capacity,
-        hours: cleanText(body.hours, 60) || "Open daily · Contact for intake",
-        description,
-        verified: true,
-        badge: "Community Mapped",
-        mapQuery,
-        createdAt: new Date().toISOString()
-      };
-      await appState.storage.writeCollection(tenantId, "fosters", [foster, ...fosters]);
-      const reviews = await appState.storage.readCollection(tenantId, "reviews");
-      await appendAudit(tenantId, user.email, "foster.created", { fosterId: foster.id, name });
-      pushSse(tenantId, "foster_update", { action: "foster_created", fosterId: foster.id });
-      sendJson(res, 201, publicFoster(foster, reviews));
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to suggest or register a local foster" });
+    const body = await readBodyJson(req);
+    const name = cleanText(body.name, 90);
+    const area = cleanText(body.area, 80);
+    const city = cleanText(body.city, 60) || "Dhaka";
+    const capacity = cleanText(body.capacity, 80) || "Home foster care";
+    const description = cleanText(body.description, 400);
+    const phone = cleanText(body.phone, 40) || null;
+    const mapQuery = cleanText(body.mapQuery, 140) || `${name} ${area} ${city} Bangladesh`;
+    const rawSpecies = Array.isArray(body.species) ? body.species : String(body.species || "cat,dog").split(",");
+    const species = rawSpecies.map((s) => s.trim().toLowerCase()).filter((s) => ["cat", "dog", "bird", "rabbit"].includes(s));
+    if (!name || !area || description.length < 10) {
+      return sendJson(res, 400, { error: "Foster name, area, and a clear description are required" });
+    }
+    const fosters = await appState.storage.readCollection(tenantId, "fosters");
+    const foster = {
+      id: `foster-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      ownerId: user.sub,
+      name,
+      area,
+      city,
+      phone,
+      species: species.length ? species : ["cat", "dog"],
+      capacity,
+      hours: cleanText(body.hours, 60) || "Open daily · Contact for intake",
+      description,
+      verified: true,
+      badge: "Community Mapped",
+      mapQuery,
+      createdAt: new Date().toISOString()
+    };
+    const updatedFosters = [foster, ...fosters];
+    await appState.storage.writeCollection(tenantId, "fosters", updatedFosters);
+    const reviews = await appState.storage.readCollection(tenantId, "reviews");
+    const totalVerifiedCount = updatedFosters.filter((f) => f.verified).length;
+    await appendAudit(tenantId, user.email, "foster.created", { fosterId: foster.id, name });
+    pushSse(tenantId, "foster_update", { action: "foster_created", fosterId: foster.id });
+    sendJson(res, 201, publicFoster(foster, reviews, user.sub, totalVerifiedCount));
+    return;
   }
 
   const fosterMatch = pathname.match(/^\/api\/fosters\/([^/]+)$/);
   if (fosterMatch && req.method === "GET") {
-      const fosterId = decodeURIComponent(fosterMatch[1]);
-      const [fosters, reviews] = await Promise.all([
-        appState.storage.readCollection(tenantId, "fosters"),
-        appState.storage.readCollection(tenantId, "reviews")
-      ]);
-      const foster = fosters.find((item) => item.id === fosterId && item.verified);
-      if (!foster) return sendJson(res, 404, { error: "Verified foster care not found" });
-      const published = reviews
-        .filter((review) => review.fosterId === foster.id && review.status === "published")
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .map(publicReview);
-      const fosterData = publicFoster(foster, reviews);
-      sendJson(res, 200, { ...fosterData, foster: fosterData, reviews: published });
-      return;
+    const fosterId = decodeURIComponent(fosterMatch[1]);
+    const [fosters, reviews] = await Promise.all([
+      appState.storage.readCollection(tenantId, "fosters"),
+      appState.storage.readCollection(tenantId, "reviews")
+    ]);
+    const foster = fosters.find((item) => item.id === fosterId && item.verified);
+    if (!foster) return sendJson(res, 404, { error: "Verified foster care not found" });
+    const published = reviews
+      .filter((review) => review.fosterId === foster.id && review.status === "published")
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map((r) => publicReview(r, user?.sub));
+    const totalVerifiedCount = fosters.filter((f) => f.verified).length;
+    const fosterData = publicFoster(foster, reviews, user?.sub, totalVerifiedCount);
+    sendJson(res, 200, { ...fosterData, foster: fosterData, reviews: published });
+    return;
   }
 
   const fosterRequestMatch = pathname.match(/^\/api\/fosters\/([^/]+)\/requests$/);
   if (fosterRequestMatch && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to request foster care" });
-      const fosterId = decodeURIComponent(fosterRequestMatch[1]);
-      const fosters = await appState.storage.readCollection(tenantId, "fosters");
-      const foster = fosters.find((item) => item.id === fosterId && item.verified);
-      if (!foster) return sendJson(res, 404, { error: "Verified foster care not found" });
-      const body = await readBodyJson(req);
-      const reason = cleanText(body.reason, 500);
-      if (reason.length < 10) return sendJson(res, 400, { error: "Please describe why foster care is needed" });
-      const requests = await appState.storage.readCollection(tenantId, "fosterRequests");
-      if (requests.some((item) => item.fosterId === fosterId && item.userId === user.sub && item.status === "pending")) return sendJson(res, 409, { error: "You already have a pending request for this foster" });
-      const request = { id: `foster-request-${Date.now()}-${Math.floor(Math.random() * 10000)}`, fosterId, fosterName: foster.name, userId: user.sub, requesterName: user.name, reason, status: "pending", createdAt: new Date().toISOString() };
-      await appState.storage.writeCollection(tenantId, "fosterRequests", [request, ...requests]);
-      await appendAudit(tenantId, user.email, "foster.request.created", { requestId: request.id, fosterId });
-      sendJson(res, 201, { id: request.id, status: request.status, fosterName: foster.name });
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to request foster care" });
+    const fosterId = decodeURIComponent(fosterRequestMatch[1]);
+    const fosters = await appState.storage.readCollection(tenantId, "fosters");
+    const foster = fosters.find((item) => item.id === fosterId && item.verified);
+    if (!foster) return sendJson(res, 404, { error: "Verified foster care not found" });
+    const body = await readBodyJson(req);
+    const reason = cleanText(body.reason, 500);
+    if (reason.length < 10) return sendJson(res, 400, { error: "Please describe why foster care is needed" });
+    const requests = await appState.storage.readCollection(tenantId, "fosterRequests");
+    if (requests.some((item) => item.fosterId === fosterId && item.userId === user.sub && item.status === "pending")) return sendJson(res, 409, { error: "You already have a pending request for this foster" });
+    const request = { id: `foster-request-${Date.now()}-${Math.floor(Math.random() * 10000)}`, fosterId, fosterName: foster.name, userId: user.sub, requesterName: user.name, reason, status: "pending", createdAt: new Date().toISOString() };
+    await appState.storage.writeCollection(tenantId, "fosterRequests", [request, ...requests]);
+    if (foster.ownerId && foster.ownerId !== user.sub) {
+      await saveAndPushNotifications(tenantId, {
+        id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        userId: foster.ownerId,
+        type: "foster_request",
+        fosterId,
+        title: `New foster inquiry for ${foster.name}`,
+        message: `${user.name || "A PawNir member"}: ${reason}`,
+        read: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+    await appendAudit(tenantId, user.email, "foster.request.created", { requestId: request.id, fosterId });
+    pushSse(tenantId, "foster_update", { action: "request_created", fosterId, requestId: request.id });
+    sendJson(res, 201, { id: request.id, status: request.status, fosterName: foster.name });
+    return;
   }
 
   const fosterReviewHelpfulMatch = pathname.match(/^\/api\/fosters\/([^/]+)\/reviews\/([^/]+)\/helpful$/);
   if (fosterReviewHelpfulMatch && req.method === "POST") {
-      const fosterId = decodeURIComponent(fosterReviewHelpfulMatch[1]);
-      const reviewId = decodeURIComponent(fosterReviewHelpfulMatch[2]);
-      const reviews = await appState.storage.readCollection(tenantId, "reviews");
-      const idx = reviews.findIndex((item) => item.id === reviewId && item.fosterId === fosterId);
-      if (idx < 0) return sendJson(res, 404, { error: "Review not found" });
-      reviews[idx] = { ...reviews[idx], helpfulCount: Number(reviews[idx].helpfulCount || 0) + 1 };
-      await appState.storage.writeCollection(tenantId, "reviews", reviews);
-      sendJson(res, 200, publicReview(reviews[idx]));
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to mark a review helpful" });
+    const fosterId = decodeURIComponent(fosterReviewHelpfulMatch[1]);
+    const reviewId = decodeURIComponent(fosterReviewHelpfulMatch[2]);
+    const reviews = await appState.storage.readCollection(tenantId, "reviews");
+    const idx = reviews.findIndex((item) => item.id === reviewId && item.fosterId === fosterId);
+    if (idx < 0) return sendJson(res, 404, { error: "Review not found" });
+    const existingVoters = Array.isArray(reviews[idx].helpfulVoterIds) ? reviews[idx].helpfulVoterIds : [];
+    const baseCount = Math.max(0, Number(reviews[idx].helpfulCount || 0) - existingVoters.length);
+    const alreadyVoted = existingVoters.includes(user.sub);
+    const nextVoters = alreadyVoted
+      ? existingVoters.filter((id) => id !== user.sub)
+      : [...existingVoters, user.sub];
+    reviews[idx] = {
+      ...reviews[idx],
+      helpfulVoterIds: nextVoters,
+      helpfulCount: baseCount + nextVoters.length
+    };
+    await appState.storage.writeCollection(tenantId, "reviews", reviews);
+    pushSse(tenantId, "foster_update", { action: "review_helpful", fosterId, reviewId });
+    sendJson(res, 200, publicReview(reviews[idx], user.sub));
+    return;
   }
 
   const fosterReviewMatch = pathname.match(/^\/api\/fosters\/([^/]+)\/reviews$/);
   if (fosterReviewMatch && req.method === "GET") {
-      const fosterId = decodeURIComponent(fosterReviewMatch[1]);
-      const reviews = await appState.storage.readCollection(tenantId, "reviews");
-      sendJson(res, 200, reviews.filter((review) => review.fosterId === fosterId && review.status === "published").sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(publicReview));
-      return;
+    const fosterId = decodeURIComponent(fosterReviewMatch[1]);
+    const reviews = await appState.storage.readCollection(tenantId, "reviews");
+    sendJson(res, 200, reviews.filter((review) => review.fosterId === fosterId && review.status === "published").sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((r) => publicReview(r, user?.sub)));
+    return;
   }
   if (fosterReviewMatch && req.method === "POST") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to review foster care" });
-      const fosterId = decodeURIComponent(fosterReviewMatch[1]);
-      const fosters = await appState.storage.readCollection(tenantId, "fosters");
-      if (!fosters.some((item) => item.id === fosterId && item.verified)) return sendJson(res, 404, { error: "Verified foster care not found" });
-      const body = await readBodyJson(req);
-      const rating = Number(body.rating);
-      const comment = cleanText(body.comment, 500);
-      const petSpecies = ["cat", "dog", "bird", "rabbit", "other"].includes(body.petSpecies) ? body.petSpecies : "cat";
-      if (!Number.isInteger(rating) || rating < 1 || rating > 5 || comment.length < 8) {
-        return sendJson(res, 400, { error: "A star rating from 1 to 5 and a review of at least 8 characters are required" });
-      }
-      const [requests, reviews] = await Promise.all([
-        appState.storage.readCollection(tenantId, "fosterRequests"),
-        appState.storage.readCollection(tenantId, "reviews")
-      ]);
-      const hasRequest = requests.find((item) => item.fosterId === fosterId && item.userId === user.sub);
-      const badge = hasRequest ? "Verified Stay" : "Verified Member";
-      const existingIdx = reviews.findIndex((item) => item.fosterId === fosterId && item.userId === user.sub);
-      let savedReview;
-      if (existingIdx >= 0) {
-        savedReview = {
-          ...reviews[existingIdx],
-          rating,
-          comment,
-          petSpecies,
-          badge,
-          authorName: cleanText(user.name || user.email.split("@")[0] || "PawNir member", 80),
-          updatedAt: new Date().toISOString()
-        };
-        reviews[existingIdx] = savedReview;
-      } else {
-        savedReview = {
-          id: `review-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-          fosterId,
-          userId: user.sub,
-          requestId: hasRequest?.id || null,
-          rating,
-          comment,
-          petSpecies,
-          badge,
-          helpfulCount: 0,
-          authorName: cleanText(user.name || user.email.split("@")[0] || "PawNir member", 80),
-          status: "published",
-          createdAt: new Date().toISOString()
-        };
-        reviews.unshift(savedReview);
-      }
-      await appState.storage.writeCollection(tenantId, "reviews", reviews);
-      await appendAudit(tenantId, user.email, "foster.review.saved", { reviewId: savedReview.id, fosterId, rating });
-      pushSse(tenantId, "foster_update", { action: "review_saved", fosterId });
-      sendJson(res, 201, publicReview(savedReview));
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to review foster care" });
+    const fosterId = decodeURIComponent(fosterReviewMatch[1]);
+    const fosters = await appState.storage.readCollection(tenantId, "fosters");
+    if (!fosters.some((item) => item.id === fosterId && item.verified)) return sendJson(res, 404, { error: "Verified foster care not found" });
+    const body = await readBodyJson(req);
+    const rating = Number(body.rating);
+    const comment = cleanText(body.comment, 500);
+    const petSpecies = ["cat", "dog", "bird", "rabbit", "other"].includes(body.petSpecies) ? body.petSpecies : "cat";
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5 || comment.length < 8) {
+      return sendJson(res, 400, { error: "A star rating from 1 to 5 and a review of at least 8 characters are required" });
+    }
+    const [requests, reviews] = await Promise.all([
+      appState.storage.readCollection(tenantId, "fosterRequests"),
+      appState.storage.readCollection(tenantId, "reviews")
+    ]);
+    const hasRequest = requests.find((item) => item.fosterId === fosterId && item.userId === user.sub);
+    const badge = hasRequest ? "Verified Stay" : "Verified Member";
+    const existingIdx = reviews.findIndex((item) => item.fosterId === fosterId && item.userId === user.sub);
+    let savedReview;
+    if (existingIdx >= 0) {
+      savedReview = {
+        ...reviews[existingIdx],
+        rating,
+        comment,
+        petSpecies,
+        badge,
+        authorName: cleanText(user.name || user.email.split("@")[0] || "PawNir member", 80),
+        updatedAt: new Date().toISOString()
+      };
+      reviews[existingIdx] = savedReview;
+    } else {
+      savedReview = {
+        id: `review-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        fosterId,
+        userId: user.sub,
+        requestId: hasRequest?.id || null,
+        rating,
+        comment,
+        petSpecies,
+        badge,
+        helpfulCount: 0,
+        helpfulVoterIds: [],
+        authorName: cleanText(user.name || user.email.split("@")[0] || "PawNir member", 80),
+        status: "published",
+        createdAt: new Date().toISOString()
+      };
+      reviews.unshift(savedReview);
+    }
+    await appState.storage.writeCollection(tenantId, "reviews", reviews);
+    await appendAudit(tenantId, user.email, "foster.review.saved", { reviewId: savedReview.id, fosterId, rating });
+    pushSse(tenantId, "foster_update", { action: "review_saved", fosterId });
+    sendJson(res, 201, { ...publicReview(savedReview, user.sub), updated: existingIdx >= 0 });
+    return;
   }
 
   if (pathname === "/api/foster-requests" && req.method === "GET") {
-      if (!user) return sendJson(res, 401, { error: "Sign in is required to view foster requests" });
-      const requests = await appState.storage.readCollection(tenantId, "fosterRequests");
-      sendJson(res, 200, requests.filter((item) => item.userId === user.sub || ["ops", "ceo"].includes(user.role)));
-      return;
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to view foster requests" });
+    const requests = await appState.storage.readCollection(tenantId, "fosterRequests");
+    sendJson(res, 200, requests.filter((item) => item.userId === user.sub || ["ops", "ceo"].includes(user.role)));
+    return;
   }
 
   if (pathname === "/api/vets" && req.method === "GET") {
-      const query = String(urlObj.searchParams.get("q") || "").trim().toLowerCase();
-      const specialty = urlObj.searchParams.get("specialty") || "all";
-      const city = urlObj.searchParams.get("city") || "all";
-      const mode = urlObj.searchParams.get("mode") || "all";
-      const vets = (await appState.storage.readVets(tenantId)).filter((vet) => {
-        const searchable = `${vet.name} ${vet.specialty} ${vet.clinic} ${vet.city}`.toLowerCase();
-        return (!query || searchable.includes(query)) &&
-          (specialty === "all" || vet.specialtyKey === specialty) &&
-          (city === "all" || vet.cityKey === city) &&
-          (mode === "all" || vet.modes.includes(mode)) &&
-          vet.verified;
-      });
-      sendJson(res, 200, vets);
-      return;
+    const query = String(urlObj.searchParams.get("q") || "").trim().toLowerCase();
+    const specialty = urlObj.searchParams.get("specialty") || "all";
+    const city = urlObj.searchParams.get("city") || "all";
+    const mode = urlObj.searchParams.get("mode") || "all";
+    const vets = (await appState.storage.readVets(tenantId)).filter((vet) => {
+      const searchable = `${vet.name} ${vet.specialty} ${vet.clinic} ${vet.city}`.toLowerCase();
+      return (!query || searchable.includes(query)) &&
+        (specialty === "all" || vet.specialtyKey === specialty) &&
+        (city === "all" || vet.cityKey === city) &&
+        (mode === "all" || vet.modes.includes(mode)) &&
+        vet.verified;
+    });
+    sendJson(res, 200, vets);
+    return;
   }
 
   const availabilityMatch = pathname.match(/^\/api\/vets\/([^/]+)\/availability$/);
   if (availabilityMatch && req.method === "GET") {
-      const vetId = decodeURIComponent(availabilityMatch[1]);
-      const date = urlObj.searchParams.get("date");
-      const mode = urlObj.searchParams.get("mode") || "";
-      const vets = await appState.storage.readVets(tenantId);
-      const vet = vets.find((item) => item.id === vetId && item.verified);
-      if (!vet) return sendJson(res, 404, { error: "Verified veterinarian not found" });
-      if (!date || !parseBangladeshDate(date)) return sendJson(res, 400, { error: "A valid date is required in YYYY-MM-DD format" });
-      if (mode && !["online", "clinic"].includes(mode)) return sendJson(res, 400, { error: "Consultation mode must be online or clinic" });
-      const bookings = await appState.storage.readBookings(tenantId);
-      return sendJson(res, 200, { vetId: vet.id, date, mode: mode || "all", timezone: "Asia/Dhaka", slots: availableVetSlots(vet, date, mode, bookings) });
+    const vetId = decodeURIComponent(availabilityMatch[1]);
+    const date = urlObj.searchParams.get("date");
+    const mode = urlObj.searchParams.get("mode") || "";
+    const vets = await appState.storage.readVets(tenantId);
+    const vet = vets.find((item) => item.id === vetId && item.verified);
+    if (!vet) return sendJson(res, 404, { error: "Verified veterinarian not found" });
+    if (!date || !parseBangladeshDate(date)) return sendJson(res, 400, { error: "A valid date is required in YYYY-MM-DD format" });
+    if (mode && !["online", "clinic"].includes(mode)) return sendJson(res, 400, { error: "Consultation mode must be online or clinic" });
+    const bookings = await appState.storage.readBookings(tenantId);
+    return sendJson(res, 200, { vetId: vet.id, date, mode: mode || "all", timezone: "Asia/Dhaka", slots: availableVetSlots(vet, date, mode, bookings) });
   }
 
   if (pathname === "/api/bookings" && req.method === "GET") {
-      if (!user) {
-        sendJson(res, 401, { error: "Sign in is required to view bookings" });
-        return;
-      }
-      const bookings = await appState.storage.readBookings(tenantId);
-      sendJson(res, 200, bookings.filter((booking) => booking.ownerId === user.sub || user.role === "ops"));
+    if (!user) {
+      sendJson(res, 401, { error: "Sign in is required to view bookings" });
       return;
+    }
+    const bookings = await appState.storage.readBookings(tenantId);
+    sendJson(res, 200, bookings.filter((booking) => booking.ownerId === user.sub || user.role === "ops"));
+    return;
   }
 
   if (pathname === "/api/bookings" && req.method === "POST") {
-      if (!user) {
-        sendJson(res, 401, { error: "Sign in is required to book a consultation" });
-        return;
-      }
-
-      const body = await readBodyJson(req);
-      const vets = await appState.storage.readVets(tenantId);
-      const vet = vets.find((item) => item.id === body.vetId && item.verified);
-      if (!vet || !body.date || !body.time || !["online", "clinic"].includes(body.mode) || !parseBangladeshDate(body.date)) {
-        sendJson(res, 400, { error: "A verified vet, date, time, and consultation mode are required" });
-        return;
-      }
-      const bookings = await appState.storage.readBookings(tenantId);
-      const slots = availableVetSlots(vet, body.date, body.mode, bookings);
-      if (!slots.includes(body.time)) {
-        sendJson(res, 409, { error: "That slot is unavailable. Please choose another available time." });
-        return;
-      }
-      const pets = await appState.storage.readCollection(tenantId, "pets");
-      const pet = pets.find((item) => item.id === body.petId && item.ownerId === user.sub);
-      if (!pet) {
-        sendJson(res, 400, { error: "Select one of your pet profiles before booking" });
-        return;
-      }
-      const booking = {
-        id: `booking-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-        ownerId: user.sub,
-        ownerEmail: user.email,
-        petId: pet.id,
-        petName: pet.name,
-        vetId: vet.id,
-        vetName: vet.name,
-        date: body.date,
-        time: body.time,
-        mode: body.mode,
-        fee: vet.fee,
-        status: "pending",
-        createdAt: new Date().toISOString()
-      };
-      await appState.storage.writeBookings(tenantId, [booking, ...bookings]);
-      await appendAudit(tenantId, user.email, "booking.created", { bookingId: booking.id, vetId: vet.id });
-      sendJson(res, 201, booking);
+    if (!user) {
+      sendJson(res, 401, { error: "Sign in is required to book a consultation" });
       return;
+    }
+
+    const body = await readBodyJson(req);
+    const vets = await appState.storage.readVets(tenantId);
+    const vet = vets.find((item) => item.id === body.vetId && item.verified);
+    if (!vet || !body.date || !body.time || !["online", "clinic"].includes(body.mode) || !parseBangladeshDate(body.date)) {
+      sendJson(res, 400, { error: "A verified vet, date, time, and consultation mode are required" });
+      return;
+    }
+    const bookings = await appState.storage.readBookings(tenantId);
+    const slots = availableVetSlots(vet, body.date, body.mode, bookings);
+    if (!slots.includes(body.time)) {
+      sendJson(res, 409, { error: "That slot is unavailable. Please choose another available time." });
+      return;
+    }
+    const pets = await appState.storage.readCollection(tenantId, "pets");
+    const pet = pets.find((item) => item.id === body.petId && item.ownerId === user.sub);
+    if (!pet) {
+      sendJson(res, 400, { error: "Select one of your pet profiles before booking" });
+      return;
+    }
+    const booking = {
+      id: `booking-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      ownerId: user.sub,
+      ownerEmail: user.email,
+      petId: pet.id,
+      petName: pet.name,
+      vetId: vet.id,
+      vetName: vet.name,
+      date: body.date,
+      time: body.time,
+      mode: body.mode,
+      fee: vet.fee,
+      status: "pending",
+      createdAt: new Date().toISOString()
+    };
+    await appState.storage.writeBookings(tenantId, [booking, ...bookings]);
+    await appendAudit(tenantId, user.email, "booking.created", { bookingId: booking.id, vetId: vet.id });
+    pushSse(tenantId, "care_update", { action: "booking_created", bookingId: booking.id, userId: user.sub });
+    sendJson(res, 201, booking);
+    return;
   }
 
   if (pathname === "/api/pets" && req.method === "GET") {
@@ -1812,6 +2182,7 @@ async function routeApi(req, res, urlObj, tenantId, user) {
     const pet = { id: `pet-${Date.now()}`, ownerId: user.sub, name: String(body.name).trim(), species: body.species, breed: String(body.breed || "").trim(), age: String(body.age || "").trim(), notes: String(body.notes || "").trim(), createdAt: new Date().toISOString() };
     await appState.storage.writeCollection(tenantId, "pets", [pet, ...pets]);
     await appendAudit(tenantId, user.email, "pet.created", { petId: pet.id });
+    pushSse(tenantId, "care_update", { action: "pet_created", petId: pet.id, userId: user.sub });
     return sendJson(res, 201, pet);
   }
 
@@ -1916,7 +2287,20 @@ async function routeApi(req, res, urlObj, tenantId, user) {
     if (index < 0) return sendJson(res, 404, { error: "Foster request not found" });
     requests[index] = { ...requests[index], status: body.status, updatedAt: new Date().toISOString(), verifiedBy: user.sub };
     await appState.storage.writeCollection(tenantId, "fosterRequests", requests);
+    if (requests[index].userId && requests[index].userId !== user.sub) {
+      await saveAndPushNotifications(tenantId, {
+        id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        userId: requests[index].userId,
+        type: "foster_request_status",
+        fosterId: requests[index].fosterId,
+        title: `Foster care request ${body.status}: ${requests[index].fosterName || "Foster"}`,
+        message: `Your foster request status is now ${body.status.toUpperCase()}.`,
+        read: false,
+        createdAt: new Date().toISOString()
+      });
+    }
     await appendAudit(tenantId, user.email, "foster.request.updated", { requestId: requests[index].id, status: body.status });
+    pushSse(tenantId, "foster_update", { action: "request_updated", requestId: requests[index].id, fosterId: requests[index].fosterId, status: body.status });
     sendJson(res, 200, requests[index]);
     return;
   }
@@ -1955,6 +2339,7 @@ async function routeApi(req, res, urlObj, tenantId, user) {
     return;
   }
 
+  const report = await getReport(tenantId);
   if (pathname === "/api/report") return sendJson(res, 200, report);
   if (pathname === "/api/summary") return sendJson(res, 200, report.summary);
   if (pathname === "/api/bottlenecks") return sendJson(res, 200, report.bottlenecks);
@@ -2362,8 +2747,8 @@ async function requestHandler(req, res) {
   try {
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader("Referrer-Policy", "same-origin");
-    res.setHeader("Permissions-Policy", "camera=(self), microphone=(self), geolocation=()");
-    if (isRateLimited(req)) {
+    res.setHeader("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self)");
+    if (isRateLimited(req, pathname)) {
       sendJson(res, 429, { error: "Too many requests. Please try again shortly." });
       return;
     }

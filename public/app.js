@@ -1,120 +1,69 @@
-const state = {
-  mode: "all",
-  language: localStorage.getItem("pawnir-lang") || document.documentElement.lang || "en",
-  authMode: "login",
-  user: null,
-  googleEnabled: false,
-  pending2faToken: null,
-  challengeToken: null
-};
-
-const taka = (value) => `৳${new Intl.NumberFormat("en-BD").format(value)}`;
-let vets = [];
-let selectedVet = null;
-let pets = [];
-let activeDialog = null;
-let dialogTrigger = null;
-let lockedScrollY = 0;
-let selectedFoster = null;
-let selectedAdoption = null;
-let selectedDonor = null;
-let selectedSightingReport = null;
-let lostSpeciesFilter = "";
-let adoptionSpeciesFilter = "";
-let pendingReviewFoster = null;
-let pendingAdoptionAction = null;
-let cachedFosters = [];
-let activeMapFosterId = null;
-let lostRefreshTimer = null;
-let lostReportSignature = "";
-let compressedReportPhoto = null;
-let toastTimer = null;
-
-function escapeHtml(value) {
-  return String(value == null ? "" : value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function showToast(message, durationMs = 3400) {
-  const toast = document.getElementById("app-toast");
-  if (!toast || !message) return;
-  toast.textContent = message;
-  toast.hidden = false;
-  requestAnimationFrame(() => toast.classList.add("is-shown"));
-  clearTimeout(toastTimer);
-  toastTimer = window.setTimeout(() => {
-    toast.classList.remove("is-shown");
-    window.setTimeout(() => { toast.hidden = true; }, 220);
-  }, durationMs);
-}
-
 const copy = {
   en: {
-    "nav.home": "Home",
-    "nav.lost": "Lost & found",
-    "nav.lostShort": "Alerts",
-    "nav.donors": "Blood donors",
-    "nav.donorsShort": "Donors",
-    "nav.adopt": "Adopt",
-    "nav.adoptShort": "Adopt",
-    "nav.foster": "Fosters",
-    "nav.find": "Find a vet",
-    "nav.how": "How it works",
     "nav.features": "Features",
+    "nav.lost": "Lost & Found",
     "nav.screens": "Screens",
     "nav.comingsoon": "Coming soon",
-    "nav.playcta": "Get it on Google Play",
-    "nav.vets": "For vets",
-    "nav.care": "My care",
+    "nav.home": "Home",
+    "nav.donors": "Blood donors",
+    "nav.foster": "Fosters & Map",
+    "nav.adopt": "Adopt",
+    "nav.find": "Find a Vet",
+    "nav.care": "My Care & Passports",
+    "nav.how": "How it works",
+    "nav.forvets": "For Vets",
     "nav.signin": "Sign in",
-    "nav.bookings": "Bookings",
-    "nav.profile": "Account",
-    "hero.eyebrow": "Help for animals, close to home",
-    "hero.title": "When animals need help,<br /><em>your area shows up.</em>",
-    "hero.subtitle": "PawNir connects animal lovers with nearby lost-pet alerts, adoption, blood donors, communities, and trusted veterinary care across Bangladesh.",
-    "hero.cta": "See what PawNir does",
-    "hero.vetLink": "Find a veterinarian",
-    "hero.trust": "<strong>10,000+</strong> pet parents<br />already trust PawNir",
-    "hero.badge1Title": "Verified network",
-    "hero.badge1Sub": "Community checked",
-    "hero.badge2Sub": "Loved by pet parents",
-    "mission.eyebrow": "One home for animal help",
-    "mission.title": "Not another group post.<br /><em>Nearby help that reaches the right people.</em>",
-    "mission.badge": "Built for Bangladesh",
-    "mission.exampleLabel": "A simple example",
-    "mission.exampleTitle": "Your cat is missing from Dhanmondi 10.",
-    "mission.exampleText": "Instead of posting across unrelated groups, PawNir can notify opted-in animal lovers around that area: <strong>“Lost pet near you.”</strong> The alert stays local, useful, and privacy-conscious.",
-    "mission.exampleNote": "Approximate area only · Contact shared with consent",
-    "mission.alertTitle": "Lost pet near you",
-    "mission.alertSub": "Cat reported near Dhanmondi 10",
-    "mission.alertMeta": "89 PawNir members in this area notified",
-    "mission.safety": "<strong>Our safety promise:</strong> PawNir does not allow buying or selling live animals. We are building with verification, moderation, consent, and animal welfare at the center.",
-    "service.lostTitle": "Lost & found alerts",
-    "service.lostDesc": "Reach animal lovers around the right area.",
-    "service.adoptTitle": "Safe adoption",
-    "service.adoptDesc": "Adopt or rehome with screening and follow-up.",
-    "service.bloodTitle": "Blood donor network",
-    "service.bloodDesc": "Find registered donors near your pet.",
-    "service.circleTitle": "Local circles",
-    "service.circleDesc": "Connect with animal lovers in your area.",
-    "service.vetTitle": "Emergency vet care",
-    "service.vetDesc": "Find urgent veterinary support when needed.",
-    "service.fosterTitle": "Foster & shelters",
-    "service.fosterDesc": "Discover registered local care and safe foster support.",
-    "service.shopTitle": "Accessories & transport",
-    "service.shopDesc": "Shop pet essentials or arrange animal transport through PetBhai.",
+    "nav.live": "Live",
+    "nav.syncing": "Syncing…",
+    "nav.offline": "Offline",
+    "common.nearMe": "📍 Near Me",
+    "common.resetFilters": "Reset filters",
+    "common.share": "Share",
+    "hero.eyebrow": "Built for pets & rescuers in Bangladesh",
+    "hero.title": "A calmer way to care<br /><em>for every animal.</em>",
+    "hero.subtitle":
+      "Report lost or found pets with instant nearby alerts, connect with consented cat and dog blood donors, explore verified fosters on Google Maps, and adopt responsibly.",
+    "hero.sub":
+      "Report lost or found pets with instant nearby alerts, connect with consented cat and dog blood donors, explore verified fosters on Google Maps, and adopt responsibly.",
+    "hero.cta": "Report lost or found",
+    "hero.ctaLost": "Report lost or found",
+    "hero.vetLink": "Find blood donor",
+    "hero.ctaDonor": "Find blood donor",
+    "hero.trust": "<span>Free &amp; non-commercial</span><span>Privacy-first contact</span><span>Dhaka, Chattogram &amp; beyond</span>",
+    "hero.trust1": "Free & non-commercial",
+    "hero.trust2": "Privacy-first contact",
+    "hero.trust3": "Dhaka, Chattogram & beyond",
+    "hero.badge1Title": "Lost & Found Radar",
+    "hero.badge1Sub": "Instant neighborhood alerts",
+    "hero.badge2Sub": "Cat & dog blood donor network",
+    "mission.eyebrow": "Community-first pet care in Bangladesh",
+    "mission.title": "Choose what you need right now",
+    "mission.badge": "100% Free · Non-commercial · Privacy-safe",
+    "mission.safety":
+      "<strong>Safety &amp; medical note:</strong> Never pay upfront fees for adoptions or blood donations. Always meet in safe public places or at a licensed veterinary clinic.",
+    "service.lostTitle": "Lost & Found Alerts",
+    "service.lostDesc": "Post a missing or spotted animal and notify people in your area.",
+    "service.bloodTitle": "Blood Donor Network",
+    "service.bloodDesc": "Find or register consented cat and dog blood donors for emergencies.",
+    "service.fosterTitle": "Google Maps Fosters",
+    "service.fosterDesc": "Explore shelters on Google Maps, read community reviews, and rate care.",
+    "service.adoptTitle": "Responsible Adoption",
+    "service.adoptDesc": "Browse screened pets or list an animal for safe, non-commercial rehoming.",
+    "service.vetTitle": "Veterinary Care",
+    "service.vetDesc": "24/7 emergency clinics, BVC-registered surgeons, and offline contacts.",
+    "service.shopTitle": "Pet Essentials",
+    "service.shopDesc": "Food, litter, and medicine partners.",
     "lost.eyebrow": "Help that reaches nearby",
     "lost.title": "Lost & found around you",
-    "lost.reportBtn": "Report an animal",
-    "lost.alertBtn": "Get alerts here",
+    "lost.reportBtn": "+ Report an animal",
+    "lost.alertBtn": "🔔 Get alerts here",
     "donor.eyebrow": "Help in urgent moments",
     "donor.title": "Animal blood donor network",
-    "donor.registerBtn": "Register a donor",
-    "donor.disclaimer": "PawNir connects consented donors; a veterinarian must confirm blood compatibility and medical suitability.",
+    "donor.registerBtn": "+ Register a donor",
+    "donor.disclaimer":
+      "PawNir connects consented donors; a licensed veterinarian must confirm blood cross-matching and medical suitability before donation.",
+    "foster.eyebrow": "Google Maps local care & verified reviews",
+    "foster.title": "Find a foster or shelter",
     "adopt.eyebrow": "A safer next home",
     "adopt.title": "Adopt or rehome responsibly",
     "adopt.btnList": "+ List a pet for adoption",
@@ -123,2341 +72,3077 @@ const copy = {
     "adopt.filterDogs": "🐶 Dogs",
     "adopt.filterBirds": "🦜 Birds",
     "adopt.filterRabbits": "🐰 Rabbits",
-    "foster.eyebrow": "Registered local care",
-    "foster.title": "Find a foster or shelter",
-    "vet.eyebrow": "A better care experience is coming",
-    "vet.title": "Paid vet consultations,<br /><em>made for PawNir.</em>",
-    "vet.desc": "We are preparing trusted paid consultations, online appointments, and follow-up care inside PawNir. Until it is ready, find local vet information through our trusted animal-care partner.",
-    "vet.btn": "Find a local vet on Catwaala",
-    "vet.artTitle": "Paid vet care",
-    "vet.artSub": "Coming soon to PawNir",
+    "vet.eyebrow": "Verified Veterinary Network · Cached Offline",
+    "vet.title": "Emergency & clinic vets,<br /><em>ready across Bangladesh.</em>",
+    "vet.desc":
+      "Browse BVC-registered veterinary surgeons, 24/7 emergency trauma care, and online consultations. Cached automatically on your device for offline emergencies.",
+    "vet.btn": "Partner directory on Catwaala",
     "how.eyebrow": "Simple from start to finish",
     "how.title": "Care in three easy steps",
     "how.step1Title": "Find nearby support",
-    "how.step1Desc": "Search verified blood donors, adoption listings, fosters, or local veterinary partners by area.",
+    "how.step1Desc": "Search verified blood donors, adoption listings, Google Maps fosters, or local veterinary partners by area.",
     "how.step2Title": "Connect with consent",
-    "how.step2Desc": "Send screened adoption, foster, or donor requests without exposing private phone numbers publicly.",
+    "how.step2Desc": "Send screened adoption, foster, sightings, or donor requests without exposing private phone numbers publicly.",
     "how.step3Title": "Keep every pet safe",
-    "how.step3Desc": "Manage your pet profiles, nearby lost-pet alerts, and care records in one trusted space.",
+    "how.step3Desc": "Manage your pet profiles, nearby lost-pet alerts, and verified foster reviews in one trusted space.",
     "banner.eyebrow": "For veterinary professionals",
     "banner.title": "Make more time for<br /><em>what matters most.</em>",
     "banner.desc": "Grow your practice, simplify your day, and give every patient a better care journey.",
-    "banner.btn": "Join PawNir"
+    "banner.btn": "Join PawNir",
+    "card.lostBadge": "LOST",
+    "card.foundBadge": "FOUND",
+    "card.shareSighting": "📍 I spotted this pet",
+    "card.reunitedBtn": "✓ Mark reunited",
+    "card.requestDonor": "🩸 Request donor",
+    "card.readyDonate": "✓ Ready to donate",
+    "card.Resting": "⏳ Resting cooldown",
+    "card.previewMap": "📍 Preview on Map",
+    "card.reviewsBtn": "★ Reviews",
+    "card.requestFoster": "Request stay",
+    "card.applyAdopt": "Apply to adopt →",
+    "card.markAdopted": "✓ Mark rehomed",
+    "card.bookVet": "Book / Call clinic",
+    "empty.lost": "No open lost or found reports match this filter.",
+    "empty.donors": "No available blood donors match this filter right now.",
+    "empty.fosters": "No verified fosters match your search filter.",
+    "empty.adoptions": "No open adoption listings match this filter right now.",
+    "empty.vets": "No verified veterinarians match this filter."
   },
   bn: {
-    "nav.home": "হোম",
-    "nav.lost": "হারানো প্রাণী",
-    "nav.lostShort": "অ্যালার্ট",
-    "nav.donors": "রক্তদাতা",
-    "nav.donorsShort": "রক্তদাতা",
-    "nav.adopt": "দত্তক",
-    "nav.adoptShort": "দত্তক",
-    "nav.foster": "ফস্টার কেয়ার",
-    "nav.find": "জরুরি ভেট",
-    "nav.how": "যেভাবে কাজ করে",
-    "nav.features": "ফিচারসমূহ",
-    "nav.screens": "স্ক্রিনশট",
+    "nav.features": "বৈশিষ্ট্য",
+    "nav.lost": "হারানো ও পাওয়া",
+    "nav.screens": "অ্যাপ স্ক্রিন",
     "nav.comingsoon": "শীঘ্রই আসছে",
-    "nav.playcta": "গুগল প্লে স্টোরে পান",
-    "nav.vets": "ভেটদের জন্য",
-    "nav.care": "আমার যত্ন",
+    "nav.home": "হোম",
+    "nav.donors": "রক্তদাতা নেটওয়ার্ক",
+    "nav.foster": "ফস্টার ও ম্যাপ",
+    "nav.adopt": "দত্তক নিন",
+    "nav.find": "ভেট খুঁজুন",
+    "nav.care": "আমার কেয়ার ও পাসপোর্ট",
+    "nav.how": "কীভাবে কাজ করে",
+    "nav.forvets": "ভেটেরিনারিয়ানদের জন্য",
     "nav.signin": "সাইন ইন",
-    "nav.bookings": "বুকিং",
-    "nav.profile": "অ্যাকাউন্ট",
-    "hero.eyebrow": "কাছের মানুষ, বিপন্ন প্রাণের পাশে",
-    "hero.title": "প্রাণীদের যখন সাহায্য প্রয়োজন,<br /><em>আপনার এলাকা পাশে দাঁড়ায়।</em>",
-    "hero.subtitle": "PawNir সারা বাংলাদেশে হারানো প্রাণীর দ্রুত অ্যালার্ট, দায়িত্বশীল দত্তক ও পুনর্বাসন, জরুরি রক্তদাতা নেটওয়ার্ক, ফস্টার কেয়ার এবং বিশ্বস্ত ভেটেরিনারি সেবাকে এক মায়ার ঠিকানায় যুক্ত করেছে।",
-    "hero.cta": "PawNir কীভাবে সাহায্য করে",
-    "hero.vetLink": "নিকটস্থ ভেটেরিনারিয়ান",
-    "hero.trust": "<strong>১০,০০০+</strong> সচেতন পেট প্যারেন্ট<br />ইতিমধ্যে PawNir-এ আস্থা রাখেন",
-    "hero.badge1Title": "যাচাইকৃত নেটওয়ার্ক",
-    "hero.badge1Sub": "কমিউনিটি দ্বারা সুরক্ষিত",
-    "hero.badge2Sub": "পেট প্যারেন্টদের প্রথম পছন্দ",
-    "mission.eyebrow": "প্রাণী সুরক্ষায় এক প্ল্যাটফর্ম",
-    "mission.title": "অগোছালো সোশ্যাল পোস্ট নয়।<br /><em>সঠিক এলাকার মানুষের কাছে সরাসরি বার্তা।</em>",
-    "mission.badge": "বাংলাদেশের প্রাণীদের জন্য",
-    "mission.exampleLabel": "একটি বাস্তব উদাহরণ",
-    "mission.exampleTitle": "ধানমন্ডি ১০ থেকে আপনার বিড়ালটি হারিয়ে গেছে।",
-    "mission.exampleText": "অসংখ্য অসংলগ্ন গ্রুপে পোস্ট না করে, PawNir ওই এলাকার নিবন্ধিত প্রাণীপ্রেমীদের ফোনে সাথে সাথে সতর্কবার্তা পাঠায়: <strong>“আপনার এলাকায় একটি পোষা প্রাণী হারিয়েছে।”</strong> সম্পূর্ণ স্থানীয়, নিরাপদ ও কার্যকর।",
-    "mission.exampleNote": "শুধুমাত্র আনুমানিক এলাকা · উভয়পক্ষের সম্মতিতে যোগাযোগ",
-    "mission.alertTitle": "আপনার কাছেই হারানো প্রাণী",
-    "mission.alertSub": "ধানমন্ডি ১০ এর কাছে বিড়াল রিপোর্ট করা হয়েছে",
-    "mission.alertMeta": "এই এলাকার ৮৯ জন প্রাণীপ্রেমীকে সতর্ক করা হয়েছে",
-    "mission.safety": "<strong>নিরাপত্তা ও নৈতিকতার অঙ্গীকার:</strong> PawNir-এ জীবন্ত প্রাণী কেনা-বেচা আইনত ও নীতিগতভাবে সম্পূর্ণ নিষিদ্ধ। যাচাইকরণ, সম্মতি এবং প্রাণী কল্যাণই আমাদের একমাত্র লক্ষ্য।",
-    "service.lostTitle": "হারানো ও প্রাপ্তি অ্যালার্ট",
-    "service.lostDesc": "আপনার এলাকার মানবিক মানুষদের কাছে দ্রুত সন্ধানবার্তা।",
-    "service.adoptTitle": "নিরাপদ দত্তক ও পুনর্বাসন",
-    "service.adoptDesc": "যাচাই ও নিয়মিত ফলো-আপের মাধ্যমে প্রাণীকে দিন সুরক্ষিত নতুন পরিবার।",
-    "service.bloodTitle": "জরুরি রক্তদাতা নেটওয়ার্ক",
-    "service.bloodDesc": "সংকটাপন্ন মুহূর্তে পোষা প্রাণীর রক্তের গ্রুপ অনুযায়ী কাছের রক্তদাতা।",
-    "service.circleTitle": "স্থানীয় অ্যানিমেল সার্কেল",
-    "service.circleDesc": "আপনার এলাকার প্রাণীপ্রেমীদের সাথে সরাসরি যুক্ত হোন।",
-    "service.vetTitle": "জরুরি ভেট সেবা",
-    "service.vetDesc": "প্রয়োজনের মুহূর্তে সঠিক ভেটেরিনারি পরামর্শ ও সহায়তা।",
-    "service.fosterTitle": "ফস্টার ও আশ্রয়কেন্দ্র",
-    "service.fosterDesc": "গুগল ম্যাপসে নিবন্ধিত নিরাপদ ফস্টার হোম ও শেল্টার।",
-    "service.shopTitle": "সামগ্রী ও জরুরি পরিবহন",
-    "service.shopDesc": "PetBhai-এর মাধ্যমে প্রয়োজনীয় খাবার ও প্রাণী পরিবহনের সহায়তা।",
-    "lost.eyebrow": "কাছাকাছি মানুষের ভালোবাসা",
-    "lost.title": "আপনার আশেপাশে হারানো ও পাওয়া প্রাণী",
-    "lost.reportBtn": "হারানো প্রাণীর রিপোর্ট করুন",
-    "lost.alertBtn": "আমার এলাকায় অ্যালার্ট চালু করুন",
-    "donor.eyebrow": "জরুরি সংকট মুহূর্তে",
-    "donor.title": "প্রাণী রক্তদাতা নেটওয়ার্ক",
-    "donor.registerBtn": "রক্তদাতা হিসেবে যুক্ত হোন",
-    "donor.disclaimer": "PawNir সম্মতিপ্রাপ্ত দাতাদের তালিকাভুক্ত করে; রক্ত সঞ্চালনের আগে অবশ্যই রেজিস্টার্ড ভেটেরিনারিয়ানের ক্রস-ম্যাচ ও স্বাস্থ্য পরীক্ষা আবশ্যক।",
-    "adopt.eyebrow": "একটি নিরাপদ ও মায়ার ঠিকানা",
-    "adopt.title": "ভালোবাসায় দত্তক নিন বা পুনর্বাসন করুন",
-    "adopt.btnList": "+ দত্তকের জন্য যুক্ত করুন",
-    "adopt.filterAll": "সকল প্রাণী",
-    "adopt.filterCats": "🐱 বিড়াল",
+    "nav.live": "লাইভ",
+    "nav.syncing": "সিঙ্ক হচ্ছে…",
+    "nav.offline": "অফলাইন",
+    "common.nearMe": "📍 আমার কাছে",
+    "common.resetFilters": "ফিল্টার রিসেট করুন",
+    "common.share": "শেয়ার",
+    "hero.eyebrow": "বাংলাদেশের পোষা প্রাণী ও উদ্ধারকারীদের জন্য নির্মিত",
+    "hero.title": "প্রতিটি প্রাণীর যত্নে<br /><em>একটি নির্ভরযোগ্য ঠিকানা।</em>",
+    "hero.subtitle":
+      "হারানো বা খুঁজে পাওয়া প্রাণীর তাৎক্ষণিক এলাকার সতর্কতা দিন, সম্মতিপ্রাপ্ত বিড়াল ও কুকুরের রক্তদাতার সাথে যোগাযোগ করুন, গুগল ম্যাপে যাচাইকৃত ফস্টার খুঁজুন এবং দায়িত্বশীলভাবে দত্তক নিন।",
+    "hero.sub":
+      "হারানো বা খুঁজে পাওয়া প্রাণীর তাৎক্ষণিক এলাকার সতর্কতা দিন, সম্মতিপ্রাপ্ত বিড়াল ও কুকুরের রক্তদাতার সাথে যোগাযোগ করুন, গুগল ম্যাপে যাচাইকৃত ফস্টার খুঁজুন এবং দায়িত্বশীলভাবে দত্তক নিন।",
+    "hero.cta": "হারানো বা পাওয়া রিপোর্ট করুন",
+    "hero.ctaLost": "হারানো বা পাওয়া রিপোর্ট করুন",
+    "hero.vetLink": "রক্তদাতা খুঁজুন",
+    "hero.ctaDonor": "রক্তদাতা খুঁজুন",
+    "hero.trust": "<span>সম্পূর্ণ বিনামূল্যে ও অবাণিজ্যিক</span><span>গোপনীয়তা-সুরক্ষিত যোগাযোগ</span><span>ঢাকা, চট্টগ্রাম ও সারা বাংলাদেশ</span>",
+    "hero.trust1": "সম্পূর্ণ বিনামূল্যে ও অবাণিজ্যিক",
+    "hero.trust2": "গোপনীয়তা-সুরক্ষিত যোগাযোগ",
+    "hero.trust3": "ঢাকা, চট্টগ্রাম ও সারা বাংলাদেশ",
+    "hero.badge1Title": "হারানো ও পাওয়া রাডার",
+    "hero.badge1Sub": "তাৎক্ষণিক এলাকার অ্যালার্ট",
+    "hero.badge2Sub": "বিড়াল ও কুকুরের রক্তদাতা নেটওয়ার্ক",
+    "mission.eyebrow": "বাংলাদেশে কমিউনিটি-ভিত্তিক প্রাণী সেবা",
+    "mission.title": "আপনার প্রয়োজনীয় সেবাটি বেছে নিন",
+    "mission.badge": "১০০% বিনামূল্যে · অবাণিজ্যিক · গোপনীয়তা-সুরক্ষিত",
+    "mission.safety":
+      "<strong>নিরাপত্তা ও চিকিৎসা নির্দেশনা:</strong> দত্তক বা রক্তদানের জন্য কখনোই অগ্রিম অর্থ দেবেন না। সর্বদা নিরাপদ প্রকাশ্য স্থানে বা নিবন্ধিত ভেটেরিনারি ক্লিনিকে সাক্ষাৎ করুন।",
+    "service.lostTitle": "হারানো ও পাওয়া অ্যালার্ট",
+    "service.lostDesc": "হারানো বা দেখতে পাওয়া প্রাণীর তথ্য দিন এবং এলাকার মানুষকে জানান।",
+    "service.bloodTitle": "রক্তদাতা নেটওয়ার্ক",
+    "service.bloodDesc": "জরুরি মুহূর্তে সম্মতিপ্রাপ্ত বিড়াল ও কুকুরের রক্তদাতা খুঁজুন বা নিবন্ধন করুন।",
+    "service.fosterTitle": "গুগল ম্যাপস ফস্টার",
+    "service.fosterDesc": "গুগল ম্যাপে ফস্টার খুঁজুন, কমিউনিটি রিভিউ পড়ুন এবং সেবা মূল্যায়ন করুন।",
+    "service.adoptTitle": "দায়িত্বশীল দত্তক",
+    "service.adoptDesc": "যাচাইকৃত পোষা প্রাণী দত্তক নিন বা নিরাপদ নতুন ঘরের জন্য তালিকাভুক্ত করুন।",
+    "service.vetTitle": "ভেটেরিনারি কেয়ার",
+    "service.vetDesc": "২৪/৭ জরুরি ক্লিনিক, BVC-নিবন্ধিত সার্জন এবং অফলাইন জরুরি নম্বর।",
+    "service.shopTitle": "পেট এসেনশিয়ালস",
+    "service.shopDesc": "খাবার, লিটার এবং ওষুধের পার্টনার।",
+    "lost.eyebrow": "কাছাকাছি মানুষের কাছে সাহায্য পৌঁছান",
+    "lost.title": "আপনার আশেপাশে হারানো ও পাওয়া প্রাণী",
+    "lost.reportBtn": "+ প্রাণী রিপোর্ট করুন",
+    "lost.alertBtn": "🔔 এই এলাকার অ্যালার্ট পান",
+    "donor.eyebrow": "জরুরি মুহূর্তে জীবন বাঁচান",
+    "donor.title": "প্রাণী রক্তদাতা নেটওয়ার্ক",
+    "donor.registerBtn": "+ রক্তদাতা নিবন্ধন করুন",
+    "donor.disclaimer":
+      "PawNir সম্মতিপ্রাপ্ত রক্তদাতাদের সংযুক্ত করে; রক্তদানের আগে অবশ্যই একজন নিবন্ধিত ভেটেরিনারি চিকিৎসকের মাধ্যমে ক্রস-ম্যাচিং ও স্বাস্থ্য পরীক্ষা নিশ্চিত করতে হবে।",
+    "foster.eyebrow": "গুগল ম্যাপস লোকাল কেয়ার ও যাচাইকৃত রিভিউ",
+    "foster.title": "ফস্টার বা আশ্রয়কেন্দ্র খুঁজুন",
+    "adopt.eyebrow": "একটি নিরাপদ নতুন ঘর",
+    "adopt.title": "দায়িত্বশীলভাবে দত্তক নিন বা ঘর খুঁজে দিন",
+    "adopt.btnList": "+ দত্তকের জন্য তালিকাভুক্ত করুন",
+    "adopt.filterAll": "সব প্রাণী",
+    "adopt.filterCats": "🐱 বিড়াল",
     "adopt.filterDogs": "🐶 কুকুর",
     "adopt.filterBirds": "🦜 পাখি",
     "adopt.filterRabbits": "🐰 খরগোশ",
-    "foster.eyebrow": "যাচাইকৃত স্থানীয় যত্ন",
-    "foster.title": "ফস্টার বা নিরাপদ আশ্রয়কেন্দ্র খুঁজুন",
-    "vet.eyebrow": "বিশেষজ্ঞ চিকিৎসকের যত্ন",
-    "vet.title": "অনলাইন ভেট কনসালটেশন,<br /><em>PawNir-এর ভেতরেই।</em>",
-    "vet.desc": "আমরা অভিজ্ঞ ভেটেরিনারিয়ানদের সমন্বয়ে সরাসরি অ্যাপয়েন্টমেন্ট ও ডিজিটাল প্রেসক্রিপশন সেবা প্রস্তুত করছি। ততক্ষণ আমাদের পার্টনার Catwaala-তে স্থানীয় ভেটদের তথ্য দেখতে পারেন।",
-    "vet.btn": "Catwaala-তে স্থানীয় ভেট খুঁজুন",
-    "vet.artTitle": "ভেট কনসালটেশন",
-    "vet.artSub": "শীঘ্রই আসছে PawNir-এ",
-    "how.eyebrow": "সহজ ও কার্যকর",
-    "how.title": "সহজ তিন ধাপে সুরক্ষা",
-    "how.step1Title": "কাছের সহায়তা খুঁজুন",
-    "how.step1Desc": "এলাকা অনুযায়ী রক্তদাতা, দত্তকের প্রাণী, ফস্টার বা ভেট সেন্টার খুঁজুন।",
-    "how.step2Title": "নিরাপদ যোগাযোগ",
-    "how.step2Desc": "ব্যক্তিগত গোপনীয়তা বজায় রেখে প্ল্যাটফর্মের মাধ্যমে যোগাযোগ করুন।",
-    "how.step3Title": "প্রতিটি প্রাণীর সুরক্ষা",
-    "how.step3Desc": "ডিজিটাল পেট পাসপোর্ট, ভ্যাকসিন হিস্ট্রি ও এলাকার সতর্কবার্তা একসাথে।",
-    "banner.eyebrow": "ভেটেরিনারি চিকিৎসকদের জন্য",
-    "banner.title": "সেবার জন্য থাকুক<br /><em>আরও বেশি সময়।</em>",
-    "banner.desc": "আপনার চেম্বার ও রোগীদের সেবা আরও ডিজিটাল করতে PawNir নেটওয়ার্কে যুক্ত হোন।",
-    "banner.btn": "PawNir-এ যোগ দিন"
+    "vet.eyebrow": "যাচাইকৃত ভেটেরিনারি নেটওয়ার্ক · অফলাইনেও সংরক্ষিত",
+    "vet.title": "জরুরি ও ক্লিনিক ভেট,<br /><em>সারা বাংলাদেশে প্রস্তুত।</em>",
+    "vet.desc":
+      "BVC-নিবন্ধিত ভেটেরিনারি সার্জন, ২৪/৭ জরুরি ট্রমা কেয়ার এবং অনলাইন পরামর্শ। ইন্টারনেট না থাকলেও জরুরি প্রয়োজনে আপনার ডিভাইসে সংরক্ষিত থাকে।",
+    "vet.btn": "Catwaala-তে পার্টনার ডিরেক্টরি দেখুন",
+    "how.eyebrow": "শুরু থেকে শেষ পর্যন্ত সহজ",
+    "how.title": "তিনটি সহজ ধাপে সেবা",
+    "how.step1Title": "কাছাকাছি সহায়তা খুঁজুন",
+    "how.step1Desc": "এলাকা অনুযায়ী যাচাইকৃত রক্তদাতা, দত্তক তালিকা, গুগল ম্যাপস ফস্টার বা স্থানীয় ভেটেরিনারি পার্টনার খুঁজুন।",
+    "how.step2Title": "সম্মতির সাথে সংযুক্ত হোন",
+    "how.step2Desc": "ব্যক্তিগত ফোন নম্বর প্রকাশ্যে না রেখে নিরাপদে দত্তক, ফস্টার, প্রাণী দেখার তথ্য বা রক্তের অনুরোধ পাঠান।",
+    "how.step3Title": "প্রতিটি প্রাণীকে নিরাপদ রাখুন",
+    "how.step3Desc": "আপনার পোষা প্রাণীর পাসপোর্ট, হারানো প্রাণীর সতর্কতা এবং ফস্টার রিভিউ এক জায়গায় পরিচালনা করুন।",
+    "banner.eyebrow": "ভেটেরিনারি পেশাজীবীদের জন্য",
+    "banner.title": "সবচেয়ে গুরুত্বপূর্ণ কাজের জন্য<br /><em>আরও সময় বাঁচান।</em>",
+    "banner.desc": "আপনার চেম্বার প্রসারিত করুন, প্রতিদিনের সময়সূচি সহজ করুন এবং প্রতিটি প্রাণীকে উন্নত চিকিৎসা অভিজ্ঞতা দিন।",
+    "banner.btn": "PawNir-এ যোগ দিন",
+    "card.lostBadge": "হারানো",
+    "card.foundBadge": "পাওয়া গেছে",
+    "card.shareSighting": "📍 আমি দেখেছি",
+    "card.reunitedBtn": "✓ ফিরে পেয়েছে চিহ্নিত করুন",
+    "card.requestDonor": "🩸 রক্তের অনুরোধ",
+    "card.readyDonate": "✓ রক্তদানে প্রস্তুত",
+    "card.Resting": "⏳ বিশ্রামের সময়কাল",
+    "card.previewMap": "📍 ম্যাপে দেখুন",
+    "card.reviewsBtn": "★ রিভিউ",
+    "card.requestFoster": "ফস্টার অনুরোধ",
+    "card.applyAdopt": "দত্তক আবেদন করুন →",
+    "card.markAdopted": "✓ দত্তক সম্পন্ন",
+    "card.bookVet": "ক্লিনিকে যোগাযোগ / বুকিং",
+    "empty.lost": "এই ফিল্টারে কোনো হারানো বা পাওয়া প্রাণীর রিপোর্ট পাওয়া যায়নি।",
+    "empty.donors": "এই মুহূর্তে আপনার ফিল্টারের সাথে মিলে এমন কোনো রক্তদাতা নেই।",
+    "empty.fosters": "আপনার অনুসন্ধানের সাথে মিলে এমন কোনো ফস্টার পাওয়া যায়নি।",
+    "empty.adoptions": "এই ফিল্টারে বর্তমানে কোনো দত্তক তালিকা নেই।",
+    "empty.vets": "এই ফিল্টারে কোনো যাচাইকৃত ভেটেরিনারি চিকিৎসক পাওয়া যায়নি।"
   }
 };
 
-function dialogFocusable(dialog) {
-  return dialog.querySelector("button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex='-1'])");
+const state = {
+  lang: localStorage.getItem("pawnir-lang") || "en",
+  token: localStorage.getItem("pawnir-token") || "",
+  user: null,
+  pending2faToken: "",
+  challengeToken: "",
+  activeSightingReportId: null,
+  activeDonorId: null,
+  activeFosterId: null,
+  activeAdoptionId: null,
+  reportPhotoData: null,
+  adoptPhotoData: null,
+  lostSpecies: "",
+  adoptionSpecies: "",
+  fostersCache: [],
+  lostCache: { reports: [], mine: [], totalOpenCount: 0 },
+  donorCache: { donors: [], myDonors: [], incomingRequests: [], mySentRequests: [], totalVerifiedCount: 0 },
+  adoptionCache: { listings: [], myListings: [], totalOpenCount: 0 },
+  vetsCache: [],
+  sse: null,
+  sseRetryCount: 0,
+  sseRetryTimer: null,
+  activeView: "home"
+};
+
+function t(key) {
+  const dict = copy[state.lang] || copy.en;
+  return dict[key] || copy.en[key] || key;
 }
-function openDialog(dialog, trigger) {
-  if (!dialog || dialog.open) return;
-  if (activeDialog && activeDialog !== dialog) {
-    activeDialog.classList.remove("is-visible");
-    if (activeDialog.open) activeDialog.close();
+
+// ============================================================================
+// Offline Resilience Store (IndexedDB + localStorage Fallback)
+// ============================================================================
+const PawNirOfflineStore = (() => {
+  const DB_NAME = "pawnir_offline_db";
+  const STORE_NAME = "api_cache";
+  let dbPromise = null;
+
+  function openDb() {
+    if (dbPromise) return dbPromise;
+    if (typeof indexedDB === "undefined") return Promise.resolve(null);
+    dbPromise = new Promise((resolve) => {
+      try {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = () => {
+          const db = req.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      } catch (_err) {
+        resolve(null);
+      }
+    });
+    return dbPromise;
   }
-  activeDialog = dialog;
-  dialogTrigger = trigger || document.activeElement;
-  dialog.setAttribute("aria-modal", "true");
-  if (!document.body.classList.contains("dialog-open")) {
-    lockedScrollY = window.scrollY;
-    document.body.style.top = `-${lockedScrollY}px`;
-    document.body.classList.add("dialog-open");
-  }
-  dialog.showModal();
-  requestAnimationFrame(() => dialog.classList.add("is-visible"));
-  const first = dialogFocusable(dialog);
-  if (first) first.focus();
-}
-function closeDialog(dialog) {
-  if (!dialog || !dialog.open) return;
-  dialog.classList.remove("is-visible");
-  window.setTimeout(() => {
-    if (dialog.open) dialog.close();
-    if (activeDialog === dialog) {
-      document.body.classList.remove("dialog-open");
-      document.body.style.top = "";
-      window.scrollTo(0, lockedScrollY);
-      if (dialogTrigger && document.contains(dialogTrigger)) dialogTrigger.focus();
-      activeDialog = null;
-      dialogTrigger = null;
+
+  async function set(key, value) {
+    const record = { updatedAt: Date.now(), data: value };
+    try {
+      localStorage.setItem(`pawnir_cache_${key}`, JSON.stringify(record));
+    } catch (_e) {
+      // ignore quota errors
     }
-  }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 180);
+    const db = await openDb();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction(STORE_NAME, "readwrite");
+        tx.objectStore(STORE_NAME).put(record, key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      } catch (_e) {
+        resolve(false);
+      }
+    });
+  }
+
+  async function get(key) {
+    const db = await openDb();
+    if (db) {
+      const fromIdb = await new Promise((resolve) => {
+        try {
+          const tx = db.transaction(STORE_NAME, "readonly");
+          const req = tx.objectStore(STORE_NAME).get(key);
+          req.onsuccess = () => resolve(req.result ? req.result.data : null);
+          req.onerror = () => resolve(null);
+        } catch (_e) {
+          resolve(null);
+        }
+      });
+      if (fromIdb !== null && fromIdb !== undefined) return fromIdb;
+    }
+    try {
+      const raw = localStorage.getItem(`pawnir_cache_${key}`);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed ? parsed.data : null;
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  return { set, get };
+})();
+window.PawNirOfflineStore = PawNirOfflineStore;
+
+// ============================================================================
+// Native Bridge & Smart Hardware Helpers (Web + Android WebView Ready)
+// ============================================================================
+const BANGLADESH_NEIGHBORHOODS = [
+  { area: "Dhanmondi 10", city: "Dhaka", lat: 23.7465, lng: 90.3760 },
+  { area: "Mohammadpur", city: "Dhaka", lat: 23.7598, lng: 90.3587 },
+  { area: "Mirpur DOHS", city: "Dhaka", lat: 23.8365, lng: 90.3695 },
+  { area: "Mirpur 10", city: "Dhaka", lat: 23.8069, lng: 90.3687 },
+  { area: "Uttara Sector 7", city: "Dhaka", lat: 23.8759, lng: 90.3795 },
+  { area: "Gulshan 2", city: "Dhaka", lat: 23.7925, lng: 90.4078 },
+  { area: "Banani", city: "Dhaka", lat: 23.7940, lng: 90.4043 },
+  { area: "Bashundhara R/A", city: "Dhaka", lat: 23.8191, lng: 90.4526 },
+  { area: "Badda", city: "Dhaka", lat: 23.7805, lng: 90.4267 },
+  { area: "Farmgate", city: "Dhaka", lat: 23.7561, lng: 90.3872 },
+  { area: "Motijheel", city: "Dhaka", lat: 23.7330, lng: 90.4172 },
+  { area: "Khilgaon", city: "Dhaka", lat: 23.7516, lng: 90.4254 },
+  { area: "Old Dhaka", city: "Dhaka", lat: 23.7115, lng: 90.4071 },
+  { area: "Panchlaish", city: "Chattogram", lat: 22.3636, lng: 91.8220 },
+  { area: "GEC Circle", city: "Chattogram", lat: 22.3590, lng: 91.8215 },
+  { area: "Agrabad", city: "Chattogram", lat: 22.3266, lng: 91.8117 },
+  { area: "Zindabazar", city: "Sylhet", lat: 24.8949, lng: 91.8687 },
+  { area: "Shaheb Bazar", city: "Rajshahi", lat: 24.3636, lng: 88.6241 },
+  { area: "Sonadanga", city: "Khulna", lat: 22.8158, lng: 89.5469 }
+];
+
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const toRad = (deg) => (deg * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
-function wireDialog(dialog) {
+
+function findNearestNeighborhood(lat, lng) {
+  let best = BANGLADESH_NEIGHBORHOODS[0];
+  let bestDist = Infinity;
+  for (const item of BANGLADESH_NEIGHBORHOODS) {
+    const dist = haversineKm(lat, lng, item.lat, item.lng);
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = item;
+    }
+  }
+  return { ...best, distanceKm: Math.round(bestDist * 10) / 10 };
+}
+
+const PawNirBridge = {
+  async detectNearestArea() {
+    if (window.AndroidBridge && typeof window.AndroidBridge.getLocation === "function") {
+      try {
+        const raw = JSON.parse(window.AndroidBridge.getLocation());
+        if (raw && typeof raw.lat === "number" && typeof raw.lng === "number") {
+          return findNearestNeighborhood(raw.lat, raw.lng);
+        }
+      } catch (_e) {
+        // fallback to web geolocation
+      }
+    }
+    if (navigator.geolocation) {
+      const coords = await new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          () => resolve(null),
+          { enableHighAccuracy: false, timeout: 6000, maximumAge: 120000 }
+        );
+      });
+      if (coords) {
+        return findNearestNeighborhood(coords.lat, coords.lng);
+      }
+    }
+    const savedArea = state.user?.area || localStorage.getItem("pawnir-last-area") || "Dhanmondi 10";
+    const matched = BANGLADESH_NEIGHBORHOODS.find((n) => savedArea.toLowerCase().includes(n.area.toLowerCase())) || BANGLADESH_NEIGHBORHOODS[0];
+    return { ...matched, distanceKm: null, fallback: true };
+  },
+
+  async compressPhoto(file) {
+    if (!file) return null;
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Please choose a JPEG, PNG, or WebP image.");
+    }
+    if (file.size > 6 * 1024 * 1024) {
+      throw new Error("Image is too large. Please pick a photo under 6 MB.");
+    }
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error("Could not read image file."));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error("Invalid image format."));
+        img.onload = () => {
+          const maxDim = 1080;
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            const ratio = Math.min(maxDim / width, maxDim / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+          resolve(dataUrl);
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  },
+
+  async shareItem({ title, text, url }) {
+    const shareUrl = url || window.location.href;
+    if (window.AndroidBridge && typeof window.AndroidBridge.share === "function") {
+      window.AndroidBridge.share(title || "PawNir", text || "", shareUrl);
+      return true;
+    }
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url: shareUrl });
+        return true;
+      } catch (_e) {
+        return false;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(`${title} — ${text} (${shareUrl})`);
+      showToast(state.lang === "bn" ? "লিংক কপি করা হয়েছে!" : "Share link copied to clipboard!");
+      return true;
+    } catch (_e) {
+      showToast(state.lang === "bn" ? "শেয়ার রেডি" : "Ready to share");
+      return false;
+    }
+  },
+
+  notifyLocal(title, body) {
+    if (window.AndroidBridge && typeof window.AndroidBridge.notify === "function") {
+      window.AndroidBridge.notify(title, body);
+      return;
+    }
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      try {
+        new Notification(title, { body, icon: "/favicon-192x192.png" });
+      } catch (_e) {
+        // ignore on restricted mobile browsers
+      }
+    }
+  }
+};
+window.PawNirBridge = PawNirBridge;
+
+// ============================================================================
+// Core Utilities & Toast / Dialog Management
+// ============================================================================
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function formatRelativeTime(iso) {
+  if (!iso) return state.lang === "bn" ? "এইমাত্র" : "Just now";
+  const diffSec = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+  if (diffSec < 60) return state.lang === "bn" ? "এইমাত্র" : "Just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return state.lang === "bn" ? `${diffMin} মিনিট আগে` : `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return state.lang === "bn" ? `${diffHr} ঘণ্টা আগে` : `${diffHr}h ago`;
+  const diffDays = Math.floor(diffHr / 24);
+  return state.lang === "bn" ? `${diffDays} দিন আগে` : `${diffDays}d ago`;
+}
+
+let toastTimer = null;
+function showToast(message) {
+  const toast = document.getElementById("app-toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.hidden = false;
+  requestAnimationFrame(() => {
+    toast.classList.add("is-shown");
+  });
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("is-shown");
+    setTimeout(() => {
+      if (!toast.classList.contains("is-shown")) {
+        toast.hidden = true;
+      }
+    }, 220);
+  }, 3800);
+}
+
+let lockedScrollY = 0;
+function lockBodyScroll() {
+  if (document.body.classList.contains("modal-open")) return;
+  lockedScrollY = window.scrollY || window.pageYOffset || 0;
+  document.body.style.top = `-${lockedScrollY}px`;
+  document.body.classList.add("modal-open");
+}
+
+function unlockBodyScroll() {
+  if (!document.body.classList.contains("modal-open")) return;
+  document.body.classList.remove("modal-open");
+  document.body.style.top = "";
+  window.scrollTo({ top: lockedScrollY, behavior: "instant" });
+}
+
+function hasAnyOpenDialog() {
+  return Array.from(document.querySelectorAll("dialog.booking-dialog")).some((d) => d.open);
+}
+
+function openDialog(dialog, pushHistory = true) {
   if (!dialog) return;
-  dialog.addEventListener("click", (event) => { if (event.target === dialog) closeDialog(dialog); });
-  dialog.addEventListener("cancel", (event) => { event.preventDefault(); closeDialog(dialog); });
-  dialog.querySelectorAll("[data-close-auth],[data-close-dashboard],[data-close-profile],.dialog-close").forEach((button) =>
-    button.addEventListener("click", (event) => { event.preventDefault(); closeDialog(dialog); })
-  );
-  dialog.addEventListener("keydown", (event) => {
-    if (event.key !== "Tab") return;
-    const focusables = [...dialog.querySelectorAll("button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex='-1'])")].filter((el) => !el.closest("[hidden]"));
-    if (!focusables.length) return;
-    const index = focusables.indexOf(document.activeElement);
-    if (event.shiftKey && index <= 0) { event.preventDefault(); focusables[focusables.length - 1].focus(); }
-    if (!event.shiftKey && index === focusables.length - 1) { event.preventDefault(); focusables[0].focus(); }
+  lockBodyScroll();
+  if (typeof dialog.showModal === "function") {
+    if (!dialog.open) dialog.showModal();
+  } else {
+    dialog.setAttribute("open", "open");
+  }
+  dialog.classList.add("is-visible");
+  if (pushHistory && window.history && typeof window.history.pushState === "function") {
+    try {
+      window.history.pushState({ pawnirModal: dialog.id }, "");
+    } catch (_e) {
+      // ignore
+    }
+  }
+}
+
+function closeDialog(dialog) {
+  if (!dialog) return;
+  dialog.classList.remove("is-visible");
+  if (typeof dialog.close === "function" && dialog.open) {
+    dialog.close();
+  } else {
+    dialog.removeAttribute("open");
+  }
+  if (!hasAnyOpenDialog()) {
+    unlockBodyScroll();
+  }
+}
+
+function renderSkeletonCards(count = 3) {
+  return Array.from({ length: count })
+    .map(
+      () => `
+      <article class="skeleton-card" aria-hidden="true">
+        <div class="skeleton-line skeleton-badge"></div>
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-body"></div>
+        <div class="skeleton-line skeleton-body-short"></div>
+      </article>`
+    )
+    .join("");
+}
+
+async function apiFetch(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (options.body && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+  if (state.token) {
+    headers.Authorization = `Bearer ${state.token}`;
+  }
+  const response = await fetch(url, { ...options, headers });
+  const contentType = response.headers.get("content-type") || "";
+  const data = contentType.includes("application/json") ? await response.json() : await response.text();
+  if (!response.ok) {
+    const err = new Error((data && data.error) || `Request failed (${response.status})`);
+    err.status = response.status;
+    err.payload = data;
+    throw err;
+  }
+  return data;
+}
+
+// ============================================================================
+// Theme, Language & Single-Page View Navigation
+// ============================================================================
+function syncBrandLogos(theme) {
+  const logoSrc = theme === "dark" ? "/pawnir-logo-dark.png?v=20261030-10" : "/pawnir-logo.png?v=20261030-10";
+  document.querySelectorAll(".brand-logo").forEach((img) => {
+    img.src = logoSrc;
   });
 }
 
-function setTheme(theme) {
+function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   localStorage.setItem("pawnir-theme", theme);
   const toggle = document.getElementById("theme-toggle");
-  const dark = theme === "dark";
   if (toggle) {
-    toggle.setAttribute("aria-pressed", String(dark));
-    toggle.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+    toggle.setAttribute("aria-pressed", String(theme === "dark"));
   }
-  document.querySelectorAll(".brand-logo").forEach((logo) => {
-    logo.src = dark ? "/pawnir-logo-dark.png?v=20261031-1" : "/pawnir-logo.png?v=20261031-1";
+  syncBrandLogos(theme);
+}
+
+function applyLanguage(lang) {
+  state.lang = lang === "bn" ? "bn" : "en";
+  localStorage.setItem("pawnir-lang", state.lang);
+  document.documentElement.lang = state.lang;
+  const langBtn = document.getElementById("language-toggle");
+  if (langBtn) {
+    langBtn.textContent = state.lang === "en" ? "বাংলা" : "EN";
+  }
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (copy[state.lang]?.[key]) {
+      el.textContent = copy[state.lang][key];
+    }
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    const key = el.getAttribute("data-i18n-html");
+    if (copy[state.lang]?.[key]) {
+      el.innerHTML = copy[state.lang][key];
+    }
+  });
+  const placeholders = {
+    "lost-area-input": state.lang === "bn" ? "এলাকা খুঁজুন (যেমন: ধানমন্ডি, মিরপুর, উত্তরা)..." : "Filter by area (e.g., Dhanmondi, Mirpur, Uttara)...",
+    "donor-area-input": state.lang === "bn" ? "এলাকা বা শহর খুঁজুন (যেমন: মিরপুর, ঢাকা)..." : "Search area or city (e.g., Mirpur, Dhaka)...",
+    "foster-search-input": state.lang === "bn" ? "নাম, এলাকা বা সেবা দিয়ে ফস্টার খুঁজুন..." : "Search fosters by name, area, or service...",
+    "adoption-area-input": state.lang === "bn" ? "এলাকা অনুযায়ী খুঁজুন (যেমন: ধানমন্ডি, উত্তরা)..." : "Filter by area (e.g., Dhanmondi, Uttara)...",
+    "vet-search-input": state.lang === "bn" ? "ভেট, ক্লিনিক বা বিশেষত্ব খুঁজুন (যেমন: সার্জারি, ট্রমা)..." : "Search vet name, clinic, or specialty (e.g., Surgery, Trauma)..."
+  };
+  Object.entries(placeholders).forEach(([id, text]) => {
+    const inputEl = document.getElementById(id);
+    if (inputEl) inputEl.setAttribute("placeholder", text);
+  });
+  updateAuthHeaderUI();
+  if (state.lostCache.reports.length || state.lostCache.mine.length) {
+    renderLostReports(state.lostCache.reports, state.lostCache.mine, state.lostCache.totalOpenCount);
+  }
+  if (state.donorCache.donors.length) {
+    renderDonors(state.donorCache);
+  }
+  if (state.fostersCache.length) {
+    renderFosters(state.fostersCache);
+  }
+  if (state.adoptionCache.listings.length) {
+    renderAdoptions(state.adoptionCache.listings, state.adoptionCache.totalOpenCount);
+  }
+  if (state.vetsCache.length) {
+    renderVets(state.vetsCache);
+  }
+}
+
+function ensureFosterMapLoaded() {
+  const iframe = document.getElementById("foster-google-map");
+  if (!iframe) return;
+  const currentSrc = iframe.getAttribute("src") || "";
+  const dataSrc = iframe.getAttribute("data-src") || "";
+  if ((!currentSrc || currentSrc === "about:blank") && dataSrc) {
+    iframe.setAttribute("src", dataSrc);
+  }
+}
+
+const DEDICATED_VIEWS = new Set(["lost-found", "blood-donors", "foster-care", "adoption", "find-care"]);
+
+function switchView(hashOrView) {
+  const cleaned = String(hashOrView || "").replace(/^#/, "").trim();
+  const nextView = DEDICATED_VIEWS.has(cleaned) ? cleaned : "home";
+  state.activeView = nextView;
+  document.body.setAttribute("data-view", nextView);
+
+  document.querySelectorAll("[data-drawer-link]").forEach((link) => {
+    const target = link.getAttribute("data-drawer-link");
+    link.classList.toggle("is-active", target === nextView || (nextView === "home" && target === "home"));
+  });
+
+  if (nextView === "foster-care") {
+    ensureFosterMapLoaded();
+  }
+  if (nextView === "find-care" && !state.vetsCache.length) {
+    loadVets();
+  }
+
+  if (DEDICATED_VIEWS.has(nextView)) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else if (cleaned && cleaned !== "main") {
+    const targetEl = document.getElementById(cleaned);
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+}
+
+// ============================================================================
+// Homepage Counters & Live Snapshots
+// ============================================================================
+function setCounterText(id, value) {
+  const el = document.getElementById(id);
+  if (el && value !== undefined && value !== null) {
+    el.textContent = String(value);
+  }
+}
+
+function setHomeBadgeCount(id, count, enLabel, bnLabel) {
+  const el = document.getElementById(id);
+  if (!el || typeof count !== "number") return;
+  el.dataset.rawCount = String(count);
+  el.textContent = state.lang === "bn" ? `${count}টি ${bnLabel} ↗` : `${count} ${enLabel} ↗`;
+}
+
+function updateGlobalCommunityCounts(counts) {
+  if (!counts || typeof counts !== "object") return;
+  if (typeof counts.openLostCount === "number") {
+    setHomeBadgeCount("home-count-lost", counts.openLostCount, "live alerts", "লাইভ অ্যালার্ট");
+  }
+  if (typeof counts.verifiedDonorCount === "number") {
+    setHomeBadgeCount("home-count-donors", counts.verifiedDonorCount, "verified donors", "যাচাইকৃত রক্তদাতা");
+  }
+  if (typeof counts.verifiedFosterCount === "number") {
+    setHomeBadgeCount("home-count-fosters", counts.verifiedFosterCount, "verified fosters", "যাচাইকৃত ফস্টার");
+  }
+  if (typeof counts.openAdoptionCount === "number") {
+    setHomeBadgeCount("home-count-adopt", counts.openAdoptionCount, "pets waiting", "পোষা প্রাণী অপেক্ষায়");
+  }
+}
+
+// ============================================================================
+// 1. Lost & Found Module
+// ============================================================================
+function renderLostReports(reports = [], mine = [], totalOpenCount = null) {
+  const grid = document.getElementById("lost-report-grid");
+  const myWrap = document.getElementById("my-lost-reports");
+  const myList = document.getElementById("my-lost-report-list");
+
+  const globalCount = typeof totalOpenCount === "number" ? totalOpenCount : reports.length;
+  setHomeBadgeCount("home-count-lost", globalCount, "live alerts", "লাইভ অ্যালার্ট");
+
+  if (reports.length > 0) {
+    const latest = reports[0];
+    setCounterText("snapshot-lost-area", `${latest.area} · ${formatRelativeTime(latest.createdAt)}`);
+    setCounterText("snapshot-lost-time", formatRelativeTime(latest.createdAt));
+    setCounterText("snapshot-lost-title", latest.title);
+    setCounterText("snapshot-lost-desc", `${latest.area}, ${latest.city} · ${latest.description.slice(0, 95)}…`);
+  }
+
+  if (grid) {
+    if (!reports.length) {
+      grid.innerHTML = `
+        <div class="empty-state-box">
+          <p>${escapeHtml(t("empty.lost"))}</p>
+          <button type="button" class="btn btn-outline btn-small" data-reset-filter="lost">${escapeHtml(t("common.resetFilters"))}</button>
+        </div>`;
+    } else {
+      grid.innerHTML = reports
+        .map((item) => {
+          const isLost = item.type === "lost";
+          const badgeClass = isLost ? "badge-lost" : "badge-found";
+          const badgeLabel = isLost ? t("card.lostBadge") : t("card.foundBadge");
+          const sightings = Array.isArray(item.sightings) ? item.sightings : [];
+          const photoHtml = item.photoData || item.photoUrl
+            ? `<div class="report-card-photo"><img src="${escapeHtml(item.photoData || item.photoUrl)}" alt="${escapeHtml(item.title)}" loading="lazy" /></div>`
+            : "";
+          const sightingsHtml = sightings.length
+            ? `<div class="sightings-box">
+                <strong>📍 ${sightings.length} community sighting${sightings.length > 1 ? "s" : ""}:</strong>
+                ${sightings
+                  .slice(0, 2)
+                  .map(
+                    (s) =>
+                      `<div class="sighting-item"><small><strong>${escapeHtml(s.reporterName)}</strong> near ${escapeHtml(s.location)} (${formatRelativeTime(s.createdAt)}):</small><p>"${escapeHtml(s.note)}"</p></div>`
+                  )
+                  .join("")}
+              </div>`
+            : "";
+
+          return `
+            <article class="lost-card" data-report-id="${escapeHtml(item.id)}">
+              ${photoHtml}
+              <div class="lost-card-top">
+                <span class="status-pill ${badgeClass}">${escapeHtml(badgeLabel)} · ${escapeHtml((item.species || "").toUpperCase())}</span>
+                <span class="card-meta">${escapeHtml(formatRelativeTime(item.createdAt))}</span>
+              </div>
+              <h3>${escapeHtml(item.title)}</h3>
+              <p class="card-location">⌖ ${escapeHtml(item.area)}, ${escapeHtml(item.city)} · Posted by ${escapeHtml(item.ownerName || "Neighbour")}</p>
+              <p class="card-desc">${escapeHtml(item.description)}</p>
+              ${sightingsHtml}
+              <div class="card-actions">
+                <button class="btn btn-primary btn-small" type="button" data-sighting-id="${escapeHtml(item.id)}" data-sighting-title="${escapeHtml(item.title)}">${escapeHtml(t("card.shareSighting"))}</button>
+                <button class="btn btn-outline btn-small" type="button" data-share-title="${escapeHtml(item.title)}" data-share-text="${escapeHtml(`${item.title} (${item.area}, ${item.city})`)}">${escapeHtml(t("common.share"))}</button>
+                ${
+                  item.isOwner
+                    ? `<button class="btn btn-outline btn-small" type="button" data-resolve-lost="${escapeHtml(item.id)}">${escapeHtml(t("card.reunitedBtn"))}</button>`
+                    : ""
+                }
+              </div>
+            </article>`;
+        })
+        .join("");
+    }
+  }
+
+  if (myWrap && myList) {
+    if (!state.user || !mine.length) {
+      myWrap.hidden = true;
+      myList.innerHTML = "";
+    } else {
+      myWrap.hidden = false;
+      myList.innerHTML = mine
+        .map(
+          (item) => `
+          <div class="my-report-row">
+            <div>
+              <strong>${escapeHtml(item.title)}</strong>
+              <small>${escapeHtml(item.area)}, ${escapeHtml(item.city)} · Status: <em>${escapeHtml(item.status)}</em> · ${Number(item.sightingsCount || 0)} sightings</small>
+            </div>
+            ${
+              item.status === "open"
+                ? `<button class="btn btn-outline btn-small" type="button" data-resolve-lost="${escapeHtml(item.id)}">${escapeHtml(t("card.reunitedBtn"))}</button>`
+                : `<span class="resolved-tag">✓ Reunited</span>`
+            }
+          </div>`
+        )
+        .join("");
+    }
+  }
+}
+
+async function loadLostReports({ silent = false } = {}) {
+  const grid = document.getElementById("lost-report-grid");
+  if (grid && !silent && !state.lostCache.reports.length) {
+    grid.innerHTML = renderSkeletonCards(3);
+  }
+  const area = document.getElementById("lost-area-input")?.value.trim() || "";
+  const type = document.getElementById("lost-type-filter")?.value || "all";
+  const species = state.lostSpecies || "";
+  const params = new URLSearchParams();
+  if (area) params.set("area", area);
+  if (type && type !== "all") params.set("type", type);
+  if (species) params.set("species", species);
+
+  try {
+    const data = await apiFetch(`/api/lost-found?${params.toString()}`);
+    const normalized = {
+      reports: Array.isArray(data.reports) ? data.reports : [],
+      mine: Array.isArray(data.mine) ? data.mine : [],
+      totalOpenCount: typeof data.totalOpenCount === "number" ? data.totalOpenCount : (data.reports || []).length
+    };
+    state.lostCache = normalized;
+    if (!area && type === "all" && !species) {
+      PawNirOfflineStore.set("lost-found", normalized);
+    }
+    renderLostReports(normalized.reports, normalized.mine, normalized.totalOpenCount);
+  } catch (_err) {
+    const cached = await PawNirOfflineStore.get("lost-found");
+    if (cached) {
+      state.lostCache = cached;
+      renderLostReports(cached.reports || [], cached.mine || [], cached.totalOpenCount);
+    }
+  }
+}
+
+// ============================================================================
+// 2. Animal Blood Donor Module (Smart Compatibility & 56-Day Cooldown)
+// ============================================================================
+function renderMyDonorPanel(myDonors = [], incomingRequests = [], mySentRequests = []) {
+  const panel = document.getElementById("my-donor-panel");
+  const listEl = document.getElementById("my-donor-list");
+  const reqEl = document.getElementById("my-donor-requests");
+  if (!panel || !listEl || !reqEl) return;
+
+  if (!state.user || (!myDonors.length && !incomingRequests.length && !mySentRequests.length)) {
+    panel.hidden = true;
+    return;
+  }
+  panel.hidden = false;
+
+  listEl.innerHTML = myDonors.length
+    ? myDonors
+        .map(
+          (d) => `
+        <div class="my-report-row">
+          <div>
+            <strong>${escapeHtml(d.petName)} (${escapeHtml(d.bloodType)})</strong>
+            <small>${escapeHtml(d.area)}, ${escapeHtml(d.city)} · ${d.available ? "Available" : "Paused"} · ${escapeHtml(d.readinessLabel || "Ready")}</small>
+          </div>
+          <button class="btn btn-outline btn-small" type="button" data-toggle-donor="${escapeHtml(d.id)}" data-donor-avail="${String(!d.available)}">
+            ${d.available ? "Pause availability" : "Set available"}
+          </button>
+        </div>`
+        )
+        .join("")
+    : `<p class="inline-state">You haven't registered a pet blood donor yet.</p>`;
+
+  const incomingHtml = incomingRequests.length
+    ? incomingRequests
+        .map(
+          (r) => `
+        <div class="my-report-row">
+          <div>
+            <strong>Incoming request for ${escapeHtml(r.donorPetName || "Donor")} · <span class="badge-inline">${escapeHtml(r.status.toUpperCase())}</span></strong>
+            <small>From ${escapeHtml(r.requesterName)} at ${escapeHtml(r.clinic)}${r.contactPhone ? ` · 📞 ${escapeHtml(r.contactPhone)}` : ""}</small>
+            <p class="req-reason">"${escapeHtml(r.reason)}"</p>
+          </div>
+          ${
+            r.status === "pending"
+              ? `<div class="row-actions">
+                  <button class="btn btn-primary btn-small" type="button" data-donor-req-action="${escapeHtml(r.id)}" data-req-status="accepted">Accept</button>
+                  <button class="btn btn-outline btn-small" type="button" data-donor-req-action="${escapeHtml(r.id)}" data-req-status="declined">Decline</button>
+                </div>`
+              : ""
+          }
+        </div>`
+        )
+        .join("")
+    : "";
+
+  const sentHtml = mySentRequests.length
+    ? mySentRequests
+        .map(
+          (r) => `
+        <div class="my-report-row">
+          <div>
+            <strong>Your request for ${escapeHtml(r.donorPetName || "Donor")} (${escapeHtml(r.donorBloodType || "")})</strong>
+            <small>Clinic: ${escapeHtml(r.clinic)} · Status: <strong>${escapeHtml((r.status || "pending").toUpperCase())}</strong></small>
+          </div>
+        </div>`
+        )
+        .join("")
+    : "";
+
+  reqEl.innerHTML = incomingHtml + sentHtml;
+}
+
+function renderDonors(payload) {
+  const donors = Array.isArray(payload) ? payload : payload.donors || [];
+  const totalVerifiedCount = typeof payload.totalVerifiedCount === "number" ? payload.totalVerifiedCount : donors.length;
+  setHomeBadgeCount("home-count-donors", totalVerifiedCount, "verified donors", "যাচাইকৃত রক্তদাতা");
+
+  if (donors.length > 0) {
+    const top = donors[0];
+    setCounterText("snapshot-donor-blood", top.bloodType || "DEA 1.1-");
+    setCounterText("snapshot-donor-count", `${totalVerifiedCount} verified`);
+    setCounterText("snapshot-donor-title", `${top.petName} · ${top.bloodType}`);
+    setCounterText("snapshot-donor-desc", `${top.area}, ${top.city} · ${top.readinessLabel || "Ready to donate"}`);
+  }
+
+  const grid = document.getElementById("donor-grid");
+  if (grid) {
+    if (!donors.length) {
+      grid.innerHTML = `
+        <div class="empty-state-box">
+          <p>${escapeHtml(t("empty.donors"))}</p>
+          <button type="button" class="btn btn-outline btn-small" data-reset-filter="donors">${escapeHtml(t("common.resetFilters"))}</button>
+        </div>`;
+    } else {
+      grid.innerHTML = donors
+        .map((d) => {
+          const isReady = d.readyToDonate !== false;
+          const readinessBadge = isReady
+            ? `<span class="readiness-pill is-ready">${escapeHtml(d.readinessLabel || t("card.readyDonate"))}</span>`
+            : `<span class="readiness-pill is-resting">${escapeHtml(d.readinessLabel || t("card.Resting"))}</span>`;
+          const compatBadge = d.compatibilityLabel
+            ? `<span class="compat-pill match-${escapeHtml(d.matchType || "compatible")}">${escapeHtml(d.compatibilityLabel)}</span>`
+            : "";
+
+          return `
+            <article class="donor-card ${isReady ? "is-ready" : "is-resting"}">
+              <div class="donor-card-top">
+                <span class="blood-badge">${escapeHtml(d.bloodType)}</span>
+                <span class="verified-pill">✓ ${escapeHtml(d.badge || "Verified")}</span>
+              </div>
+              <h3>${escapeHtml(d.petName)} <small>(${escapeHtml(d.species === "cat" ? "🐱 Cat" : "🐶 Dog")})</small></h3>
+              <p class="card-location">⌖ ${escapeHtml(d.area)}, ${escapeHtml(d.city)} · Guardian: ${escapeHtml(d.ownerName || "Verified Member")}</p>
+              <div class="donor-badges-row">
+                ${readinessBadge}
+                ${compatBadge}
+              </div>
+              <ul class="donor-specs">
+                <li>Weight: <strong>${d.weightKg ? `${escapeHtml(d.weightKg)} kg` : "Vet verified"}</strong></li>
+                <li>Vaccinations: <strong>${d.vaccinated ? "Up-to-date" : "Pending check"}</strong></li>
+              </ul>
+              <div class="card-actions">
+                <button class="btn btn-primary btn-small" type="button" data-request-donor="${escapeHtml(d.id)}" data-donor-name="${escapeHtml(d.petName)}" data-donor-blood="${escapeHtml(d.bloodType)}">${escapeHtml(t("card.requestDonor"))}</button>
+                <button class="btn btn-outline btn-small" type="button" data-share-title="${escapeHtml(`${d.petName} (${d.bloodType}) Blood Donor`)}" data-share-text="${escapeHtml(`Verified ${d.species} blood donor (${d.bloodType}) in ${d.area}, ${d.city}`)}">${escapeHtml(t("common.share"))}</button>
+              </div>
+            </article>`;
+        })
+        .join("");
+    }
+  }
+
+  if (!Array.isArray(payload)) {
+    renderMyDonorPanel(payload.myDonors || [], payload.incomingRequests || [], payload.mySentRequests || []);
+  }
+}
+
+async function loadDonors({ silent = false } = {}) {
+  const grid = document.getElementById("donor-grid");
+  if (grid && !silent && !state.donorCache.donors.length) {
+    grid.innerHTML = renderSkeletonCards(3);
+  }
+  const area = document.getElementById("donor-area-input")?.value.trim() || "";
+  const species = document.getElementById("donor-species-filter")?.value || "";
+  const bloodType = document.getElementById("donor-blood-filter")?.value || "";
+  const params = new URLSearchParams({ includeMine: "1" });
+  if (area) params.set("area", area);
+  if (species) params.set("species", species);
+  if (bloodType) params.set("bloodType", bloodType);
+
+  try {
+    const data = await apiFetch(`/api/donors?${params.toString()}`);
+    const payload = Array.isArray(data)
+      ? { donors: data, myDonors: [], incomingRequests: [], mySentRequests: [], totalVerifiedCount: data.length }
+      : data;
+    state.donorCache = payload;
+    if (!area && !species && !bloodType) {
+      PawNirOfflineStore.set("donors", payload);
+    }
+    renderDonors(payload);
+  } catch (_err) {
+    const cached = await PawNirOfflineStore.get("donors");
+    if (cached) {
+      state.donorCache = cached;
+      renderDonors(cached);
+    }
+  }
+}
+
+// ============================================================================
+// 3. Fosters & Google Maps Explorer + Reviews
+// ============================================================================
+function selectFosterOnMap(foster) {
+  if (!foster) return;
+  state.activeFosterId = foster.id;
+  ensureFosterMapLoaded();
+  const iframe = document.getElementById("foster-google-map");
+  if (iframe && foster.mapEmbedUrl) {
+    iframe.src = foster.mapEmbedUrl;
+  }
+  setCounterText("foster-map-active-title", foster.name);
+  setCounterText("foster-map-active-meta", `⌖ ${foster.area}, ${foster.city} · ★ ${foster.averageRating || "5.0"} (${foster.reviewCount || 0})`);
+  setCounterText("foster-map-active-desc", foster.description);
+  const extLink = document.getElementById("foster-map-external-link");
+  if (extLink && foster.mapExternalUrl) {
+    extLink.href = foster.mapExternalUrl;
+  }
+  document.querySelectorAll(".map-pin-chip").forEach((chip) => {
+    chip.classList.toggle("is-active", chip.getAttribute("data-map-foster-id") === foster.id);
   });
 }
 
-function applyLanguage(language) {
-  const lang = copy[language] ? language : "en";
-  state.language = lang;
-  document.documentElement.lang = lang;
-  localStorage.setItem("pawnir-lang", lang);
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const key = element.dataset.i18n;
-    if (key === "nav.signin" && state.user) return;
-    if (key === "nav.profile" && state.user) return;
-    if (copy[lang][key]) element.textContent = copy[lang][key];
-  });
-  document.querySelectorAll("[data-i18n-html]").forEach((element) => {
-    const key = element.dataset.i18nHtml;
-    if (copy[lang][key]) element.innerHTML = copy[lang][key];
-  });
-  document.getElementById("language-toggle").textContent = lang === "bn" ? "English" : "বাংলা";
+function renderFosters(fosters = []) {
+  const totalVerified = fosters[0]?.totalVerifiedCount || fosters.length;
+  setHomeBadgeCount("home-count-fosters", totalVerified, "verified fosters", "যাচাইকৃত ফস্টার");
+
+  if (fosters.length > 0) {
+    const top = fosters[0];
+    setCounterText("snapshot-foster-rating", `★ ${top.averageRating || "5.0"}`);
+    setCounterText("snapshot-foster-title", top.name);
+    setCounterText("snapshot-foster-desc", `${top.area}, ${top.city} · ${top.capacity}`);
+  }
+
+  const pinsWrap = document.getElementById("foster-map-pins");
+  if (pinsWrap) {
+    pinsWrap.innerHTML = fosters
+      .map(
+        (f, idx) => `
+        <button type="button" class="map-pin-chip ${idx === 0 ? "is-active" : ""}" data-map-foster-id="${escapeHtml(f.id)}">
+          📍 ${escapeHtml(f.name)}
+        </button>`
+      )
+      .join("");
+  }
+
+  const grid = document.getElementById("foster-grid");
+  if (grid) {
+    if (!fosters.length) {
+      grid.innerHTML = `
+        <div class="empty-state-box">
+          <p>${escapeHtml(t("empty.fosters"))}</p>
+          <button type="button" class="btn btn-outline btn-small" data-reset-filter="fosters">${escapeHtml(t("common.resetFilters"))}</button>
+        </div>`;
+    } else {
+      grid.innerHTML = fosters
+        .map((f) => {
+          const reviewsPreview = (f.recentReviews || [])
+            .slice(0, 1)
+            .map(
+              (r) =>
+                `<blockquote class="foster-review-snippet">"${escapeHtml(r.comment.slice(0, 110))}${r.comment.length > 110 ? "…" : ""}" <cite>— ${escapeHtml(r.authorName)} (★${r.rating})</cite></blockquote>`
+            )
+            .join("");
+
+          return `
+            <article class="foster-card" data-foster-card-id="${escapeHtml(f.id)}">
+              <div class="foster-card-top">
+                <span class="verified-pill">✓ ${escapeHtml(f.badge || "Google Maps Verified")}</span>
+                <button type="button" class="rating-pill-btn" data-open-reviews="${escapeHtml(f.id)}" data-foster-name="${escapeHtml(f.name)}">
+                  ★ ${escapeHtml(f.averageRating || "5.0")} (${escapeHtml(f.reviewCount || 0)})
+                </button>
+              </div>
+              <h3>${escapeHtml(f.name)}</h3>
+              <p class="card-location">⌖ ${escapeHtml(f.area)}, ${escapeHtml(f.city)} · ${escapeHtml(f.hours || "Open daily")}</p>
+              <p class="card-desc">${escapeHtml(f.description)}</p>
+              <div class="foster-tags">
+                <span class="tag-chip">${escapeHtml(f.capacity)}</span>
+                <span class="tag-chip">Supports: ${escapeHtml((f.species || []).join(", "))}</span>
+              </div>
+              ${reviewsPreview}
+              <div class="card-actions">
+                <button class="btn btn-outline btn-small" type="button" data-focus-map="${escapeHtml(f.id)}">${escapeHtml(t("card.previewMap"))}</button>
+                <button class="btn btn-outline btn-small" type="button" data-open-reviews="${escapeHtml(f.id)}" data-foster-name="${escapeHtml(f.name)}">${escapeHtml(t("card.reviewsBtn"))} (${escapeHtml(f.reviewCount || 0)})</button>
+                <button class="btn btn-primary btn-small" type="button" data-request-foster="${escapeHtml(f.id)}" data-foster-name="${escapeHtml(f.name)}">${escapeHtml(t("card.requestFoster"))}</button>
+              </div>
+            </article>`;
+        })
+        .join("");
+    }
+  }
 }
 
-function updateAuthUI() {
+async function loadFosters({ silent = false } = {}) {
+  const grid = document.getElementById("foster-grid");
+  if (grid && !silent && !state.fostersCache.length) {
+    grid.innerHTML = renderSkeletonCards(3);
+  }
+  const q = document.getElementById("foster-search-input")?.value.trim() || "";
+  const city = document.getElementById("foster-city-filter")?.value || "";
+  const species = document.getElementById("foster-species-filter")?.value || "";
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (city) params.set("city", city);
+  if (species) params.set("species", species);
+
+  try {
+    const fosters = await apiFetch(`/api/fosters?${params.toString()}`);
+    const list = Array.isArray(fosters) ? fosters : [];
+    state.fostersCache = list;
+    if (!q && !city && !species) {
+      PawNirOfflineStore.set("fosters", list);
+    }
+    renderFosters(list);
+    if (list.length > 0 && !state.activeFosterId) {
+      state.activeFosterId = list[0].id;
+    }
+  } catch (_err) {
+    const cached = await PawNirOfflineStore.get("fosters");
+    if (cached) {
+      state.fostersCache = cached;
+      renderFosters(cached);
+    }
+  }
+}
+
+async function openFosterReviewsModal(fosterId, fosterName) {
+  state.activeFosterId = fosterId;
+  const dialog = document.getElementById("foster-review-dialog");
+  const titleEl = document.getElementById("foster-review-title");
+  const listEl = document.getElementById("foster-reviews-list");
+  if (titleEl && fosterName) titleEl.textContent = `${fosterName} · Reviews`;
+  if (listEl) listEl.innerHTML = `<p class="inline-state">Loading community reviews…</p>`;
+  openDialog(dialog);
+
+  try {
+    const data = await apiFetch(`/api/fosters/${encodeURIComponent(fosterId)}`);
+    const foster = data.foster || data;
+    const reviews = Array.isArray(data.reviews) ? data.reviews : [];
+
+    setCounterText("review-summary-avg", foster.averageRating ? Number(foster.averageRating).toFixed(1) : "5.0");
+    const rounded = Math.round(Number(foster.averageRating || 5));
+    setCounterText("review-summary-stars", "★".repeat(rounded) + "☆".repeat(Math.max(0, 5 - rounded)));
+    setCounterText("review-summary-count", `Based on ${reviews.length} verified community review${reviews.length === 1 ? "" : "s"}`);
+
+    const barsEl = document.getElementById("review-summary-bars");
+    if (barsEl && foster.ratingBreakdown) {
+      const total = Math.max(1, reviews.length);
+      barsEl.innerHTML = [5, 4, 3, 2, 1]
+        .map((star) => {
+          const count = Number(foster.ratingBreakdown[star] || 0);
+          const pct = Math.round((count / total) * 100);
+          return `<div class="rating-bar-row"><span>${star} ★</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width:${pct}%"></div></div><small>${count}</small></div>`;
+        })
+        .join("");
+    }
+
+    if (listEl) {
+      if (!reviews.length) {
+        listEl.innerHTML = `<p class="inline-state">No reviews yet. Be the first to share your experience!</p>`;
+      } else {
+        listEl.innerHTML = reviews
+          .map(
+            (r) => `
+            <article class="review-item">
+              <div class="review-item-head">
+                <div>
+                  <strong>${escapeHtml(r.authorName)}</strong>
+                  <span class="verified-pill">${escapeHtml(r.badge || "Verified")}</span>
+                </div>
+                <span class="review-stars">${"★".repeat(r.rating)}${"☆".repeat(Math.max(0, 5 - r.rating))}</span>
+              </div>
+              <p>${escapeHtml(r.comment)}</p>
+              <div class="review-item-foot">
+                <small>Cared for: ${escapeHtml(r.petSpecies || "pet")} · ${escapeHtml(formatRelativeTime(r.createdAt))}</small>
+                <button type="button" class="btn btn-outline btn-small ${r.voted ? "is-voted" : ""}" data-helpful-review="${escapeHtml(r.id)}" data-helpful-foster="${escapeHtml(fosterId)}">
+                  👍 Helpful (${Number(r.helpfulCount || 0)})
+                </button>
+              </div>
+            </article>`
+          )
+          .join("");
+      }
+    }
+  } catch (err) {
+    if (listEl) listEl.innerHTML = `<p class="inline-state">${escapeHtml(err.message)}</p>`;
+  }
+}
+
+// ============================================================================
+// 4. Responsible Adoption Module
+// ============================================================================
+function renderAdoptions(listings = [], totalOpenCount = null) {
+  const globalCount = typeof totalOpenCount === "number" ? totalOpenCount : listings.length;
+  setHomeBadgeCount("home-count-adopt", globalCount, "pets waiting", "পোষা প্রাণী অপেক্ষায়");
+
+  const grid = document.getElementById("adoption-grid");
+  if (!grid) return;
+
+  if (!listings.length) {
+    grid.innerHTML = `
+      <div class="empty-state-box">
+        <p>${escapeHtml(t("empty.adoptions"))}</p>
+        <button type="button" class="btn btn-outline btn-small" data-reset-filter="adoptions">${escapeHtml(t("common.resetFilters"))}</button>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = listings
+    .map((item) => {
+      const photoHtml = item.photo
+        ? `<div class="adoption-card-photo"><img src="${escapeHtml(item.photo)}" alt="${escapeHtml(item.name)}" loading="lazy" /></div>`
+        : "";
+      return `
+        <article class="adoption-card">
+          ${photoHtml}
+          <div class="adoption-card-top">
+            <span class="verified-pill">✓ Free &amp; Screened</span>
+            <span class="card-meta">${escapeHtml(item.species || "pet")} · ${escapeHtml(item.age || "Young")}</span>
+          </div>
+          <h3>${escapeHtml(item.name)} <small>(${escapeHtml(item.breed || "Deshi Mix")})</small></h3>
+          <p class="card-location">⌖ ${escapeHtml(item.area)} · Gender: ${escapeHtml(item.gender || "Unknown")}</p>
+          <p class="card-desc">${escapeHtml(item.description)}</p>
+          <div class="foster-tags">
+            ${item.vaccinated ? `<span class="tag-chip">✓ Vaccinated</span>` : ""}
+            ${item.neutered ? `<span class="tag-chip">✓ Spayed/Neutered</span>` : ""}
+            ${item.indoorOnly ? `<span class="tag-chip">🏠 Indoor-safe</span>` : ""}
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-primary btn-small" type="button" data-apply-adopt="${escapeHtml(item.id)}" data-adopt-name="${escapeHtml(item.name)}">${escapeHtml(t("card.applyAdopt"))}</button>
+            <button class="btn btn-outline btn-small" type="button" data-share-title="${escapeHtml(`Adopt ${item.name} on PawNir`)}" data-share-text="${escapeHtml(`${item.name} (${item.breed || item.species}) in ${item.area} is looking for a loving home.`)}">${escapeHtml(t("common.share"))}</button>
+            ${
+              item.isOwner
+                ? `<button class="btn btn-outline btn-small" type="button" data-mark-adopted="${escapeHtml(item.id)}">${escapeHtml(t("card.markAdopted"))}</button>`
+                : ""
+            }
+          </div>
+        </article>`;
+    })
+    .join("");
+}
+
+async function loadAdoptions({ silent = false } = {}) {
+  const grid = document.getElementById("adoption-grid");
+  if (grid && !silent && !state.adoptionCache.listings.length) {
+    grid.innerHTML = renderSkeletonCards(3);
+  }
+  const species = state.adoptionSpecies || document.getElementById("adoption-species-filter")?.value || "";
+  const area = document.getElementById("adoption-area-input")?.value.trim() || "";
+  const params = new URLSearchParams({ includeMine: "1" });
+  if (species) params.set("species", species);
+  if (area) params.set("area", area);
+
+  try {
+    const data = await apiFetch(`/api/adoptions?${params.toString()}`);
+    const normalized = Array.isArray(data)
+      ? { listings: data, myListings: [], totalOpenCount: data.length }
+      : {
+          listings: data.listings || [],
+          myListings: data.myListings || [],
+          totalOpenCount: typeof data.totalOpenCount === "number" ? data.totalOpenCount : (data.listings || []).length
+        };
+    state.adoptionCache = normalized;
+    if (!species && !area) {
+      PawNirOfflineStore.set("adoptions", normalized);
+    }
+    renderAdoptions(normalized.listings, normalized.totalOpenCount);
+  } catch (_err) {
+    const cached = await PawNirOfflineStore.get("adoptions");
+    if (cached) {
+      state.adoptionCache = cached;
+      renderAdoptions(cached.listings || [], cached.totalOpenCount);
+    }
+  }
+}
+
+// ============================================================================
+// 5. Verified Veterinarians & Offline Emergency Directory (#find-care)
+// ============================================================================
+function renderVets(vets = []) {
+  const grid = document.getElementById("vet-directory-grid");
+  if (!grid) return;
+
+  if (!vets.length) {
+    grid.innerHTML = `
+      <div class="empty-state-box">
+        <p>${escapeHtml(t("empty.vets"))}</p>
+        <button type="button" class="btn btn-outline btn-small" data-reset-filter="vets">${escapeHtml(t("common.resetFilters"))}</button>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = vets
+    .map(
+      (vet) => `
+      <article class="vet-card">
+        <div class="vet-card-top">
+          <span class="verified-pill">✓ ${escapeHtml(vet.bvcReg || "BVC Verified")}</span>
+          <span class="card-meta">★ ${escapeHtml(vet.rating || "4.9")} (${escapeHtml(vet.reviews || 0)})</span>
+        </div>
+        <h3>${escapeHtml(vet.name)}</h3>
+        <p class="card-location">🏥 ${escapeHtml(vet.clinic)} · ${escapeHtml(vet.city)}</p>
+        <p class="card-desc"><strong>Specialty:</strong> ${escapeHtml(vet.specialty)} · <strong>Experience:</strong> ${escapeHtml(vet.experience || "Verified")}</p>
+        <div class="foster-tags">
+          <span class="tag-chip">Fee: ৳${escapeHtml(vet.fee || 800)}</span>
+          <span class="tag-chip">Modes: ${escapeHtml((vet.modes || ["clinic"]).join(", "))}</span>
+          <span class="tag-chip">Next: ${escapeHtml(vet.nextSlot || "Open daily")}</span>
+        </div>
+        <div class="card-actions">
+          <a class="btn btn-primary btn-small" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${vet.clinic} ${vet.city} Bangladesh`)}" target="_blank" rel="noopener noreferrer">📍 Directions in Maps ↗</a>
+          <button class="btn btn-outline btn-small" type="button" data-share-title="${escapeHtml(`${vet.name} — ${vet.clinic}`)}" data-share-text="${escapeHtml(`${vet.name} (${vet.specialty}) at ${vet.clinic}, ${vet.city}`)}" >${escapeHtml(t("common.share"))}</button>
+        </div>
+      </article>`
+    )
+    .join("");
+}
+
+async function loadVets({ silent = false } = {}) {
+  const grid = document.getElementById("vet-directory-grid");
+  if (grid && !silent && !state.vetsCache.length) {
+    grid.innerHTML = renderSkeletonCards(3);
+  }
+  const q = document.getElementById("vet-search-input")?.value.trim() || "";
+  const city = document.getElementById("vet-city-filter")?.value || "all";
+  const mode = document.getElementById("vet-mode-filter")?.value || "all";
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (city !== "all") params.set("city", city);
+  if (mode !== "all") params.set("mode", mode);
+
+  try {
+    const vets = await apiFetch(`/api/vets?${params.toString()}`);
+    const list = Array.isArray(vets) ? vets : [];
+    state.vetsCache = list;
+    if (!q && city === "all" && mode === "all") {
+      PawNirOfflineStore.set("vets", list);
+    }
+    renderVets(list);
+  } catch (_err) {
+    const cached = await PawNirOfflineStore.get("vets");
+    if (cached) {
+      state.vetsCache = cached;
+      renderVets(cached);
+    }
+  }
+}
+
+// ============================================================================
+// 6. Notifications, Auth & User Dashboard
+// ============================================================================
+function updateAuthHeaderUI() {
   const navBtn = document.getElementById("auth-nav-button");
-  const navAvatar = document.getElementById("auth-nav-avatar");
   const navLabel = document.getElementById("auth-nav-label");
-  const mobileLabel = document.getElementById("mobile-account-label");
-  const userBar = document.getElementById("dashboard-user-bar");
+  const navAvatar = document.getElementById("auth-nav-avatar");
+  const drawerCta = document.getElementById("drawer-auth-cta");
 
   if (state.user) {
-    const displayName = state.user.name || state.user.email?.split("@")[0] || "Account";
-    const firstName = displayName.split(/\s+/)[0];
-    const initial = displayName.charAt(0).toUpperCase();
-    if (navAvatar) {
-      navAvatar.textContent = initial;
-      navAvatar.hidden = false;
-    }
+    const firstName = (state.user.name || state.user.email || "Member").split(" ")[0];
     if (navLabel) navLabel.textContent = firstName;
-    if (mobileLabel) mobileLabel.textContent = firstName;
-    if (navBtn) {
-      navBtn.removeAttribute("data-open-auth");
-      navBtn.setAttribute("data-open-dashboard", "true");
+    if (navAvatar) {
+      navAvatar.hidden = false;
+      navAvatar.textContent = firstName.charAt(0).toUpperCase();
     }
-    if (userBar) {
-      userBar.hidden = false;
-      document.getElementById("dashboard-user-initials").textContent = initial;
-      document.getElementById("dashboard-user-name").textContent = displayName;
-      document.getElementById("dashboard-user-email").textContent = state.user.email || "";
-    }
+    if (drawerCta) drawerCta.textContent = `Account (${firstName})`;
+    if (navBtn) navBtn.removeAttribute("data-open-auth");
   } else {
+    if (navLabel) navLabel.textContent = t("nav.signin");
     if (navAvatar) navAvatar.hidden = true;
-    if (navLabel) navLabel.textContent = copy[state.language]["nav.signin"] || "Sign in";
-    if (mobileLabel) mobileLabel.textContent = copy[state.language]["nav.profile"] || "Account";
-    if (navBtn) {
-      navBtn.removeAttribute("data-open-dashboard");
-      navBtn.setAttribute("data-open-auth", "true");
-    }
-    if (userBar) userBar.hidden = true;
-  }
-}
-
-function setAuthMode(mode) {
-  state.authMode = mode === "register" ? "register" : "login";
-  document.querySelectorAll("[data-auth-mode]").forEach((tab) => {
-    const active = tab.dataset.authMode === state.authMode;
-    tab.classList.toggle("is-active", active);
-    tab.setAttribute("aria-selected", String(active));
-  });
-  const title = document.getElementById("auth-dialog-title");
-  const nameInput = document.getElementById("auth-name");
-  const submitBtn = document.getElementById("auth-submit-btn");
-  if (state.authMode === "register") {
-    if (title) title.textContent = "Create your PawNir account";
-    if (nameInput) nameInput.required = true;
-    if (submitBtn) submitBtn.innerHTML = 'Continue to 2FA check <span aria-hidden="true">→</span>';
-  } else {
-    if (title) title.textContent = "Sign in to your care space";
-    if (nameInput) nameInput.required = false;
-    if (submitBtn) submitBtn.innerHTML = 'Continue to verification <span aria-hidden="true">→</span>';
-  }
-}
-
-function showAuthStep(step, challenge = null) {
-  const credStep = document.getElementById("auth-step-credentials");
-  const twoFaForm = document.getElementById("auth-2fa-form");
-  const status = document.getElementById("auth-status");
-  if (step === "2fa") {
-    credStep.hidden = true;
-    twoFaForm.hidden = false;
-    if (challenge) {
-      state.challengeToken = challenge.challengeToken;
-      document.getElementById("auth-2fa-question").textContent = challenge.question;
-    }
-    const answerInput = document.getElementById("auth-2fa-answer");
-    answerInput.value = "";
-    status.textContent = "Step 2 of 2: Enter the result of the calculation above.";
-    window.setTimeout(() => answerInput.focus(), 60);
-  } else {
-    credStep.hidden = false;
-    twoFaForm.hidden = true;
-    state.pending2faToken = null;
-    status.textContent = "Protected by 2-step math verification.";
-  }
-}
-
-async function refreshMathChallenge() {
-  try {
-    const response = await fetch("/api/auth/challenge");
-    if (!response.ok) return;
-    const challenge = await response.json();
-    state.challengeToken = challenge.challengeToken;
-    document.getElementById("auth-2fa-question").textContent = challenge.question;
-    const answerInput = document.getElementById("auth-2fa-answer");
-    answerInput.value = "";
-    answerInput.focus();
-  } catch (err) {
-    // ignore
-  }
-}
-
-async function syncSession() {
-  const token = localStorage.getItem("pawnir_token");
-  if (!token) {
-    state.user = null;
-    updateAuthUI();
-    return null;
-  }
-  try {
-    const response = await fetch("/api/auth/me", { headers: { Authorization: `Bearer ${token}` } });
-    if (!response.ok) {
-      localStorage.removeItem("pawnir_token");
-      state.user = null;
-      updateAuthUI();
-      return null;
-    }
-    const data = await response.json();
-    if (!data.user) {
-      localStorage.removeItem("pawnir_token");
-      state.user = null;
-      updateAuthUI();
-      return null;
-    }
-    state.user = data.user;
-    updateAuthUI();
-    loadNotifications();
-    return state.user;
-  } catch (err) {
-    return null;
-  }
-}
-
-async function loadAuthConfig() {
-  try {
-    const response = await fetch("/api/auth/config");
-    if (!response.ok) return;
-    const cfg = await response.json();
-    state.googleEnabled = Boolean(cfg.googleEnabled);
-  } catch (err) {
-    // ignore
+    if (drawerCta) drawerCta.textContent = t("nav.signin");
+    if (navBtn) navBtn.setAttribute("data-open-auth", "");
   }
 }
 
 async function loadNotifications() {
-  const token = localStorage.getItem("pawnir_token");
   const badge = document.getElementById("notifications-badge");
-  const list = document.getElementById("notifications-list");
-  if (!token) {
+  const listEl = document.getElementById("notifications-list");
+  if (!state.user) {
     if (badge) badge.hidden = true;
-    if (list) list.innerHTML = '<p class="inline-state">Sign in and subscribe to an area to receive nearby lost-pet alerts.</p>';
+    if (listEl) listEl.innerHTML = `<p class="inline-state">Sign in to receive real-time nearby alerts and sighting notifications.</p>`;
     return;
   }
   try {
-    const response = await fetch("/api/notifications", { headers: { Authorization: `Bearer ${token}` } });
-    if (!response.ok) return;
-    const items = await response.json();
-    const unread = items.filter((item) => !item.read).length;
+    const items = await apiFetch("/api/notifications");
+    const unread = items.filter((n) => !n.read).length;
     if (badge) {
-      badge.textContent = unread > 99 ? "99+" : String(unread);
       badge.hidden = unread === 0;
+      badge.textContent = String(unread);
     }
-    if (list) {
-      list.innerHTML = items.length
-        ? items.map((item) => `<article class="notification-item ${item.read ? "" : "is-unread"}"><div><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.message)}</p></div><small>${new Date(item.createdAt).toLocaleDateString("en-BD", { day: "numeric", month: "short" })}</small></article>`).join("")
-        : '<p class="inline-state">No nearby alerts yet. Subscribe to your area in Lost &amp; Found to get notified.</p>';
-    }
-  } catch (err) {
-    // ignore
-  }
-}
-
-function reportCard(report, own = false) {
-  const label = report.type === "lost" ? "Lost" : "Found";
-  const typeClass = report.type === "found" ? "found" : "lost";
-  const photo = report.photoData
-    ? `<img class="lost-report-photo" src="${escapeHtml(report.photoData)}" alt="${escapeHtml(label)} ${escapeHtml(report.species)} photo" loading="lazy" />`
-    : "";
-  const status = report.status === "resolved"
-    ? '<span class="report-status resolved">Reunited ✓</span>'
-    : '<span class="report-status">Open</span>';
-  const mapSearchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${report.area}, ${report.city}, Bangladesh`)}`;
-  const sightings = Array.isArray(report.sightings) ? report.sightings : [];
-  const sightingsHtml = sightings.length
-    ? `<div class="sighting-box"><div class="sighting-box-title"><span>📍 ${sightings.length} Community Sighting${sightings.length === 1 ? "" : "s"}</span></div>${sightings.slice(0, 2).map((s) => `<div class="sighting-item"><strong>${escapeHtml(s.location)}</strong> — ${escapeHtml(s.note)}<small>By ${escapeHtml(s.reporterName || "Community member")} · ${new Date(s.createdAt).toLocaleDateString("en-BD", { day: "numeric", month: "short" })}</small></div>`).join("")}</div>`
-    : "";
-  const sightingBtn = report.status === "open"
-    ? `<button class="btn btn-small btn-outline sighting-report-button" data-report-id="${escapeHtml(report.id)}" data-report-title="${escapeHtml(report.title)}" type="button">📍 I spotted this pet</button>`
-    : "";
-  const resolveBtn = own && report.status === "open"
-    ? `<button class="btn btn-small btn-dark resolve-report-button" data-report-id="${escapeHtml(report.id)}" type="button">Mark reunited ✓</button>`
-    : "";
-  return `<article class="lost-report-card">${photo}<div class="lost-report-top"><span class="report-pill ${typeClass}">${label}</span><span>${new Date(report.createdAt).toLocaleDateString("en-BD", { day: "numeric", month: "short" })}</span></div><h3>${escapeHtml(report.title)}</h3><p>${escapeHtml(report.description)}</p><div class="lost-report-meta"><a href="${escapeHtml(mapSearchUrl)}" target="_blank" rel="noopener noreferrer" title="View area on Google Maps">⌖ ${escapeHtml(report.area)}, ${escapeHtml(report.city)} ↗</a><span>${escapeHtml(report.species)}</span>${status}</div>${sightingsHtml}<div class="report-card-actions">${sightingBtn}${resolveBtn}</div></article>`;
-}
-
-function compressAndReadPhoto(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      return reject(new Error("Only JPG, PNG, or WebP photos are allowed."));
-    }
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("Unable to read the selected photo."));
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      if (file.size <= 900 * 1024) {
-        return resolve(dataUrl);
-      }
-      const img = new Image();
-      img.onerror = () => reject(new Error("Unable to process image."));
-      img.onload = () => {
-        const maxDim = 1280;
-        let { width, height } = img;
-        if (width > maxDim || height > maxDim) {
-          if (width >= height) {
-            height = Math.round((height * maxDim) / width);
-            width = maxDim;
-          } else {
-            width = Math.round((width * maxDim) / height);
-            height = maxDim;
-          }
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
-        const compressed = canvas.toDataURL("image/jpeg", 0.84);
-        resolve(compressed);
-      };
-      img.src = dataUrl;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-function wireSightingButtons(container) {
-  container.querySelectorAll(".sighting-report-button").forEach((button) =>
-    button.addEventListener("click", (event) => {
-      selectedSightingReport = { id: button.dataset.reportId, title: button.dataset.reportTitle };
-      if (!localStorage.getItem("pawnir_token")) {
-        showAuthStep("credentials");
-        document.getElementById("auth-status").textContent = "Sign in first to share a sighting tip.";
-        openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-        return;
-      }
-      document.getElementById("sighting-dialog-title").textContent = `Share sighting for: ${selectedSightingReport.title}`;
-      document.getElementById("sighting-status").textContent = "";
-      openDialog(document.getElementById("sighting-dialog"), event.currentTarget);
-    })
-  );
-}
-
-async function loadLostReports() {
-  const area = document.getElementById("lost-area-input").value.trim();
-  const type = document.getElementById("lost-type-filter").value;
-  const grid = document.getElementById("lost-report-grid");
-  if (!grid.querySelector(".lost-report-card")) grid.innerHTML = '<p class="inline-state">Loading nearby reports…</p>';
-  try {
-    const token = localStorage.getItem("pawnir_token");
-    const headers = token ? { Authorization: "Bearer " + token } : {};
-    const params = new URLSearchParams({ area, type, species: lostSpeciesFilter });
-    const response = await fetch(`/api/lost-found?${params}`, { headers });
-    if (!response.ok) throw new Error("Unable to load nearby reports.");
-    const result = await response.json();
-    const reports = Array.isArray(result) ? result : result.reports;
-    const mine = Array.isArray(result) ? [] : result.mine || [];
-    const signature = `${lostSpeciesFilter}|${area}|${type}|` + reports.map((report) => `${report.id}:${report.updatedAt || report.createdAt}:${report.status}:${(report.sightings || []).length}`).join("|");
-    const changed = signature !== lostReportSignature;
-    lostReportSignature = signature;
-    if (changed || !grid.querySelector(".lost-report-card")) {
-      grid.innerHTML = reports.length
-        ? reports.map((r) => reportCard(r, false)).join("")
-        : '<p class="inline-state">No open reports match this filter right now. Try clearing filters or report an animal above.</p>';
-      wireSightingButtons(grid);
-    }
-    const mineWrap = document.getElementById("my-lost-reports");
-    const mineList = document.getElementById("my-lost-report-list");
-    if (mineWrap && mineList) {
-      if (token && mine.length > 0) {
-        mineWrap.hidden = false;
-        mineList.innerHTML = mine.slice(0, 5).map((report) => reportCard(report, true)).join("");
-        wireSightingButtons(mineList);
-        mineList.querySelectorAll(".resolve-report-button").forEach((button) =>
-          button.addEventListener("click", async () => {
-            button.disabled = true;
-            const res = await fetch(`/api/lost-found/${encodeURIComponent(button.dataset.reportId)}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-              body: JSON.stringify({ status: "resolved" })
-            });
-            if (!res.ok) {
-              button.disabled = false;
-              return;
-            }
-            showToast("Marked as safely reunited!");
-            lostReportSignature = "";
-            await loadLostReports();
-          })
-        );
-      } else {
-        mineWrap.hidden = true;
-        mineList.innerHTML = "";
-      }
-    }
-    const liveStatus = document.getElementById("lost-live-status");
-    if (liveStatus) {
-      liveStatus.innerHTML = `<span class="live-pulse" aria-hidden="true"></span><strong>${changed ? "Live feed updated" : "Live nearby feed"}</strong><span>${reports.length} open report${reports.length === 1 ? "" : "s"} · Updated ${new Date().toLocaleTimeString("en-BD", { hour: "numeric", minute: "2-digit" })}</span>`;
-    }
-    const homeCountLost = document.getElementById("home-count-lost");
-    if (homeCountLost) {
-      homeCountLost.textContent = `${reports.length} open alert${reports.length === 1 ? "" : "s"} ↗`;
-    }
-    if (reports.length > 0) {
-      const topReport = reports[0];
-      const snapArea = document.getElementById("snapshot-lost-area");
-      const snapTitle = document.getElementById("snapshot-lost-title");
-      const snapDesc = document.getElementById("snapshot-lost-desc");
-      if (snapArea) snapArea.textContent = `⌖ ${topReport.area || "Dhaka"}`;
-      if (snapTitle) snapTitle.textContent = topReport.title || "Nearby pet alert";
-      if (snapDesc) snapDesc.textContent = (topReport.description || "").slice(0, 115) + ((topReport.description || "").length > 115 ? "…" : "");
-    }
-  } catch (error) {
-    grid.innerHTML = `<p class="inline-state error-state" role="alert">${escapeHtml(error.message)}</p>`;
-  }
-}
-
-function selectFosterOnMap(foster, scrollIntoMap = false) {
-  if (!foster) return;
-  activeMapFosterId = foster.id;
-  const iframe = document.getElementById("foster-google-map");
-  if (iframe && foster.embedMapUrl && iframe.dataset.currentSrc !== foster.embedMapUrl) {
-    iframe.src = foster.embedMapUrl;
-    iframe.dataset.currentSrc = foster.embedMapUrl;
-  }
-  const ratingText = foster.rating ? `★ ${foster.rating} (${foster.reviewCount} reviews)` : "New community foster";
-  const activeTitle = document.getElementById("foster-map-active-title");
-  if (activeTitle) activeTitle.textContent = foster.name;
-  const activeMeta = document.getElementById("foster-map-active-meta");
-  if (activeMeta) activeMeta.textContent = `⌖ ${foster.area}, ${foster.city} · ★ ${foster.rating || "5.0"} (${foster.reviewCount || 0} reviews)`;
-  const activeDesc = document.getElementById("foster-map-active-desc");
-  if (activeDesc) activeDesc.textContent = foster.description;
-
-  const dirLink = document.getElementById("foster-map-directions-link") || document.getElementById("foster-map-external-link");
-  if (dirLink && (foster.mapUrl || foster.embedMapUrl)) {
-    dirLink.href = foster.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(foster.name + " " + foster.area + " Bangladesh")}`;
-  }
-  const reviewBtn = document.getElementById("foster-map-review-btn") || document.getElementById("foster-map-reviews-btn");
-  if (reviewBtn) {
-    reviewBtn.onclick = (event) => openFosterReviews(foster.id, foster.name, event.currentTarget);
-  }
-  document.querySelectorAll(".map-pin-chip").forEach((chip) => {
-    chip.classList.toggle("is-active", chip.dataset.fosterId === foster.id);
-  });
-  document.querySelectorAll(".foster-card").forEach((card) => {
-    card.classList.toggle("is-map-selected", card.dataset.fosterCardId === foster.id);
-  });
-  if (scrollIntoMap) {
-    document.getElementById("foster-map-explorer")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }
-}
-
-function fosterCard(foster) {
-  const ratingBadge = foster.rating
-    ? `<span class="foster-rating-pill">★ ${escapeHtml(foster.rating)} (${escapeHtml(foster.reviewCount)})</span>`
-    : `<span class="foster-rating-pill">New · Be first to review</span>`;
-  const speciesList = Array.isArray(foster.species) ? foster.species.map(escapeHtml).join(" · ") : "";
-  const topReview = Array.isArray(foster.recentReviews) && foster.recentReviews[0]
-    ? `<div class="foster-review-snippet">“${escapeHtml(foster.recentReviews[0].comment.slice(0, 110))}${foster.recentReviews[0].comment.length > 110 ? "…" : ""}”<small>— ${escapeHtml(foster.recentReviews[0].userName || "Pet Parent")} (${"★".repeat(foster.recentReviews[0].rating)})</small></div>`
-    : "";
-  const selectedClass = foster.id === activeMapFosterId ? "is-map-selected" : "";
-  return `<article class="foster-card ${selectedClass}" data-foster-card-id="${escapeHtml(foster.id)}"><div class="foster-card-top"><span class="foster-mark">⌂</span>${ratingBadge}</div><h3>${escapeHtml(foster.name)}</h3><p>${escapeHtml(foster.description)}</p><div class="foster-meta"><span>⌖ ${escapeHtml(foster.area)}, ${escapeHtml(foster.city)}</span><span class="verified-badge"><span class="icon icon-check" aria-hidden="true"></span> Verified</span></div><small>${escapeHtml(foster.capacity)} · ${speciesList}</small>${topReview}<div class="foster-actions"><button class="btn btn-small btn-outline foster-focus-map-btn" data-foster="${escapeHtml(foster.id)}" type="button">📍 Show on Map</button><button class="btn btn-small btn-outline foster-review-link" data-foster="${escapeHtml(foster.id)}" data-name="${escapeHtml(foster.name)}" type="button">★ Reviews (${escapeHtml(foster.reviewCount || 0)})</button><button class="btn btn-small btn-dark foster-request-button" data-foster="${escapeHtml(foster.id)}" data-name="${escapeHtml(foster.name)}" type="button">Request care</button></div></article>`;
-}
-
-function updateStarPickerUI(ratingVal) {
-  const rating = Math.min(5, Math.max(1, Number(ratingVal) || 5));
-  const input = document.getElementById("foster-review-rating");
-  if (input) input.value = String(rating);
-  const labels = {
-    5: "5 / 5 · Excellent",
-    4: "4 / 5 · Very Good",
-    3: "3 / 5 · Good",
-    2: "2 / 5 · Fair",
-    1: "1 / 5 · Needs Improvement"
-  };
-  const labelEl = document.getElementById("star-rating-label");
-  if (labelEl) labelEl.textContent = labels[rating] || "5 / 5 · Excellent";
-  document.querySelectorAll("#star-rating-picker .star-btn").forEach((btn) => {
-    const starVal = Number(btn.dataset.starValue);
-    const lit = starVal <= rating;
-    btn.classList.toggle("is-Lit", lit);
-    btn.setAttribute("aria-checked", String(starVal === rating));
-  });
-}
-
-async function openFosterReviews(fosterId, fosterName, trigger) {
-  selectedFoster = { id: fosterId, name: fosterName };
-  document.getElementById("foster-review-title").textContent = `${fosterName} · Community Reviews`;
-  document.getElementById("foster-review-status").textContent = "";
-  updateStarPickerUI(5);
-  openDialog(document.getElementById("foster-review-dialog"), trigger);
-  await refreshFosterReviewSheet(fosterId);
-}
-
-async function refreshFosterReviewSheet(fosterId) {
-  try {
-    const response = await fetch(`/api/fosters/${encodeURIComponent(fosterId)}`);
-    if (!response.ok) return;
-    const data = await response.json();
-    const avgEl = document.getElementById("review-avg-number");
-    const starsEl = document.getElementById("review-avg-stars");
-    const countEl = document.getElementById("review-total-count");
-    const barsEl = document.getElementById("review-summary-bars");
-    const listEl = document.getElementById("foster-reviews-list");
-
-    const total = Number(data.reviewCount || 0);
-    const avg = data.rating ? Number(data.rating).toFixed(1) : "—";
-    if (avgEl) avgEl.textContent = avg;
-    if (starsEl) {
-      const rounded = data.rating ? Math.round(Number(data.rating)) : 5;
-      starsEl.textContent = "★".repeat(rounded) + "☆".repeat(Math.max(0, 5 - rounded));
-    }
-    if (countEl) countEl.textContent = `${total} verified review${total === 1 ? "" : "s"}`;
-
-    const breakdown = data.ratingBreakdown || { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    if (barsEl) {
-      barsEl.innerHTML = [5, 4, 3, 2, 1].map((star) => {
-        const count = Number(breakdown[star] || 0);
-        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-        return `<div class="review-bar-row"><span>${star} ★</span><div class="review-bar-track"><div class="review-bar-fill" style="width:${pct}%"></div></div><span>${count}</span></div>`;
-      }).join("");
-    }
-
-    const reviews = Array.isArray(data.reviews) ? data.reviews : [];
     if (listEl) {
-      listEl.innerHTML = reviews.length
-        ? reviews.map((rev) => `
-          <article class="review-item">
-            <div class="review-item-top">
-              <div class="review-author-wrap">
-                <strong>${escapeHtml(rev.userName || "Pet Parent")}</strong>
-                <span class="review-badge">✓ ${escapeHtml(rev.badge || "Verified Member")}</span>
+      if (!items.length) {
+        listEl.innerHTML = `<p class="inline-state">No nearby alerts yet.</p>`;
+      } else {
+        listEl.innerHTML = items
+          .map(
+            (n) => `
+            <div class="notification-item ${n.read ? "" : "is-unread"}">
+              <div>
+                <strong>${escapeHtml(n.title)}</strong>
+                <p>${escapeHtml(n.message)}</p>
+                <small>${escapeHtml(formatRelativeTime(n.createdAt))}</small>
               </div>
-              <span class="review-stars-inline" aria-label="${escapeHtml(rev.rating)} out of 5 stars">${"★".repeat(rev.rating)}${"☆".repeat(Math.max(0, 5 - rev.rating))}</span>
-            </div>
-            <p>${escapeHtml(rev.comment)}</p>
-            <div class="review-item-footer">
-              <small>${new Date(rev.createdAt).toLocaleDateString("en-BD", { day: "numeric", month: "short", year: "numeric" })}</small>
-              <button class="helpful-btn" data-helpful-review="${escapeHtml(rev.id)}" type="button">👍 Helpful (${Number(rev.helpfulCount || 0)})</button>
-            </div>
-          </article>
-        `).join("")
-        : '<p class="inline-state">No community reviews yet. Share your experience below!</p>';
-
-      listEl.querySelectorAll("[data-helpful-review]").forEach((btn) =>
-        btn.addEventListener("click", async (event) => {
-          const token = localStorage.getItem("pawnir_token");
-          if (!token) {
-            showAuthStep("credentials");
-            document.getElementById("auth-status").textContent = "Sign in to mark reviews as helpful.";
-            openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-            return;
-          }
-          btn.disabled = true;
-          const res = await fetch(`/api/fosters/${encodeURIComponent(fosterId)}/reviews/${encodeURIComponent(btn.dataset.helpfulReview)}/helpful`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          if (res.ok) {
-            const out = await res.json();
-            btn.textContent = `👍 Helpful (${out.helpfulCount})`;
-            btn.classList.toggle("is-voted", out.voted);
-          }
-          btn.disabled = false;
-        })
-      );
+            </div>`
+          )
+          .join("");
+      }
     }
-  } catch (err) {
+  } catch (_err) {
     // ignore
   }
 }
 
-async function loadFosters() {
-  const city = document.getElementById("foster-city-filter").value;
-  const response = await fetch(`/api/fosters?city=${encodeURIComponent(city)}`);
-  const fosters = await response.json();
-  cachedFosters = Array.isArray(fosters) ? fosters : [];
-
-  const pinsWrap = document.getElementById("foster-map-pins");
-  if (pinsWrap) {
-    pinsWrap.innerHTML = cachedFosters.map((f) =>
-      `<button class="map-pin-chip ${f.id === activeMapFosterId ? "is-active" : ""}" data-foster-id="${escapeHtml(f.id)}" type="button">📍 ${escapeHtml(f.name)} (${escapeHtml(f.area)})</button>`
-    ).join("");
-    pinsWrap.querySelectorAll(".map-pin-chip").forEach((chip) =>
-      chip.addEventListener("click", () => {
-        const target = cachedFosters.find((item) => item.id === chip.dataset.fosterId);
-        if (target) selectFosterOnMap(target, false);
-      })
-    );
+async function loadDashboardData() {
+  if (!state.user) return;
+  setCounterText("dashboard-user-name", state.user.name || "PawNir Member");
+  setCounterText("dashboard-user-email", state.user.email || "");
+  const initial = (state.user.name || state.user.email || "P").charAt(0).toUpperCase();
+  const initialsEl = document.getElementById("dashboard-user-initials") || document.getElementById("dashboard-avatar");
+  if (initialsEl) initialsEl.textContent = initial;
+  const areaChip = document.getElementById("dashboard-user-area-chip");
+  if (areaChip) {
+    areaChip.textContent = state.user.area ? `⌖ ${state.user.area}` : "⌖ Bangladesh";
   }
 
-  document.getElementById("foster-grid").innerHTML = cachedFosters.length
-    ? cachedFosters.map(fosterCard).join("")
-    : '<p class="inline-state">No registered foster care matches this filter.</p>';
+  const nameInput = document.getElementById("profile-name");
+  const areaInput = document.getElementById("profile-area");
+  const bioInput = document.getElementById("profile-bio");
+  if (nameInput) nameInput.value = state.user.name || "";
+  if (areaInput) areaInput.value = state.user.area || "";
+  if (bioInput) bioInput.value = state.user.bio || "";
 
-  if (cachedFosters.length) {
-    const current = cachedFosters.find((f) => f.id === activeMapFosterId) || cachedFosters[0];
-    selectFosterOnMap(current, false);
-    const homeCountFosters = document.getElementById("home-count-fosters");
-    if (homeCountFosters) {
-      homeCountFosters.textContent = `${cachedFosters.length} on Google Maps ↗`;
+  try {
+    const [pets, adoptData, lostData, fosterReqs, bookings] = await Promise.all([
+      apiFetch("/api/pets").catch(() => []),
+      apiFetch("/api/adoptions?includeMine=1").catch(() => ({ myListings: [] })),
+      apiFetch("/api/lost-found").catch(() => ({ mine: [] })),
+      apiFetch("/api/foster-requests").catch(() => []),
+      apiFetch("/api/bookings").catch(() => [])
+    ]);
+
+    const myLost = Array.isArray(lostData.mine) ? lostData.mine : [];
+    const myAdoptions = Array.isArray(adoptData.myListings) ? adoptData.myListings : [];
+
+    setCounterText("dash-stat-pets", pets.length);
+    setCounterText("dash-stat-adoptions", myAdoptions.length);
+    setCounterText("dash-stat-alerts", myLost.length);
+    setCounterText("dash-stat-fosters", fosterReqs.length);
+
+    const petsEl = document.getElementById("dashboard-pets");
+    if (petsEl) {
+      petsEl.innerHTML = pets.length
+        ? pets
+            .map(
+              (p) => `
+            <div class="pet-passport-card">
+              <strong>${escapeHtml(p.name)}</strong>
+              <span>${escapeHtml(p.species)} · ${escapeHtml(p.breed || "Deshi")} · ${escapeHtml(p.age || "Age N/A")}</span>
+            </div>`
+            )
+            .join("")
+        : `<p class="inline-state">No pet passports registered yet. Tap "+ Register pet" above.</p>`;
     }
-    const topFoster = [...cachedFosters].sort((a, b) => (Number(b.rating) || 0) - (Number(a.rating) || 0))[0] || cachedFosters[0];
-    const snapRating = document.getElementById("snapshot-foster-rating");
-    const snapTitle = document.getElementById("snapshot-foster-title");
-    const snapDesc = document.getElementById("snapshot-foster-desc");
-    if (snapRating) snapRating.textContent = `★ ${topFoster.rating || "5.0"} · ${topFoster.area}`;
-    if (snapTitle) snapTitle.textContent = topFoster.name;
-    if (snapDesc) snapDesc.textContent = (topFoster.description || "").slice(0, 115) + ((topFoster.description || "").length > 115 ? "…" : "");
+
+    const myAdoptEl = document.getElementById("dashboard-my-adoptions");
+    if (myAdoptEl) {
+      myAdoptEl.innerHTML = myAdoptions.length
+        ? myAdoptions
+            .map(
+              (a) => `
+            <div class="my-report-row">
+              <div><strong>${escapeHtml(a.name)}</strong> <small>(${escapeHtml(a.area)} · ${escapeHtml(a.status)})</small></div>
+              ${
+                a.status === "open"
+                  ? `<button class="btn btn-outline btn-small" type="button" data-mark-adopted="${escapeHtml(a.id)}">✓ Mark rehomed</button>`
+                  : `<span class="resolved-tag">✓ Rehomed</span>`
+              }
+            </div>`
+            )
+            .join("")
+        : `<p class="inline-state">No adoption listings published yet.</p>`;
+    }
+
+    const myLostEl = document.getElementById("dashboard-my-lost");
+    if (myLostEl) {
+      myLostEl.innerHTML = myLost.length
+        ? myLost
+            .map(
+              (r) => `
+            <div class="my-report-row">
+              <div><strong>${escapeHtml(r.title)}</strong> <small>(${escapeHtml(r.area)} · ${escapeHtml(r.status)})</small></div>
+              ${
+                r.status === "open"
+                  ? `<button class="btn btn-outline btn-small" type="button" data-resolve-lost="${escapeHtml(r.id)}">✓ Mark reunited</button>`
+                  : `<span class="resolved-tag">✓ Reunited</span>`
+              }
+            </div>`
+            )
+            .join("")
+        : `<p class="inline-state">No active lost alerts published.</p>`;
+    }
+
+    const fosterReqsEl = document.getElementById("dashboard-foster-requests");
+    if (fosterReqsEl) {
+      fosterReqsEl.innerHTML = fosterReqs.length
+        ? fosterReqs
+            .map(
+              (req) => `
+            <div class="my-report-row">
+              <div><strong>${escapeHtml(req.fosterName || "Foster")}</strong> <small>Status: ${escapeHtml(req.status)}</small></div>
+            </div>`
+            )
+            .join("")
+        : `<p class="inline-state">No pending foster requests.</p>`;
+    }
+
+    const bookingsEl = document.getElementById("dashboard-bookings");
+    if (bookingsEl) {
+      bookingsEl.innerHTML = bookings.length
+        ? bookings
+            .map(
+              (b) => `
+            <div class="my-report-row">
+              <div><strong>${escapeHtml(b.vetName)}</strong> <small>${escapeHtml(b.date)} ${escapeHtml(b.time)} (${escapeHtml(b.mode)})</small></div>
+            </div>`
+            )
+            .join("")
+        : `<p class="inline-state">No upcoming clinic visits.</p>`;
+    }
+  } catch (_err) {
+    // ignore
   }
-
-  document.querySelectorAll(".foster-focus-map-btn").forEach((button) =>
-    button.addEventListener("click", () => {
-      const target = cachedFosters.find((item) => item.id === button.dataset.foster);
-      if (target) selectFosterOnMap(target, true);
-    })
-  );
-
-  document.querySelectorAll(".foster-request-button").forEach((button) =>
-    button.addEventListener("click", (event) => {
-      selectedFoster = { id: button.dataset.foster, name: button.dataset.name };
-      if (!localStorage.getItem("pawnir_token")) {
-        showAuthStep("credentials");
-        document.getElementById("auth-status").textContent = "Sign in first to request foster care.";
-        openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-        return;
-      }
-      document.getElementById("foster-request-title").textContent = `Request care from ${selectedFoster.name}`;
-      document.getElementById("foster-request-status").textContent = "";
-      openDialog(document.getElementById("foster-request-dialog"), event.currentTarget);
-    })
-  );
-
-  document.querySelectorAll(".foster-review-link").forEach((button) =>
-    button.addEventListener("click", (event) => {
-      openFosterReviews(button.dataset.foster, button.dataset.name, event.currentTarget);
-    })
-  );
 }
 
-function donorCard(donor) {
-  const speciesLabel = donor.species === "cat" ? "Cat" : "Dog";
-  const petTitle = donor.petName ? `${escapeHtml(donor.petName)} (${speciesLabel})` : `${speciesLabel} donor`;
-  const weightPill = donor.weightKg ? `<span class="donor-meta-pill">⚖ ${escapeHtml(donor.weightKg)} kg</span>` : "";
-  const vaxPill = donor.vaccinated !== false ? `<span class="donor-meta-pill is-vax">✓ Vaccinated</span>` : "";
-  const badgeLabel = donor.badge || "Verified Donor";
-  return `<article class="donor-card"><div class="donor-card-header"><span class="blood-type-pill">🩸 ${escapeHtml(donor.bloodType)}</span><span class="verified-badge"><span class="icon icon-check" aria-hidden="true"></span> ${escapeHtml(badgeLabel)}</span></div><h3>${petTitle}</h3><p>Available near <strong>${escapeHtml(donor.area)}, ${escapeHtml(donor.city)}</strong></p><div class="donor-meta-pills">${weightPill}${vaxPill}<span class="donor-meta-pill">${speciesLabel}</span></div><small>Owner consented · Vet cross-match required before transfusion</small><button class="btn btn-small btn-dark donor-request-button" data-donor="${escapeHtml(donor.id)}" data-label="Request ${escapeHtml(donor.bloodType)} blood from ${petTitle} (${escapeHtml(donor.area)})" type="button">Request emergency blood</button></article>`;
-}
-
-function renderMyDonorPanel(myDonors, incomingRequests) {
-  const panel = document.getElementById("my-donor-panel");
-  const list = document.getElementById("my-donor-list");
-  if (!panel || !list) return;
-  const token = localStorage.getItem("pawnir_token");
-  if (!token || (!myDonors.length && !incomingRequests.length)) {
-    panel.hidden = true;
-    list.innerHTML = "";
+async function restoreSession() {
+  if (!state.token) {
+    updateAuthHeaderUI();
     return;
   }
-  panel.hidden = false;
-  const donorCardsHtml = myDonors.map((d) => `
-    <div class="donor-owner-card">
-      <div class="donor-owner-top">
-        <strong>${escapeHtml(d.petName || (d.species === "cat" ? "Cat" : "Dog"))} · ${escapeHtml(d.bloodType)}</strong>
-        <button class="donor-avail-toggle ${d.available ? "is-on" : ""}" data-toggle-donor="${escapeHtml(d.id)}" data-avail="${d.available ? "1" : "0"}" type="button">
-          ${d.available ? "● Available" : "○ Paused"}
-        </button>
-      </div>
-      <small>⌖ ${escapeHtml(d.area)}, ${escapeHtml(d.city)}${d.weightKg ? ` · ${escapeHtml(d.weightKg)} kg` : ""}</small>
-    </div>
-  `).join("");
-
-  const openRequests = incomingRequests.filter((r) => r.status === "open");
-  const reqHtml = openRequests.map((r) => `
-    <div class="donor-req-banner">
-      <strong>🚨 Urgent Blood Request (${escapeHtml(r.clinic || "Nearby Clinic")})</strong>
-      <p style="margin:0;font-size:12px">${escapeHtml(r.reason)}${r.contactPhone ? ` · Contact: <strong>${escapeHtml(r.contactPhone)}</strong>` : ""}</p>
-      <div class="donor-req-actions">
-        <button class="btn btn-small btn-green" data-respond-req="${escapeHtml(r.id)}" data-status="accepted" type="button">Accept &amp; Connect</button>
-        <button class="btn btn-small btn-outline" data-respond-req="${escapeHtml(r.id)}" data-status="declined" type="button">Unavailable right now</button>
-      </div>
-    </div>
-  `).join("");
-
-  list.innerHTML = donorCardsHtml + reqHtml;
-
-  list.querySelectorAll("[data-toggle-donor]").forEach((btn) =>
-    btn.addEventListener("click", async () => {
-      const nextAvail = btn.dataset.avail !== "1";
-      btn.disabled = true;
-      const res = await fetch(`/api/donors/${encodeURIComponent(btn.dataset.toggleDonor)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ available: nextAvail })
-      });
-      if (res.ok) {
-        showToast(nextAvail ? "Donor marked as available!" : "Donor availability paused.");
-        await loadDonors();
-      } else {
-        btn.disabled = false;
-      }
-    })
-  );
-
-  list.querySelectorAll("[data-respond-req]").forEach((btn) =>
-    btn.addEventListener("click", async () => {
-      btn.disabled = true;
-      const res = await fetch(`/api/donor-requests/${encodeURIComponent(btn.dataset.respondReq)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ status: btn.dataset.status })
-      });
-      if (res.ok) {
-        showToast(btn.dataset.status === "accepted" ? "Accepted! Requester has been notified." : "Request updated.");
-        await loadDonors();
-      } else {
-        btn.disabled = false;
-      }
-    })
-  );
-}
-
-async function loadDonors() {
-  const params = new URLSearchParams({
-    area: document.getElementById("donor-area-input").value.trim(),
-    species: document.getElementById("donor-species-filter").value,
-    bloodType: document.getElementById("donor-blood-filter").value,
-    includeMine: "1"
-  });
-  const token = localStorage.getItem("pawnir_token");
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
-  const response = await fetch(`/api/donors?${params}`, { headers });
-  const payload = await response.json();
-  const donors = Array.isArray(payload) ? payload : (payload.donors || []);
-  const myDonors = Array.isArray(payload) ? [] : (payload.myDonors || []);
-  const incomingRequests = Array.isArray(payload) ? [] : (payload.incomingRequests || []);
-
-  renderMyDonorPanel(myDonors, incomingRequests);
-
-  const homeCountDonors = document.getElementById("home-count-donors");
-  if (homeCountDonors) {
-    homeCountDonors.textContent = `${donors.length} verified donor${donors.length === 1 ? "" : "s"} ↗`;
-  }
-  if (donors.length > 0) {
-    const topDonor = donors[0];
-    const speciesLabel = topDonor.species === "cat" ? "Cat" : "Dog";
-    const snapBlood = document.getElementById("snapshot-donor-blood");
-    const snapTitle = document.getElementById("snapshot-donor-title");
-    const snapDesc = document.getElementById("snapshot-donor-desc");
-    if (snapBlood) snapBlood.textContent = `🩸 ${topDonor.bloodType} · ${topDonor.area}`;
-    if (snapTitle) snapTitle.textContent = `${topDonor.petName || speciesLabel} (${speciesLabel} donor)`;
-    if (snapDesc) snapDesc.textContent = `Consented & vaccinated ${speciesLabel.toLowerCase()} donor ready near ${topDonor.area}, ${topDonor.city}.`;
-  }
-
-  const grid = document.getElementById("donor-grid");
-  grid.innerHTML = donors.length
-    ? donors.map(donorCard).join("")
-    : '<p class="inline-state">No verified available donors match this filter. Try clearing the blood type or area filter, or register your pet above.</p>';
-  grid.querySelectorAll(".donor-request-button").forEach((button) =>
-    button.addEventListener("click", (event) => {
-      selectedDonor = { id: button.dataset.donor, label: button.dataset.label, button };
-      if (!localStorage.getItem("pawnir_token")) {
-        showAuthStep("credentials");
-        document.getElementById("auth-status").textContent = "Sign in first to request an emergency blood donor connection.";
-        openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-        return;
-      }
-      document.getElementById("donor-request-title").textContent = selectedDonor.label || "Request donor connection";
-      document.getElementById("donor-request-status").textContent = "";
-      openDialog(document.getElementById("donor-request-dialog"), event.currentTarget);
-    })
-  );
-}
-
-async function loadAdoptions() {
-  const areaInput = document.getElementById("adoption-area-input");
-  const area = areaInput ? areaInput.value.trim() : "";
-  const params = new URLSearchParams();
-  if (adoptionSpeciesFilter) params.set("species", adoptionSpeciesFilter);
-  if (area) params.set("area", area);
-  params.set("includeMine", "1");
-
-  const token = localStorage.getItem("pawnir_token");
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
   try {
-    const response = await fetch(`/api/adoptions?${params.toString()}`, { headers });
-    const data = await response.json();
-    const listings = Array.isArray(data) ? data : (Array.isArray(data.listings) ? data.listings : []);
-
-    const homeCountAdopt = document.getElementById("home-count-adopt");
-    if (homeCountAdopt) {
-      homeCountAdopt.textContent = `${listings.length} pet${listings.length === 1 ? "" : "s"} ready ↗`;
+    const res = await apiFetch("/api/auth/me");
+    if (res && res.user) {
+      state.user = res.user;
+    } else {
+      state.token = "";
+      localStorage.removeItem("pawnir-token");
     }
-
-    const liveCountEl = document.getElementById("adoption-live-count");
-    if (liveCountEl) {
-      liveCountEl.innerHTML = `<span class="live-pulse"></span> ${listings.length} verified pet${listings.length === 1 ? "" : "s"} ready`;
-    }
-
-    const grid = document.getElementById("adoption-grid");
-    if (!grid) return;
-
-    if (!listings.length) {
-      grid.innerHTML = `
-        <div class="adoption-empty-card">
-          <div class="empty-icon">🐾</div>
-          <h4>No pets found matching this filter</h4>
-          <p>Try clearing your species or location filter, or be the first to list a rescue pet needing a loving home.</p>
-          <div class="empty-actions">
-            <button class="btn btn-small btn-outline" id="adoption-reset-filters-btn" type="button">Reset all filters</button>
-            <button class="btn btn-small btn-primary" id="adoption-empty-list-btn" type="button">+ List a pet for adoption</button>
-          </div>
-        </div>
-      `;
-      document.getElementById("adoption-reset-filters-btn")?.addEventListener("click", () => {
-        adoptionSpeciesFilter = "";
-        if (areaInput) areaInput.value = "";
-        document.querySelectorAll("#adoption-species-pills [data-adoption-species]").forEach((p) => {
-          p.classList.toggle("active", !p.dataset.adoptionSpecies);
-        });
-        const select = document.getElementById("adoption-species-filter");
-        if (select) select.value = "";
-        loadAdoptions();
-      });
-      document.getElementById("adoption-empty-list-btn")?.addEventListener("click", () => {
-        document.getElementById("list-adoption-button")?.click();
-      });
-      return;
-    }
-
-    grid.innerHTML = listings.map((listing) => {
-      const isOwner = Boolean(listing.isOwner || (state.user && listing.ownerId === state.user.id));
-      const speciesEmoji = listing.species === "cat" ? "🐱" : listing.species === "dog" ? "🐶" : listing.species === "bird" ? "🦜" : listing.species === "rabbit" ? "🐰" : "🐾";
-      const speciesLabel = listing.species ? listing.species.charAt(0).toUpperCase() + listing.species.slice(1) : "Rescue";
-      const statusPill = listing.status === "adopted"
-        ? '<span class="sleek-status-pill pill-adopted">✓ Rehomed</span>'
-        : (isOwner ? '<span class="sleek-status-pill pill-owner">Your Listing</span>' : '<span class="sleek-status-pill pill-open">Open for Adoption</span>');
-      const vaxBadge = listing.vaccinated !== false ? '<span class="sleek-tag tag-vax">💉 Vaccinated</span>' : '';
-      const neuteredBadge = listing.neutered ? '<span class="sleek-tag tag-neutered">✂ Neutered</span>' : '';
-      const indoorBadge = listing.indoorOnly ? '<span class="sleek-tag tag-indoor">🏠 Indoor Only</span>' : '';
-
-      return `
-        <article class="adoption-card ${isOwner ? 'is-my-listing' : ''}">
-          <div class="sleek-card-header">
-            <span class="sleek-species-chip">
-              <span class="chip-emoji" aria-hidden="true">${speciesEmoji}</span>
-              <span>${escapeHtml(speciesLabel)}</span>
-            </span>
-            ${statusPill}
-          </div>
-          <h3>${escapeHtml(listing.name)}</h3>
-          <div class="sleek-meta-row">
-            <span>⌖ ${escapeHtml(listing.area || "Dhaka")}</span>
-            <span class="sleek-meta-dot" aria-hidden="true">•</span>
-            <span>🎂 ${escapeHtml(listing.age || "Young")}</span>
-            ${listing.gender ? `<span class="sleek-meta-dot" aria-hidden="true">•</span><span>${escapeHtml(listing.gender)}</span>` : ""}
-            ${listing.breed ? `<span class="sleek-meta-dot" aria-hidden="true">•</span><span>${escapeHtml(listing.breed)}</span>` : ""}
-          </div>
-          <p class="sleek-card-bio">${escapeHtml(listing.description || "")}</p>
-          <div class="sleek-tags-row">
-            ${vaxBadge}
-            ${neuteredBadge}
-            ${indoorBadge}
-          </div>
-          <div class="adoption-card-actions">
-            ${isOwner
-              ? `<button class="btn btn-small btn-outline manage-my-adopt-btn" type="button">Manage in Profile ↗</button>`
-              : `<button class="btn btn-small btn-primary adoption-apply-button" data-listing="${escapeHtml(listing.id)}" data-name="${escapeHtml(listing.name)}" type="button">Apply to adopt ♡</button>`
-            }
-          </div>
-        </article>
-      `;
-    }).join("");
-
-    grid.querySelectorAll(".adoption-apply-button").forEach((button) =>
-      button.addEventListener("click", (event) => {
-        selectedAdoption = { id: button.dataset.listing, name: button.dataset.name };
-        if (!localStorage.getItem("pawnir_token")) {
-          showAuthStep("credentials");
-          document.getElementById("auth-status").textContent = "Sign in first to apply for adoption.";
-          openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-          return;
-        }
-        document.getElementById("adoption-form-title").textContent = `Apply to adopt ${selectedAdoption.name}`;
-        document.getElementById("adoption-status").textContent = "";
-        document.getElementById("adoption-pdf-link").hidden = true;
-        openDialog(document.getElementById("adoption-dialog"), event.currentTarget);
-      })
-    );
-
-    grid.querySelectorAll(".manage-my-adopt-btn").forEach((button) =>
-      button.addEventListener("click", (event) => {
-        openDialog(document.getElementById("dashboard-dialog"), event.currentTarget);
-        const activityTab = document.querySelector('[data-dash-tab="activity"]');
-        if (activityTab) activityTab.click();
-      })
-    );
-  } catch (err) {
-    // network error fallback
+  } catch (_err) {
+    // keep token if offline so mobile sessions don't get wiped during transient drops
   }
+  updateAuthHeaderUI();
 }
 
-async function loadPets() {
-  const token = localStorage.getItem("pawnir_token");
-  if (!token) return [];
-  const response = await fetch("/api/pets", { headers: { Authorization: `Bearer ${token}` } });
-  if (!response.ok) throw new Error("Unable to load pet profiles.");
-  pets = await response.json();
-  const select = document.getElementById("booking-pet");
-  if (select) {
-    select.innerHTML = pets.length
-      ? pets.map((pet) => `<option value="${escapeHtml(pet.id)}">${escapeHtml(pet.name)} · ${escapeHtml(pet.species)}</option>`).join("")
-      : '<option value="">Add a pet in My care first</option>';
-  }
-  return pets;
-}
+// ============================================================================
+// 7. Resilient Real-Time SSE Stream (/api/stream) with Exponential Backoff
+// ============================================================================
+function setRealtimePillStatus(status) {
+  const pill = document.getElementById("realtime-status-pill");
+  const textEl = document.getElementById("realtime-status-text");
+  if (!pill || !textEl) return;
 
-async function loadDashboard() {
-  const token = localStorage.getItem("pawnir_token");
-  if (!token) return;
-  const headers = { Authorization: `Bearer ${token}` };
-
-  const [bookings, petList, prescriptions, profile, fosterRequests, adoptionsData, lostData] = await Promise.all([
-    fetch("/api/bookings", { headers }).then((res) => (res.ok ? res.json() : [])),
-    fetch("/api/pets", { headers }).then((res) => (res.ok ? res.json() : [])),
-    fetch("/api/prescriptions", { headers }).then((res) => (res.ok ? res.json() : [])),
-    fetch("/api/auth/me", { headers }).then((res) => (res.ok ? res.json() : null)),
-    fetch("/api/foster-requests", { headers }).then((res) => (res.ok ? res.json() : [])),
-    fetch("/api/adoptions?includeMine=1", { headers }).then((res) => (res.ok ? res.json() : [])),
-    fetch("/api/lost-found", { headers }).then((res) => (res.ok ? res.json() : []))
-  ]);
-
-  if (profile && profile.user) {
-    state.user = profile.user;
-    updateAuthUI();
-    const initials = (state.user.name || "P").charAt(0).toUpperCase();
-    const initialsEl = document.getElementById("dashboard-user-initials");
-    if (initialsEl) initialsEl.textContent = initials;
-    const nameEl = document.getElementById("dashboard-user-name");
-    if (nameEl) nameEl.textContent = state.user.name || "Pet Parent";
-    const emailEl = document.getElementById("dashboard-user-email");
-    if (emailEl) emailEl.textContent = state.user.email || "";
-    const areaChip = document.getElementById("dashboard-user-area-chip");
-    if (areaChip) areaChip.textContent = `⌖ ${state.user.area || "Dhaka"}`;
-
-    const profName = document.getElementById("profile-name");
-    if (profName) profName.value = state.user.name || "";
-    const profArea = document.getElementById("profile-area");
-    if (profArea) profArea.value = state.user.area || "";
-    const profBio = document.getElementById("profile-bio");
-    if (profBio) profBio.value = state.user.bio || "";
-  }
-
-  // 1. Pet Passports Grid
-  const petsGrid = document.getElementById("dashboard-pets");
-  if (petsGrid) {
-    if (Array.isArray(petList) && petList.length) {
-      pets = petList;
-      petsGrid.innerHTML = petList.map((pet) => {
-        const icon = pet.species === "cat" ? "🐱" : pet.species === "dog" ? "🐶" : pet.species === "bird" ? "🦜" : pet.species === "rabbit" ? "🐰" : "🐾";
-        return `
-          <div class="pet-passport-card">
-            <div class="passport-icon">${icon}</div>
-            <div class="passport-info">
-              <strong>${escapeHtml(pet.name)}</strong>
-              <p>${escapeHtml(pet.species.toUpperCase())}${pet.breed ? ` · ${escapeHtml(pet.breed)}` : ""}${pet.age ? ` · ${escapeHtml(pet.age)}` : ""}</p>
-              <div class="passport-tags">
-                <span class="passport-tag">Verified Digital Passport</span>
-                <span class="passport-tag tag-green">✓ Active Care</span>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    } else {
-      petsGrid.innerHTML = '<p class="inline-state">No pet passports registered yet. Click <strong>+ Register pet</strong> to add your first companion.</p>';
-    }
-  }
-
-  // 2. User's Adoption Listings
-  const myAdoptionsEl = document.getElementById("dashboard-my-adoptions");
-  if (myAdoptionsEl) {
-    const rawList = Array.isArray(adoptionsData) ? adoptionsData : (Array.isArray(adoptionsData.myListings) ? adoptionsData.myListings : []);
-    const myListings = rawList.filter((item) => item.isOwner || (state.user && item.ownerId === state.user.id));
-    if (myListings.length) {
-      myAdoptionsEl.innerHTML = myListings.map((item) => `
-        <div class="dashboard-item">
-          <div>
-            <strong>${escapeHtml(item.name)} (${escapeHtml(item.species)})</strong>
-            <span>${escapeHtml(item.area || "Dhaka")} · Status: <strong class="${item.status === "adopted" ? "text-green" : ""}">${escapeHtml(item.status || "open")}</strong></span>
-          </div>
-          ${item.status !== "adopted"
-            ? `<button class="btn btn-small btn-primary mark-rehomed-btn" data-rehome-id="${escapeHtml(item.id)}" type="button">Mark Rehomed ✓</button>`
-            : `<small class="status-pill-rehomed">Rehomed successfully ✓</small>`
-          }
-        </div>
-      `).join("");
-
-      myAdoptionsEl.querySelectorAll(".mark-rehomed-btn").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          btn.disabled = true;
-          const patchRes = await fetch(`/api/adoptions/listings/${encodeURIComponent(btn.dataset.rehomeId)}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ status: "adopted" })
-          });
-          if (patchRes.ok) {
-            showToast("Marked as safely rehomed! 🎉");
-            await Promise.all([loadDashboard(), loadAdoptions()]);
-          } else {
-            showToast("Unable to update listing status.");
-            btn.disabled = false;
-          }
-        });
-      });
-    } else {
-      myAdoptionsEl.innerHTML = '<p class="inline-state">No adoption listings published yet. Rehome a rescue directly from the adoption portal.</p>';
-    }
-  }
-
-  // 3. User's Lost & Found Alerts
-  const myLostEl = document.getElementById("dashboard-my-lost");
-  if (myLostEl) {
-    const myLost = (Array.isArray(lostData) ? lostData : []).filter((item) => state.user && (item.userId === state.user.id || item.reportedBy === state.user.name));
-    if (myLost.length) {
-      myLostEl.innerHTML = myLost.map((item) => `
-        <div class="dashboard-item">
-          <div>
-            <strong>${escapeHtml(item.title || item.species)}</strong>
-            <span>${escapeHtml(item.area || item.city)} · Status: <strong>${escapeHtml(item.status || "active")}</strong></span>
-          </div>
-          <span class="profile-area-pill">${escapeHtml(item.type === "lost" ? "Lost Pet" : "Found Pet")}</span>
-        </div>
-      `).join("");
-    } else {
-      myLostEl.innerHTML = '<p class="inline-state">No active lost or found alerts posted by you.</p>';
-    }
-  }
-
-  // 4. Foster Care Requests
-  const fosterEl = document.getElementById("dashboard-foster-requests");
-  if (fosterEl) {
-    fosterEl.innerHTML = Array.isArray(fosterRequests) && fosterRequests.length
-      ? fosterRequests.slice(0, 4).map((req) => `<div class="dashboard-item"><strong>Foster inquiry</strong><span>${escapeHtml(req.reason ? req.reason.slice(0, 60) : "")}</span><small>Status: ${escapeHtml(req.status || "pending")}</small></div>`).join("")
-      : '<p class="inline-state">No foster requests yet.</p>';
-  }
-
-  // 5. Clinic Visits & Prescriptions
-  const bookingItems = Array.isArray(bookings) ? bookings : [];
-  const rxItems = Array.isArray(prescriptions) ? prescriptions : [];
-  const bookingsEl = document.getElementById("dashboard-bookings");
-  if (bookingsEl) {
-    if (bookingItems.length || rxItems.length) {
-      bookingsEl.innerHTML = [
-        ...bookingItems.slice(0, 3).map((booking) => `<div class="dashboard-item"><strong>${escapeHtml(booking.vetName || "Vet")}</strong><span>${escapeHtml(booking.date || "")} · ${escapeHtml(booking.time || "")}</span><small>${escapeHtml(booking.petName || "Pet")} · ${escapeHtml(booking.status || "confirmed")}</small></div>`),
-        ...rxItems.slice(0, 2).map((item) => `<div class="dashboard-item"><strong>Rx: ${escapeHtml(item.items?.[0]?.medicine || "Prescription")}</strong><span>${new Date(item.issuedAt).toLocaleDateString("en-BD")}</span></div>`)
-      ].join("");
-    } else {
-      bookingsEl.innerHTML = '<p class="inline-state">No clinic visits or prescriptions recorded yet.</p>';
-    }
+  pill.classList.remove("is-live", "is-syncing", "is-offline");
+  if (status === "live") {
+    pill.classList.add("is-live");
+    textEl.textContent = t("nav.live");
+  } else if (status === "offline") {
+    pill.classList.add("is-offline");
+    textEl.textContent = t("nav.offline");
+  } else {
+    pill.classList.add("is-syncing");
+    textEl.textContent = t("nav.syncing");
   }
 }
 
 function connectRealtimeStream() {
-  if (typeof window.EventSource !== "function") return;
-  try {
-    const source = new EventSource("/api/stream");
-    source.addEventListener("lost_found_update", () => {
-      loadLostReports();
-      if (localStorage.getItem("pawnir_token")) loadNotifications();
-    });
-  } catch (err) {
-    // fallback polling already active
+  if (typeof EventSource === "undefined") return;
+  if (state.sse) {
+    try {
+      state.sse.close();
+    } catch (_e) {}
+  }
+  clearTimeout(state.sseRetryTimer);
+
+  if (!navigator.onLine) {
+    setRealtimePillStatus("offline");
+    return;
+  }
+
+  setRealtimePillStatus(state.sseRetryCount > 0 ? "syncing" : "live");
+  const es = new EventSource("/api/stream");
+  state.sse = es;
+
+  es.addEventListener("open", () => {
+    state.sseRetryCount = 0;
+    setRealtimePillStatus("live");
+  });
+
+  es.addEventListener("ready", () => {
+    state.sseRetryCount = 0;
+    setRealtimePillStatus("live");
+  });
+
+  es.addEventListener("lost_found_update", () => {
+    loadLostReports({ silent: true });
+    loadNotifications();
+  });
+
+  es.addEventListener("donor_update", () => {
+    loadDonors({ silent: true });
+    loadNotifications();
+  });
+
+  es.addEventListener("foster_update", (ev) => {
+    loadFosters({ silent: true });
+    try {
+      const payload = JSON.parse(ev.data || "{}");
+      const reviewDialog = document.getElementById("foster-review-dialog");
+      if (reviewDialog && reviewDialog.open && payload.fosterId && payload.fosterId === state.activeFosterId) {
+        openFosterReviewsModal(payload.fosterId);
+      }
+    } catch (_e) {}
+  });
+
+  es.addEventListener("adoption_update", () => {
+    loadAdoptions({ silent: true });
+    loadNotifications();
+  });
+
+  es.addEventListener("notification_update", (ev) => {
+    loadNotifications();
+    try {
+      const payload = JSON.parse(ev.data || "{}");
+      const matchesUser =
+        state.user &&
+        (payload.userId === state.user.id || (Array.isArray(payload.userIds) && payload.userIds.includes(state.user.id)));
+      if (matchesUser) {
+        showToast(payload.title || "New community alert received");
+        PawNirBridge.notifyLocal("PawNir Alert", payload.title || "You have a new PawNir update");
+      }
+    } catch (_e) {}
+  });
+
+  es.addEventListener("care_update", () => {
+    if (document.getElementById("dashboard-dialog")?.open) {
+      loadDashboardData();
+    }
+  });
+
+  es.addEventListener("snapshot", (ev) => {
+    try {
+      const data = JSON.parse(ev.data || "{}");
+      if (data.community) {
+        updateGlobalCommunityCounts(data.community);
+      }
+    } catch (_e) {}
+  });
+
+  es.onerror = () => {
+    try {
+      es.close();
+    } catch (_e) {}
+    state.sse = null;
+    if (!navigator.onLine) {
+      setRealtimePillStatus("offline");
+      return;
+    }
+    setRealtimePillStatus("syncing");
+    const delayMs = Math.min(30000, 1000 * Math.pow(2, state.sseRetryCount));
+    state.sseRetryCount += 1;
+    state.sseRetryTimer = setTimeout(() => {
+      connectRealtimeStream();
+    }, delayMs);
+  };
+}
+
+// ============================================================================
+// 8. Touch Swipe-to-Dismiss & Android Hardware Back Button (popstate)
+// ============================================================================
+function attachSwipeToDismiss() {
+  document.querySelectorAll("dialog.booking-dialog").forEach((dialog) => {
+    const card = dialog.querySelector(".dialog-card");
+    if (!card) return;
+    let startY = 0;
+    let currentY = 0;
+    let tracking = false;
+
+    card.addEventListener(
+      "touchstart",
+      (e) => {
+        if (card.scrollTop > 4) return;
+        const touch = e.touches[0];
+        startY = touch.clientY;
+        currentY = startY;
+        tracking = true;
+      },
+      { passive: true }
+    );
+
+    card.addEventListener(
+      "touchmove",
+      (e) => {
+        if (!tracking) return;
+        currentY = e.touches[0].clientY;
+        const deltaY = currentY - startY;
+        if (deltaY > 12) {
+          card.style.transform = `translateY(${Math.min(deltaY, 220)}px)`;
+        }
+      },
+      { passive: true }
+    );
+
+    card.addEventListener(
+      "touchend",
+      () => {
+        if (!tracking) return;
+        tracking = false;
+        const deltaY = currentY - startY;
+        card.style.transform = "";
+        if (deltaY > 95) {
+          closeDialog(dialog);
+        }
+      },
+      { passive: true }
+    );
+  });
+
+  const drawer = document.getElementById("menu-drawer");
+  if (drawer) {
+    let startX = 0;
+    let currentX = 0;
+    drawer.addEventListener(
+      "touchstart",
+      (e) => {
+        startX = e.touches[0].clientX;
+        currentX = startX;
+      },
+      { passive: true }
+    );
+    drawer.addEventListener(
+      "touchmove",
+      (e) => {
+        currentX = e.touches[0].clientX;
+      },
+      { passive: true }
+    );
+    drawer.addEventListener(
+      "touchend",
+      () => {
+        if (currentX - startX > 70) {
+          closeNavigationDrawer();
+        }
+      },
+      { passive: true }
+    );
   }
 }
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    const menuDrawer = document.getElementById("menu-drawer");
-    if (menuDrawer?.classList.contains("is-open")) {
-      event.preventDefault();
-      menuDrawer.classList.remove("is-open");
-      menuDrawer.setAttribute("aria-hidden", "true");
-      document.getElementById("menu-toggle-btn")?.classList.remove("is-active");
-      document.getElementById("menu-toggle-btn")?.setAttribute("aria-expanded", "false");
-      const backdrop = document.getElementById("menu-drawer-backdrop");
-      if (backdrop) {
-        backdrop.classList.remove("is-open");
-        setTimeout(() => { backdrop.hidden = true; }, 280);
+function openNavigationDrawer() {
+  const drawer = document.getElementById("menu-drawer");
+  const backdrop = document.getElementById("menu-drawer-backdrop");
+  const toggleBtn = document.getElementById("menu-toggle-btn");
+  if (!drawer) return;
+  drawer.classList.add("is-open");
+  drawer.setAttribute("aria-hidden", "false");
+  if (backdrop) {
+    backdrop.hidden = false;
+    backdrop.classList.add("is-open");
+  }
+  if (toggleBtn) {
+    toggleBtn.classList.add("is-active");
+    toggleBtn.setAttribute("aria-expanded", "true");
+  }
+  lockBodyScroll();
+}
+
+function closeNavigationDrawer() {
+  const drawer = document.getElementById("menu-drawer");
+  const backdrop = document.getElementById("menu-drawer-backdrop");
+  const toggleBtn = document.getElementById("menu-toggle-btn");
+  if (!drawer) return;
+  drawer.classList.remove("is-open");
+  drawer.setAttribute("aria-hidden", "true");
+  if (backdrop) {
+    backdrop.classList.remove("is-open");
+    backdrop.hidden = true;
+  }
+  if (toggleBtn) {
+    toggleBtn.classList.remove("is-active");
+    toggleBtn.setAttribute("aria-expanded", "false");
+  }
+  if (!hasAnyOpenDialog()) {
+    unlockBodyScroll();
+  }
+}
+
+// ============================================================================
+// 9. Interactive Event Listeners & Form Submissions
+// ============================================================================
+function initEventListeners() {
+  // Theme & Language
+  document.getElementById("theme-toggle")?.addEventListener("click", () => {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(next);
+  });
+
+  document.getElementById("language-toggle")?.addEventListener("click", () => {
+    applyLanguage(state.lang === "en" ? "bn" : "en");
+  });
+
+  // Navigation Drawer
+  document.getElementById("menu-toggle-btn")?.addEventListener("click", () => {
+    const drawer = document.getElementById("menu-drawer");
+    if (drawer?.classList.contains("is-open")) closeNavigationDrawer();
+    else openNavigationDrawer();
+  });
+  document.getElementById("drawer-close-btn")?.addEventListener("click", closeNavigationDrawer);
+  document.getElementById("menu-drawer-backdrop")?.addEventListener("click", closeNavigationDrawer);
+
+  document.querySelectorAll("[data-drawer-link]").forEach((link) => {
+    link.addEventListener("click", () => {
+      closeNavigationDrawer();
+    });
+  });
+
+  // Close buttons on all dialogs
+  document.querySelectorAll("dialog .dialog-close, [data-close-adoption-form], [data-close-policy]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const dialog = btn.closest("dialog");
+      closeDialog(dialog);
+    });
+  });
+
+  // Close dialog on backdrop click
+  document.querySelectorAll("dialog.booking-dialog").forEach((dialog) => {
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) closeDialog(dialog);
+    });
+  });
+
+  // Hardware Back Button & Hash Routing
+  window.addEventListener("popstate", () => {
+    const openDialogs = Array.from(document.querySelectorAll("dialog.booking-dialog")).filter((d) => d.open);
+    if (openDialogs.length > 0) {
+      closeDialog(openDialogs[openDialogs.length - 1]);
+      return;
+    }
+    const drawer = document.getElementById("menu-drawer");
+    if (drawer?.classList.contains("is-open")) {
+      closeNavigationDrawer();
+      return;
+    }
+    switchView(window.location.hash);
+  });
+
+  window.addEventListener("hashchange", () => {
+    switchView(window.location.hash);
+  });
+
+  window.addEventListener("online", () => {
+    setRealtimePillStatus("syncing");
+    connectRealtimeStream();
+    loadLostReports({ silent: true });
+    loadDonors({ silent: true });
+    loadFosters({ silent: true });
+    loadAdoptions({ silent: true });
+  });
+
+  window.addEventListener("offline", () => {
+    setRealtimePillStatus("offline");
+  });
+
+  // One-Tap GPS Area Detection ("[data-gps-fill]")
+  document.addEventListener("click", async (e) => {
+    const gpsBtn = e.target.closest("[data-gps-fill]");
+    if (!gpsBtn) return;
+    const targetId = gpsBtn.getAttribute("data-gps-fill");
+    const input = document.getElementById(targetId);
+    if (!input) return;
+
+    const origText = gpsBtn.textContent;
+    gpsBtn.disabled = true;
+    gpsBtn.textContent = "⏳…";
+    try {
+      const loc = await PawNirBridge.detectNearestArea();
+      input.value = loc.area;
+      localStorage.setItem("pawnir-last-area", loc.area);
+      const cityInputId =
+        targetId === "report-area"
+          ? "report-city"
+          : targetId === "donor-area"
+          ? "donor-city"
+          : targetId === "new-foster-area"
+          ? "new-foster-city"
+          : null;
+      if (cityInputId) {
+        const cityEl = document.getElementById(cityInputId);
+        if (cityEl) cityEl.value = loc.city;
+      }
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      showToast(
+        loc.distanceKm !== null
+          ? `📍 Nearest area: ${loc.area}, ${loc.city} (${loc.distanceKm} km)`
+          : `📍 Selected area: ${loc.area}, ${loc.city}`
+      );
+    } finally {
+      gpsBtn.disabled = false;
+      gpsBtn.textContent = origText;
+    }
+  });
+
+  // Delegated Actions across Cards & Empty States
+  document.addEventListener("click", async (e) => {
+    // Reset Filters button
+    const resetBtn = e.target.closest("[data-reset-filter]");
+    if (resetBtn) {
+      const target = resetBtn.getAttribute("data-reset-filter");
+      if (target === "lost") {
+        const areaIn = document.getElementById("lost-area-input");
+        const typeIn = document.getElementById("lost-type-filter");
+        if (areaIn) areaIn.value = "";
+        if (typeIn) typeIn.value = "all";
+        state.lostSpecies = "";
+        document.querySelectorAll("#lost-species-pills .chip").forEach((c) => c.classList.toggle("active", !c.dataset.lostSpecies));
+        loadLostReports();
+      } else if (target === "donors") {
+        const areaIn = document.getElementById("donor-area-input");
+        const spIn = document.getElementById("donor-species-filter");
+        const blIn = document.getElementById("donor-blood-filter");
+        if (areaIn) areaIn.value = "";
+        if (spIn) spIn.value = "";
+        if (blIn) blIn.value = "";
+        loadDonors();
+      } else if (target === "fosters") {
+        const qIn = document.getElementById("foster-search-input");
+        const cIn = document.getElementById("foster-city-filter");
+        const sIn = document.getElementById("foster-species-filter");
+        if (qIn) qIn.value = "";
+        if (cIn) cIn.value = "";
+        if (sIn) sIn.value = "";
+        loadFosters();
+      } else if (target === "adoptions") {
+        const aIn = document.getElementById("adoption-area-input");
+        if (aIn) aIn.value = "";
+        state.adoptionSpecies = "";
+        document.querySelectorAll("#adoption-species-pills .chip").forEach((c) => c.classList.toggle("active", !c.dataset.adoptionSpecies));
+        loadAdoptions();
+      } else if (target === "vets") {
+        const qIn = document.getElementById("vet-search-input");
+        const cIn = document.getElementById("vet-city-filter");
+        const mIn = document.getElementById("vet-mode-filter");
+        if (qIn) qIn.value = "";
+        if (cIn) cIn.value = "all";
+        if (mIn) mIn.value = "all";
+        loadVets();
       }
       return;
     }
-    if (activeDialog) {
-      event.preventDefault();
-      closeDialog(activeDialog);
-    }
-  }
-});
 
-document.addEventListener("DOMContentLoaded", async () => {
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
-  }
-
-  document.querySelectorAll(".booking-dialog").forEach(wireDialog);
-
-  setTheme(document.documentElement.dataset.theme || "light");
-  applyLanguage(state.language);
-
-  await loadAuthConfig();
-
-  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-  const googleToken = hashParams.get("google_token");
-  const googlePending = hashParams.get("google_pending");
-  const authError = new URLSearchParams(window.location.search).get("auth_error");
-
-  if (googleToken) {
-    localStorage.setItem("pawnir_token", googleToken);
-    window.history.replaceState({}, "", window.location.pathname);
-    await syncSession();
-    await Promise.all([loadPets(), loadLostReports(), loadDonors(), loadNotifications(), loadAdoptions()]);
-    if (pendingReviewFoster) {
-      const foster = pendingReviewFoster;
-      pendingReviewFoster = null;
-      openFosterReviews(foster.id, foster.name);
-      showToast(`Welcome! You can now review ${foster.name}.`);
-    } else if (pendingAdoptionAction === "list") {
-      pendingAdoptionAction = null;
-      openDialog(document.getElementById("list-adoption-dialog"));
-    } else {
-      showToast("Signed in with Google!");
-    }
-  } else if (googlePending) {
-    state.pending2faToken = googlePending;
-    window.history.replaceState({}, "", window.location.pathname);
-    showAuthStep("2fa");
-    await refreshMathChallenge();
-    openDialog(document.getElementById("auth-dialog"));
-  } else {
-    await syncSession();
-  }
-
-  if (authError) {
-    window.history.replaceState({}, "", window.location.pathname);
-    showAuthStep("credentials");
-    const status = document.getElementById("auth-status");
-    if (status) {
-      status.textContent = authError === "google_not_configured"
-        ? "Google Sign-In requires GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET in .env. Please use email sign-in below."
-        : "Google sign-in could not be completed. Please try again or use email.";
-    }
-    openDialog(document.getElementById("auth-dialog"));
-  }
-
-  document.querySelectorAll(".hero-copy, .hero-art, .mission-section, .lost-found-section, .donor-section, .adoption-section, .foster-section, .vet-coming-soon, .how-it-works, .mobile-app-showcase, .vet-banner").forEach((element) => element.classList.add("reveal"));
-  const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add("revealed");
-      observer.unobserve(entry.target);
-    }
-  }), { threshold: 0.08 });
-  document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
-
-  // Dynamic View Routing (Home vs Dedicated Fosters, Alerts, Donors)
-  function updateViewFromHash() {
-    const rawHash = (window.location.hash || "").replace(/^#/, "");
-    if (rawHash === "mobile-app") {
-      document.body.dataset.view = "home";
-      document.getElementById("mobile-app")?.scrollIntoView({ behavior: "smooth" });
+    // Native Share button
+    const shareBtn = e.target.closest("[data-share-title]");
+    if (shareBtn) {
+      PawNirBridge.shareItem({
+        title: shareBtn.getAttribute("data-share-title"),
+        text: shareBtn.getAttribute("data-share-text"),
+        url: window.location.href
+      });
       return;
     }
-    if (rawHash === "download-app") {
-      document.body.dataset.view = "home";
-      document.getElementById("download-app")?.scrollIntoView({ behavior: "smooth" });
+
+    // Open Auth or Dashboard
+    const openAuthBtn = e.target.closest("[data-open-auth], [data-open-dashboard], #auth-nav-button");
+    if (openAuthBtn) {
+      closeNavigationDrawer();
+      if (state.user) {
+        loadDashboardData();
+        openDialog(document.getElementById("dashboard-dialog"));
+      } else {
+        openDialog(document.getElementById("auth-dialog"));
+      }
       return;
     }
-    if (rawHash === "how-it-works") {
-      document.body.dataset.view = "home";
-      document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
-    if (["privacy", "terms", "guidelines"].includes(rawHash)) {
-      document.body.dataset.view = "home";
-      showPolicyTab(rawHash);
+
+    // Open Policy Modal
+    const policyBtn = e.target.closest("[data-policy], [data-open-policy]");
+    if (policyBtn) {
+      closeNavigationDrawer();
+      const tab = policyBtn.getAttribute("data-policy") || policyBtn.getAttribute("data-open-policy") || "privacy";
+      document.querySelectorAll(".policy-nav-tab").forEach((tBtn) => {
+        tBtn.classList.toggle("is-active", tBtn.dataset.policyTab === tab);
+      });
+      document.querySelectorAll(".policy-article").forEach((art) => {
+        art.classList.toggle("is-active", art.id === `policy-panel-${tab}`);
+      });
       openDialog(document.getElementById("policy-dialog"));
       return;
     }
-    const dedicatedViews = ["foster-care", "lost-found", "blood-donors", "adoption", "find-care"];
-    const view = dedicatedViews.includes(rawHash) ? rawHash : "home";
-    document.body.dataset.view = view;
 
-    // Desktop top-bar navigation link active styling
-    document.querySelectorAll(".site-nav-links .site-nav-link").forEach((link) => {
-      const href = (link.getAttribute("href") || "").replace(/^#/, "");
-      link.classList.toggle("is-active", href === rawHash);
-    });
-
-    // Desktop header active nav styling
-    document.querySelectorAll(".main-nav a").forEach((link) => {
-      const href = (link.getAttribute("href") || "").replace(/^#/, "");
-      const isHomeLink = href === "main" || href === "home";
-      link.classList.toggle("is-active", (view === "home" && isHomeLink) || href === view);
-    });
-
-    // Drawer active nav styling
-    document.querySelectorAll(".drawer-nav [data-drawer-link]").forEach((link) => {
-      const target = link.dataset.drawerLink;
-      const isHome = target === "home" && (view === "home");
-      link.classList.toggle("is-active", isHome || target === view);
-    });
-
-    // Scroll smoothly to top on view change
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  // ── Top-Right 3-Bar Slide-Out Drawer Controls ──
-  const menuToggleBtn = document.getElementById("menu-toggle-btn");
-  const menuDrawer = document.getElementById("menu-drawer");
-  const menuBackdrop = document.getElementById("menu-drawer-backdrop");
-  const drawerCloseBtn = document.getElementById("drawer-close-btn");
-
-  function openMenuDrawer() {
-    if (!menuDrawer) return;
-    menuDrawer.classList.add("is-open");
-    menuDrawer.setAttribute("aria-hidden", "false");
-    menuToggleBtn?.classList.add("is-active");
-    menuToggleBtn?.setAttribute("aria-expanded", "true");
-    if (menuBackdrop) {
-      menuBackdrop.hidden = false;
-      requestAnimationFrame(() => menuBackdrop.classList.add("is-open"));
-    }
-  }
-
-  function closeMenuDrawer() {
-    if (!menuDrawer) return;
-    menuDrawer.classList.remove("is-open");
-    menuDrawer.setAttribute("aria-hidden", "true");
-    menuToggleBtn?.classList.remove("is-active");
-    menuToggleBtn?.setAttribute("aria-expanded", "false");
-    if (menuBackdrop) {
-      menuBackdrop.classList.remove("is-open");
-      setTimeout(() => {
-        if (!menuDrawer.classList.contains("is-open")) {
-          menuBackdrop.hidden = true;
-        }
-      }, 280);
-    }
-  }
-
-  menuToggleBtn?.addEventListener("click", () => {
-    const isOpen = menuDrawer?.classList.contains("is-open");
-    if (isOpen) {
-      closeMenuDrawer();
-    } else {
-      openMenuDrawer();
-    }
-  });
-
-  drawerCloseBtn?.addEventListener("click", closeMenuDrawer);
-  menuBackdrop?.addEventListener("click", closeMenuDrawer);
-
-  // Close drawer when clicking any link inside the drawer
-  menuDrawer?.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      closeMenuDrawer();
-    });
-  });
-
-  // Wire drawer care button
-  menuDrawer?.querySelector("[data-open-dashboard]")?.addEventListener("click", (e) => {
-    closeMenuDrawer();
-    if (!localStorage.getItem("pawnir_token")) {
-      showAuthStep("credentials");
-      openDialog(document.getElementById("auth-dialog"), e.currentTarget);
+    // Sighting modal trigger
+    const sightBtn = e.target.closest("[data-sighting-id]");
+    if (sightBtn) {
+      if (!state.user) {
+        showToast("Please sign in to share a verified sighting tip.");
+        openDialog(document.getElementById("auth-dialog"));
+        return;
+      }
+      state.activeSightingReportId = sightBtn.getAttribute("data-sighting-id");
+      const titleEl = document.getElementById("sighting-dialog-title");
+      if (titleEl) titleEl.textContent = `Sighting tip: ${sightBtn.getAttribute("data-sighting-title") || "Pet"}`;
+      openDialog(document.getElementById("sighting-dialog"));
       return;
     }
-    openDialog(document.getElementById("dashboard-dialog"), e.currentTarget);
-  });
 
-  window.addEventListener("hashchange", updateViewFromHash);
-  updateViewFromHash();
-
-  // Homepage Snapshot quick-action triggers
-  document.getElementById("home-report-lost-btn")?.addEventListener("click", (event) => {
-    if (!localStorage.getItem("pawnir_token")) {
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to report a lost or found animal.";
-      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-      return;
-    }
-    document.getElementById("lost-report-status").textContent = "";
-    openDialog(document.getElementById("lost-report-dialog"), event.currentTarget);
-  });
-
-  document.getElementById("home-add-foster-btn")?.addEventListener("click", (event) => {
-    if (!localStorage.getItem("pawnir_token")) {
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to list a local foster or shelter on Google Maps.";
-      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-      return;
-    }
-    document.getElementById("add-foster-status").textContent = "";
-    openDialog(document.getElementById("add-foster-dialog"), event.currentTarget);
-  });
-
-  // How it works carousel
-  const stepsTrack = document.querySelector(".steps");
-  const stepCards = [...document.querySelectorAll("[data-step-card]")];
-  const stepDots = [...document.querySelectorAll("[data-step-dot]")];
-  let activeStep = 0;
-  let syncingSteps = false;
-  const showStep = (index, scroll = true) => {
-    activeStep = (index + stepCards.length) % stepCards.length;
-    stepCards.forEach((card, cardIndex) => card.classList.toggle("is-active", cardIndex === activeStep));
-    stepDots.forEach((dot, dotIndex) => {
-      dot.classList.toggle("is-active", dotIndex === activeStep);
-      dot.setAttribute("aria-current", dotIndex === activeStep ? "step" : "false");
-    });
-    if (scroll && window.matchMedia("(max-width: 640px)").matches) {
-      syncingSteps = true;
-      stepsTrack.scrollTo({
-        left: Math.max(0, stepCards[activeStep].offsetLeft - (stepsTrack.clientWidth - stepCards[activeStep].offsetWidth) / 2),
-        behavior: "smooth"
-      });
-      window.setTimeout(() => { syncingSteps = false; }, 450);
-    }
-  };
-  document.querySelector("[data-step-prev]")?.addEventListener("click", () => showStep(activeStep - 1));
-  document.querySelector("[data-step-next]")?.addEventListener("click", () => showStep(activeStep + 1));
-  stepDots.forEach((dot) => dot.addEventListener("click", () => showStep(Number(dot.dataset.stepDot))));
-  stepsTrack?.addEventListener("scroll", () => {
-    if (!window.matchMedia("(max-width: 640px)").matches || syncingSteps) return;
-    const center = stepsTrack.scrollLeft + stepsTrack.clientWidth / 2;
-    let nearest = 0;
-    stepCards.forEach((card, index) => {
-      if (Math.abs(card.offsetLeft + card.offsetWidth / 2 - center) < Math.abs(stepCards[nearest].offsetLeft + stepCards[nearest].offsetWidth / 2 - center)) nearest = index;
-    });
-    if (nearest !== activeStep) showStep(nearest, false);
-  }, { passive: true });
-
-  // Auth & Account triggers
-  const openAccountOrAuth = async (trigger) => {
-    if (localStorage.getItem("pawnir_token")) {
-      openDialog(document.getElementById("dashboard-dialog"), trigger);
-      await loadDashboard();
-    } else {
-      showAuthStep("credentials");
-      openDialog(document.getElementById("auth-dialog"), trigger);
-    }
-  };
-
-  document.querySelectorAll("[data-open-auth]").forEach((button) =>
-    button.addEventListener("click", (event) => openAccountOrAuth(event.currentTarget))
-  );
-  document.querySelectorAll("[data-open-dashboard],[data-open-account]").forEach((button) =>
-    button.addEventListener("click", (event) => openAccountOrAuth(event.currentTarget))
-  );
-
-  // Auth mode tabs & password visibility
-  document.querySelectorAll("[data-auth-mode]").forEach((tab) =>
-    tab.addEventListener("click", () => setAuthMode(tab.dataset.authMode))
-  );
-  document.getElementById("toggle-password-btn")?.addEventListener("click", (event) => {
-    const pwd = document.getElementById("auth-password");
-    const showing = pwd.type === "text";
-    pwd.type = showing ? "password" : "text";
-    event.currentTarget.textContent = showing ? "Show" : "Hide";
-  });
-
-  // Google Sign-In button check
-  document.getElementById("google-signin-link")?.addEventListener("click", (event) => {
-    if (!state.googleEnabled) {
-      event.preventDefault();
-      document.getElementById("auth-status").textContent = "Google Sign-In is ready to activate once GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET are added to .env. Please sign in with email below.";
-    }
-  });
-
-  // 2FA Controls
-  document.getElementById("auth-2fa-refresh")?.addEventListener("click", refreshMathChallenge);
-  document.getElementById("auth-2fa-back")?.addEventListener("click", () => showAuthStep("credentials"));
-
-  document.getElementById("auth-2fa-form")?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const status = document.getElementById("auth-status");
-    const submitBtn = document.getElementById("auth-2fa-submit");
-    const answer = document.getElementById("auth-2fa-answer").value.trim();
-    if (!state.pending2faToken || !state.challengeToken) {
-      showAuthStep("credentials");
-      return;
-    }
-    submitBtn.disabled = true;
-    const response = await fetch("/api/auth/verify-2fa", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        pendingToken: state.pending2faToken,
-        challengeToken: state.challengeToken,
-        answer
-      })
-    });
-    const result = await response.json();
-    submitBtn.disabled = false;
-    if (!response.ok) {
-      status.textContent = result.error || "Incorrect answer. Please try again.";
-      if (result.challenge) {
-        state.challengeToken = result.challenge.challengeToken;
-        document.getElementById("auth-2fa-question").textContent = result.challenge.question;
-        document.getElementById("auth-2fa-answer").value = "";
-        document.getElementById("auth-2fa-answer").focus();
+    // Resolve Lost Report
+    const resolveBtn = e.target.closest("[data-resolve-lost]");
+    if (resolveBtn) {
+      const id = resolveBtn.getAttribute("data-resolve-lost");
+      resolveBtn.disabled = true;
+      try {
+        await apiFetch(`/api/lost-found/${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: "resolved" })
+        });
+        showToast("Report marked as reunited!");
+        loadLostReports({ silent: true });
+        if (document.getElementById("dashboard-dialog")?.open) loadDashboardData();
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        resolveBtn.disabled = false;
       }
       return;
     }
-    localStorage.setItem("pawnir_token", result.token);
-    state.user = result.user;
-    state.pending2faToken = null;
-    updateAuthUI();
-    closeDialog(document.getElementById("auth-dialog"));
-    showAuthStep("credentials");
-    await Promise.all([loadPets(), loadLostReports(), loadDonors(), loadNotifications(), loadAdoptions()]);
-    if (pendingReviewFoster) {
-      const foster = pendingReviewFoster;
-      pendingReviewFoster = null;
-      openFosterReviews(foster.id, foster.name);
-      showToast(`Welcome! You can now review ${foster.name}.`);
-    } else if (pendingAdoptionAction === "list") {
-      pendingAdoptionAction = null;
-      openDialog(document.getElementById("list-adoption-dialog"));
-    } else {
-      showToast(`Welcome, ${result.user?.name || "Pet parent"}!`);
+
+    // Request Blood Donor
+    const reqDonorBtn = e.target.closest("[data-request-donor]");
+    if (reqDonorBtn) {
+      if (!state.user) {
+        showToast("Please sign in to request an emergency blood donor.");
+        openDialog(document.getElementById("auth-dialog"));
+        return;
+      }
+      state.activeDonorId = reqDonorBtn.getAttribute("data-request-donor");
+      const titleEl = document.getElementById("donor-request-title");
+      if (titleEl) {
+        titleEl.textContent = `Request ${reqDonorBtn.getAttribute("data-donor-name") || "Donor"} (${reqDonorBtn.getAttribute("data-donor-blood") || ""})`;
+      }
+      openDialog(document.getElementById("donor-request-dialog"));
+      return;
+    }
+
+    // Toggle My Donor Availability
+    const toggleDonorBtn = e.target.closest("[data-toggle-donor]");
+    if (toggleDonorBtn) {
+      const id = toggleDonorBtn.getAttribute("data-toggle-donor");
+      const nextAvail = toggleDonorBtn.getAttribute("data-donor-avail") === "true";
+      toggleDonorBtn.disabled = true;
+      try {
+        await apiFetch(`/api/donors/${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ available: nextAvail })
+        });
+        showToast(nextAvail ? "Donor marked available" : "Donor paused");
+        loadDonors({ silent: true });
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        toggleDonorBtn.disabled = false;
+      }
+      return;
+    }
+
+    // Accept / Decline Incoming Donor Request
+    const donorReqAction = e.target.closest("[data-donor-req-action]");
+    if (donorReqAction) {
+      const reqId = donorReqAction.getAttribute("data-donor-req-action");
+      const nextStatus = donorReqAction.getAttribute("data-req-status");
+      donorReqAction.disabled = true;
+      try {
+        await apiFetch(`/api/donor-requests/${encodeURIComponent(reqId)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: nextStatus })
+        });
+        showToast(`Request ${nextStatus}!`);
+        loadDonors({ silent: true });
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        donorReqAction.disabled = false;
+      }
+      return;
+    }
+
+    // Foster Map Pin / Preview click
+    const mapPinBtn = e.target.closest("[data-map-foster-id], [data-focus-map]");
+    if (mapPinBtn) {
+      const fId = mapPinBtn.getAttribute("data-map-foster-id") || mapPinBtn.getAttribute("data-focus-map");
+      const found = state.fostersCache.find((f) => f.id === fId);
+      if (found) {
+        selectFosterOnMap(found);
+        document.querySelector(".foster-map-explorer")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+      return;
+    }
+
+    // Open Foster Reviews
+    const openRevBtn = e.target.closest("[data-open-reviews]");
+    if (openRevBtn) {
+      openFosterReviewsModal(openRevBtn.getAttribute("data-open-reviews"), openRevBtn.getAttribute("data-foster-name"));
+      return;
+    }
+
+    // Helpful Review Vote
+    const helpfulBtn = e.target.closest("[data-helpful-review]");
+    if (helpfulBtn) {
+      if (!state.user) {
+        showToast("Please sign in to vote on reviews.");
+        openDialog(document.getElementById("auth-dialog"));
+        return;
+      }
+      const rId = helpfulBtn.getAttribute("data-helpful-review");
+      const fId = helpfulBtn.getAttribute("data-helpful-foster");
+      helpfulBtn.disabled = true;
+      try {
+        await apiFetch(`/api/fosters/${encodeURIComponent(fId)}/reviews/${encodeURIComponent(rId)}/helpful`, {
+          method: "POST"
+        });
+        openFosterReviewsModal(fId);
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        helpfulBtn.disabled = false;
+      }
+      return;
+    }
+
+    // Request Foster Stay
+    const reqFosterBtn = e.target.closest("[data-request-foster]");
+    if (reqFosterBtn) {
+      if (!state.user) {
+        showToast("Please sign in to request foster care.");
+        openDialog(document.getElementById("auth-dialog"));
+        return;
+      }
+      state.activeFosterId = reqFosterBtn.getAttribute("data-request-foster");
+      setCounterText("foster-request-title", `Request stay at ${reqFosterBtn.getAttribute("data-foster-name") || "Foster"}`);
+      openDialog(document.getElementById("foster-request-dialog"));
+      return;
+    }
+
+    // Apply to Adopt
+    const applyAdoptBtn = e.target.closest("[data-apply-adopt]");
+    if (applyAdoptBtn) {
+      if (!state.user) {
+        showToast("Please sign in to apply for adoption.");
+        openDialog(document.getElementById("auth-dialog"));
+        return;
+      }
+      state.activeAdoptionId = applyAdoptBtn.getAttribute("data-apply-adopt");
+      setCounterText("adoption-form-title", `Apply to adopt ${applyAdoptBtn.getAttribute("data-adopt-name") || ""}`);
+      const pdfLink = document.getElementById("adoption-pdf-link");
+      if (pdfLink) pdfLink.hidden = true;
+      openDialog(document.getElementById("adoption-dialog"));
+      return;
+    }
+
+    // Mark Adoption Listing as Rehomed
+    const markAdoptedBtn = e.target.closest("[data-mark-adopted]");
+    if (markAdoptedBtn) {
+      const id = markAdoptedBtn.getAttribute("data-mark-adopted");
+      markAdoptedBtn.disabled = true;
+      try {
+        await apiFetch(`/api/adoptions/listings/${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: "adopted" })
+        });
+        showToast("Marked as safely rehomed!");
+        loadAdoptions({ silent: true });
+        if (document.getElementById("dashboard-dialog")?.open) loadDashboardData();
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        markAdoptedBtn.disabled = false;
+      }
     }
   });
 
-  // Sign Out
-  document.getElementById("signout-button")?.addEventListener("click", () => {
-    localStorage.removeItem("pawnir_token");
-    state.user = null;
-    pets = [];
-    updateAuthUI();
-    loadNotifications();
-    loadLostReports();
-    loadDonors();
-    closeDialog(document.getElementById("dashboard-dialog"));
-    showToast("Signed out safely.");
-  });
-
-  // Notifications dialog
-  document.getElementById("notifications-button")?.addEventListener("click", async (event) => {
-    await loadNotifications();
-    openDialog(document.getElementById("notifications-dialog"), event.currentTarget);
-  });
-  document.getElementById("mark-notifications-read")?.addEventListener("click", async () => {
-    const token = localStorage.getItem("pawnir_token");
-    if (!token) return;
-    await fetch("/api/notifications/read", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
-    await loadNotifications();
-    showToast("All alerts marked as read.");
-  });
-
-  document.getElementById("theme-toggle").addEventListener("click", () =>
-    setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark")
-  );
-  document.getElementById("language-toggle").addEventListener("click", () =>
-    applyLanguage(state.language === "bn" ? "en" : "bn")
-  );
-
-  // Lost & Found species filter pills
-  document.querySelectorAll("#lost-species-pills [data-lost-species]").forEach((pill) =>
-    pill.addEventListener("click", () => {
-      lostSpeciesFilter = pill.dataset.lostSpecies || "";
-      document.querySelectorAll("#lost-species-pills [data-lost-species]").forEach((btn) =>
-        btn.classList.toggle("is-active", btn === pill)
-      );
+  // Filter Toolbars & Search Inputs
+  document.getElementById("lost-area-input")?.addEventListener("input", () => loadLostReports({ silent: true }));
+  document.getElementById("lost-type-filter")?.addEventListener("change", () => loadLostReports());
+  document.querySelectorAll("#lost-species-pills .chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll("#lost-species-pills .chip").forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      state.lostSpecies = chip.getAttribute("data-lost-species") || "";
       loadLostReports();
-    })
-  );
-
-  // Sighting form submission
-  document.getElementById("sighting-form")?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (!selectedSightingReport) return;
-    const status = document.getElementById("sighting-status");
-    const submitBtn = document.getElementById("sighting-submit-btn");
-    submitBtn.disabled = true;
-    const response = await fetch(`/api/lost-found/${encodeURIComponent(selectedSightingReport.id)}/sightings`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") },
-      body: JSON.stringify({
-        location: document.getElementById("sighting-location").value.trim(),
-        note: document.getElementById("sighting-note").value.trim(),
-        contact: document.getElementById("sighting-contact").value.trim()
-      })
     });
-    const result = await response.json();
-    submitBtn.disabled = false;
-    status.textContent = response.ok
-      ? "Sighting shared! The pet owner has been notified."
-      : (result.error || "Unable to post sighting.");
-    status.classList.toggle("is-success", response.ok);
-    if (response.ok) {
-      document.getElementById("sighting-form").reset();
-      lostReportSignature = "";
-      await loadLostReports();
-      showToast("Sighting tip sent to owner!");
-      window.setTimeout(() => closeDialog(document.getElementById("sighting-dialog")), 650);
-    }
   });
 
-  // Lost & Found report photo preview + compression
-  const photoInput = document.getElementById("report-photo");
-  const previewWrap = document.getElementById("report-photo-preview-wrap");
-  const previewImg = document.getElementById("report-photo-preview");
-  photoInput?.addEventListener("change", async () => {
-    const file = photoInput.files?.[0];
-    const status = document.getElementById("lost-report-status");
-    if (!file) {
-      compressedReportPhoto = null;
-      previewWrap.hidden = true;
-      return;
-    }
-    try {
-      compressedReportPhoto = await compressAndReadPhoto(file);
-      previewImg.src = compressedReportPhoto;
-      previewWrap.hidden = false;
-      status.textContent = "";
-    } catch (error) {
-      compressedReportPhoto = null;
-      previewWrap.hidden = true;
-      status.textContent = error.message;
-    }
-  });
-  document.getElementById("report-photo-clear")?.addEventListener("click", () => {
-    photoInput.value = "";
-    compressedReportPhoto = null;
-    previewWrap.hidden = true;
+  document.getElementById("donor-area-input")?.addEventListener("input", () => loadDonors({ silent: true }));
+  document.getElementById("donor-species-filter")?.addEventListener("change", () => loadDonors());
+  document.getElementById("donor-blood-filter")?.addEventListener("change", () => loadDonors());
+
+  document.getElementById("foster-search-input")?.addEventListener("input", () => loadFosters({ silent: true }));
+  document.getElementById("foster-city-filter")?.addEventListener("change", () => loadFosters());
+  document.getElementById("foster-species-filter")?.addEventListener("change", () => loadFosters());
+  document.getElementById("foster-map-reviews-btn")?.addEventListener("click", () => {
+    const active = state.fostersCache.find((f) => f.id === state.activeFosterId) || state.fostersCache[0];
+    if (active) openFosterReviewsModal(active.id, active.name);
   });
 
-  document.getElementById("report-lost-button").addEventListener("click", (event) => {
-    if (!localStorage.getItem("pawnir_token")) {
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to publish a nearby animal alert.";
-      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-      return;
-    }
-    document.getElementById("lost-report-status").textContent = "";
-    openDialog(document.getElementById("lost-report-dialog"), event.currentTarget);
-  });
-
-  document.getElementById("lost-report-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const status = document.getElementById("lost-report-status");
-    const payload = {
-      type: document.querySelector("input[name='report-type']:checked").value,
-      species: document.getElementById("report-species").value,
-      area: document.getElementById("report-area").value,
-      city: document.getElementById("report-city").value,
-      title: document.getElementById("report-title").value,
-      description: document.getElementById("report-description").value,
-      photoData: compressedReportPhoto
-    };
-    const response = await fetch("/api/lost-found", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json();
-    status.textContent = response.ok
-      ? `Alert published. ${result.notifiedCount} nearby members notified.`
-      : (result.error || "Unable to publish alert.");
-    status.classList.toggle("is-success", response.ok);
-    if (response.ok) {
-      document.getElementById("lost-report-form").reset();
-      compressedReportPhoto = null;
-      previewWrap.hidden = true;
-      lostReportSignature = "";
-      await loadLostReports();
-      showToast("Nearby alert published!");
-      window.setTimeout(() => closeDialog(document.getElementById("lost-report-dialog")), 700);
-    }
-  });
-
-  document.getElementById("lost-type-filter").addEventListener("change", loadLostReports);
-  document.getElementById("lost-area-input").addEventListener("input", () => {
-    clearTimeout(window.pawnirLostTimer);
-    window.pawnirLostTimer = setTimeout(loadLostReports, 220);
-  });
-
-  document.getElementById("nearby-alert-button").addEventListener("click", async (event) => {
-    const token = localStorage.getItem("pawnir_token");
-    const area = document.getElementById("lost-area-input").value.trim();
-    if (!token) {
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to receive nearby animal alerts.";
-      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-      return;
-    }
-    if (!area) {
-      document.getElementById("lost-area-input").focus();
-      showToast("Enter your area name first (e.g. Dhanmondi 10).");
-      return;
-    }
-    const response = await fetch("/api/lost-found/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-      body: JSON.stringify({ area, city: document.getElementById("report-city")?.value || "Dhaka" })
-    });
-    const result = await response.json();
-    event.currentTarget.textContent = response.ok ? "Alerts enabled ✓" : (result.error || "Try again");
-    if (response.ok) showToast(`Subscribed to alerts near ${area}`);
-  });
-
-  // Donors & Donor Request sheet
-  document.getElementById("register-donor-button").addEventListener("click", (event) => {
-    if (!localStorage.getItem("pawnir_token")) {
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to register an animal donor.";
-      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-      return;
-    }
-    document.getElementById("donor-status").textContent = "";
-    openDialog(document.getElementById("donor-dialog"), event.currentTarget);
-  });
-
-  document.getElementById("donor-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const response = await fetch("/api/donors", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") },
-      body: JSON.stringify({
-        petName: document.getElementById("donor-pet-name")?.value.trim() || "",
-        species: document.getElementById("donor-species").value,
-        weightKg: document.getElementById("donor-weight")?.value || null,
-        vaccinated: document.getElementById("donor-vaccinated")?.value !== "false",
-        area: document.getElementById("donor-area").value.trim(),
-        city: document.getElementById("donor-city").value,
-        bloodType: document.getElementById("donor-blood-type").value,
-        consent: document.getElementById("donor-consent").checked,
-        eligibilityAcknowledged: document.getElementById("donor-eligible").checked
-      })
-    });
-    const result = await response.json();
-    const status = document.getElementById("donor-status");
-    status.textContent = response.ok
-      ? "Registered & live in the verified donor network!"
-      : (result.error || "Unable to register donor.");
-    status.classList.toggle("is-success", response.ok);
-    if (response.ok) {
-      document.getElementById("donor-form").reset();
-      await loadDonors();
-      showToast("Donor registered and active!");
-      window.setTimeout(() => closeDialog(document.getElementById("donor-dialog")), 700);
-    }
-  });
-
-  document.getElementById("donor-request-form")?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (!selectedDonor) return;
-    const status = document.getElementById("donor-request-status");
-    const submitBtn = document.getElementById("donor-request-submit");
-    submitBtn.disabled = true;
-    const response = await fetch(`/api/donors/${encodeURIComponent(selectedDonor.id)}/requests`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") },
-      body: JSON.stringify({
-        clinic: document.getElementById("donor-request-clinic")?.value.trim() || "",
-        contactPhone: document.getElementById("donor-request-phone")?.value.trim() || "",
-        reason: document.getElementById("donor-request-reason").value.trim()
-      })
-    });
-    const result = await response.json();
-    submitBtn.disabled = false;
-    status.textContent = response.ok
-      ? "Urgent request sent! The donor owner has been notified immediately."
-      : (result.error || "Unable to send request.");
-    status.classList.toggle("is-success", response.ok);
-    if (response.ok) {
-      if (selectedDonor.button) {
-        selectedDonor.button.textContent = "Request sent ✓";
-        selectedDonor.button.disabled = true;
-      }
-      document.getElementById("donor-request-form").reset();
-      showToast("Urgent blood request sent!");
-      window.setTimeout(() => closeDialog(document.getElementById("donor-request-dialog")), 750);
-    }
-  });
-
-  ["donor-species-filter", "donor-blood-filter"].forEach((id) =>
-    document.getElementById(id).addEventListener("change", loadDonors)
-  );
-  document.getElementById("donor-area-input").addEventListener("input", () => {
-    clearTimeout(window.pawnirDonorTimer);
-    window.pawnirDonorTimer = setTimeout(loadDonors, 220);
-  });
-
-  // Adoptions
-  document.getElementById("list-adoption-button")?.addEventListener("click", (event) => {
-    if (!localStorage.getItem("pawnir_token")) {
-      pendingAdoptionAction = "list";
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to list an animal for adoption.";
-      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
-      return;
-    }
-    const statusEl = document.getElementById("list-adoption-status");
-    if (statusEl) statusEl.textContent = "";
-    openDialog(document.getElementById("list-adoption-dialog"), event.currentTarget);
-  });
-
-  document.querySelectorAll("[data-close-adoption-form]").forEach((btn) => {
-    btn.addEventListener("click", () => closeDialog(document.getElementById("list-adoption-dialog")));
-  });
-
-  document.querySelectorAll("#adoption-species-pills [data-adoption-species]").forEach((pill) => {
-    pill.addEventListener("click", () => {
-      adoptionSpeciesFilter = pill.dataset.adoptionSpecies || "";
-      document.querySelectorAll("#adoption-species-pills [data-adoption-species]").forEach((p) => {
-        p.classList.toggle("active", p === pill);
-      });
-      const select = document.getElementById("adoption-species-filter");
-      if (select) select.value = adoptionSpeciesFilter;
+  document.getElementById("adoption-area-input")?.addEventListener("input", () => loadAdoptions({ silent: true }));
+  document.querySelectorAll("#adoption-species-pills .chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll("#adoption-species-pills .chip").forEach((c) => c.classList.remove("active"));
+      chip.classList.add("active");
+      state.adoptionSpecies = chip.getAttribute("data-adoption-species") || "";
       loadAdoptions();
     });
   });
 
-  document.getElementById("adoption-species-filter")?.addEventListener("change", (e) => {
-    adoptionSpeciesFilter = e.target.value;
-    document.querySelectorAll("#adoption-species-pills [data-adoption-species]").forEach((p) => {
-      p.classList.toggle("active", p.dataset.adoptionSpecies === adoptionSpeciesFilter);
-    });
-    loadAdoptions();
-  });
+  document.getElementById("vet-search-input")?.addEventListener("input", () => loadVets({ silent: true }));
+  document.getElementById("vet-city-filter")?.addEventListener("change", () => loadVets());
+  document.getElementById("vet-mode-filter")?.addEventListener("change", () => loadVets());
 
-  document.getElementById("adoption-area-input")?.addEventListener("input", () => {
-    clearTimeout(window.pawnirAdoptTimer);
-    window.pawnirAdoptTimer = setTimeout(loadAdoptions, 250);
-  });
-
-  document.getElementById("list-adoption-form")?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const token = localStorage.getItem("pawnir_token");
-    if (!token) {
-      pendingAdoptionAction = "list";
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to list an animal for adoption.";
-      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
+  // Primary Action Buttons
+  const handleReportLostClick = () => {
+    if (!state.user) {
+      showToast("Please sign in to publish a lost or found alert.");
+      openDialog(document.getElementById("auth-dialog"));
       return;
     }
-    const statusEl = document.getElementById("list-adoption-status");
-    const submitBtn = document.getElementById("adopt-submit-button");
-    if (submitBtn) submitBtn.disabled = true;
+    openDialog(document.getElementById("lost-report-dialog"));
+  };
+  document.getElementById("report-lost-button")?.addEventListener("click", handleReportLostClick);
+  document.getElementById("home-report-lost-btn")?.addEventListener("click", handleReportLostClick);
 
-    const payload = {
-      name: document.getElementById("adopt-pet-name").value.trim(),
-      species: document.getElementById("adopt-pet-species").value,
-      breed: document.getElementById("adopt-pet-breed")?.value.trim() || "",
-      age: document.getElementById("adopt-pet-age").value.trim(),
-      gender: document.getElementById("adopt-pet-gender")?.value || "Unknown",
-      area: document.getElementById("adopt-pet-area").value.trim(),
-      vaccinated: document.getElementById("adopt-pet-vaccinated")?.checked !== false,
-      neutered: document.getElementById("adopt-pet-neutered")?.checked === true,
-      indoorOnly: document.getElementById("adopt-pet-indoor")?.checked !== false,
-      description: document.getElementById("adopt-pet-desc").value.trim()
-    };
-
-    const response = await fetch("/api/adoptions/listings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json();
-    if (submitBtn) submitBtn.disabled = false;
-
-    if (!response.ok) {
-      if (statusEl) statusEl.textContent = result.error || "Unable to publish listing.";
+  document.getElementById("nearby-alert-button")?.addEventListener("click", async () => {
+    if (!state.user) {
+      showToast("Please sign in to subscribe to area alerts.");
+      openDialog(document.getElementById("auth-dialog"));
       return;
     }
-
-    if (statusEl) statusEl.textContent = "Adoption listing published successfully!";
-    showToast(`${result.name || "Pet"} listed for free adoption! ♡`);
-    document.getElementById("list-adoption-form").reset();
-    window.setTimeout(() => closeDialog(document.getElementById("list-adoption-dialog")), 600);
-    await Promise.all([loadAdoptions(), loadDashboard()]);
-  });
-
-  document.getElementById("adoption-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const response = await fetch("/api/adoptions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") },
-      body: JSON.stringify({
-        listingId: selectedAdoption.id,
-        housing: document.getElementById("adopt-housing").value,
-        experience: document.getElementById("adopt-experience").value,
-        household: document.getElementById("adopt-household").value,
-        vetPlan: document.getElementById("adopt-vet-plan").value
-      })
-    });
-    const result = await response.json();
-    document.getElementById("adoption-status").textContent = response.ok
-      ? "Application submitted for screening."
-      : (result.error || "Unable to submit application.");
-    if (response.ok) {
-      const link = document.getElementById("adoption-pdf-link");
-      link.hidden = false;
-      link.href = `/api/adoptions/${encodeURIComponent(result.applicationId)}/pdf`;
-      link.download = `pawnir-adoption-${result.applicationId}.pdf`;
-      showToast("Adoption application submitted!");
+    const loc = await PawNirBridge.detectNearestArea();
+    const area = document.getElementById("lost-area-input")?.value.trim() || loc.area;
+    try {
+      await apiFetch("/api/lost-found/subscribe", {
+        method: "POST",
+        body: JSON.stringify({ area, city: loc.city || "Dhaka" })
+      });
+      showToast(`🔔 Subscribed to live alerts in ${area}!`);
+    } catch (err) {
+      showToast(err.message);
     }
   });
 
-  // Fosters, Google Maps Foster Registration & Real Review System
-  document.getElementById("foster-city-filter").addEventListener("change", loadFosters);
-
-  document.getElementById("add-foster-button")?.addEventListener("click", (event) => {
-    if (!localStorage.getItem("pawnir_token")) {
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to list a local foster or shelter on Google Maps.";
-      openDialog(document.getElementById("auth-dialog"), event.currentTarget);
+  document.getElementById("register-donor-button")?.addEventListener("click", () => {
+    if (!state.user) {
+      showToast("Please sign in to register a blood donor.");
+      openDialog(document.getElementById("auth-dialog"));
       return;
     }
-    document.getElementById("add-foster-status").textContent = "";
-    openDialog(document.getElementById("add-foster-dialog"), event.currentTarget);
+    openDialog(document.getElementById("donor-dialog"));
   });
 
-  document.getElementById("add-foster-form")?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const status = document.getElementById("add-foster-status");
-    const submitBtn = document.getElementById("add-foster-submit");
-    submitBtn.disabled = true;
-    const response = await fetch("/api/fosters", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") },
-      body: JSON.stringify({
-        name: document.getElementById("new-foster-name").value.trim(),
-        city: document.getElementById("new-foster-city").value,
-        area: document.getElementById("new-foster-area").value.trim(),
-        mapQuery: document.getElementById("new-foster-map-query").value.trim(),
-        capacity: document.getElementById("new-foster-capacity").value.trim(),
-        phone: document.getElementById("new-foster-phone").value.trim(),
-        species: document.getElementById("new-foster-species").value,
-        description: document.getElementById("new-foster-description").value.trim()
-      })
-    });
-    const result = await response.json();
-    submitBtn.disabled = false;
-    status.textContent = response.ok
-      ? "Foster home added & pinned on Google Maps!"
-      : (result.error || "Unable to add foster care.");
-    status.classList.toggle("is-success", response.ok);
-    if (response.ok) {
-      document.getElementById("add-foster-form").reset();
-      activeMapFosterId = result.id;
-      await loadFosters();
-      showToast("Foster care added to Google Maps explorer!");
-      window.setTimeout(() => closeDialog(document.getElementById("add-foster-dialog")), 700);
+  const handleAddFosterClick = () => {
+    if (!state.user) {
+      showToast("Please sign in to add a foster location.");
+      openDialog(document.getElementById("auth-dialog"));
+      return;
     }
-  });
+    openDialog(document.getElementById("add-foster-dialog"));
+  };
+  document.getElementById("add-foster-button")?.addEventListener("click", handleAddFosterClick);
+  document.getElementById("home-add-foster-btn")?.addEventListener("click", handleAddFosterClick);
 
-  document.getElementById("foster-request-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const response = await fetch(`/api/fosters/${encodeURIComponent(selectedFoster.id)}/requests`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") },
-      body: JSON.stringify({ reason: document.getElementById("foster-request-reason").value })
-    });
-    const result = await response.json();
-    const status = document.getElementById("foster-request-status");
-    status.textContent = response.ok
-      ? "Request sent. A registered foster team can now review it."
-      : (result.error || "Unable to send request.");
-    status.classList.toggle("is-success", response.ok);
-    if (response.ok) {
-      document.getElementById("foster-request-form").reset();
-      showToast("Foster care request sent!");
-      window.setTimeout(() => closeDialog(document.getElementById("foster-request-dialog")), 750);
+  document.getElementById("list-adoption-button")?.addEventListener("click", () => {
+    if (!state.user) {
+      showToast("Please sign in to list a pet for adoption.");
+      openDialog(document.getElementById("auth-dialog"));
+      return;
     }
+    openDialog(document.getElementById("list-adoption-dialog"));
   });
 
-  // Interactive 5-Star Picker
+  document.getElementById("notifications-button")?.addEventListener("click", () => {
+    loadNotifications();
+    openDialog(document.getElementById("notifications-dialog"));
+  });
+
+  document.getElementById("mark-notifications-read")?.addEventListener("click", async () => {
+    if (!state.user) return;
+    await apiFetch("/api/notifications/read", { method: "POST" }).catch(() => {});
+    loadNotifications();
+  });
+
+  // Star Rating Picker in Foster Reviews
+  const starLabels = {
+    1: "1 — Poor care",
+    2: "2 — Below average",
+    3: "3 — Good care",
+    4: "4 — Very good care",
+    5: "5 — Excellent care"
+  };
   document.querySelectorAll("#star-rating-picker .star-btn").forEach((btn) => {
-    btn.addEventListener("click", () => updateStarPickerUI(Number(btn.dataset.starValue)));
-    btn.addEventListener("mouseenter", () => updateStarPickerUI(Number(btn.dataset.starValue)));
+    btn.addEventListener("click", () => {
+      const val = Number(btn.dataset.star || btn.dataset.starValue || 5);
+      const hiddenInput = document.getElementById("foster-review-rating");
+      const labelEl = document.getElementById("star-rating-label");
+      if (hiddenInput) hiddenInput.value = String(val);
+      if (labelEl) labelEl.textContent = starLabels[val] || "5 — Excellent care";
+      document.querySelectorAll("#star-rating-picker .star-btn").forEach((b) => {
+        const bVal = Number(b.dataset.star || b.dataset.starValue || 0);
+        b.classList.toggle("is-lit", bVal <= val);
+      });
+    });
   });
 
-  document.getElementById("foster-review-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (!selectedFoster) return;
-    const token = localStorage.getItem("pawnir_token");
-    if (!token) {
-      pendingReviewFoster = { id: selectedFoster.id, name: selectedFoster.name };
-      showAuthStep("credentials");
-      document.getElementById("auth-status").textContent = "Sign in first to publish a verified community review.";
-      openDialog(document.getElementById("auth-dialog"), event.submitter);
+  // Photo Compression & Preview for Lost Report & Adoption Listing
+  document.getElementById("report-photo")?.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await PawNirBridge.compressPhoto(file);
+      state.reportPhotoData = dataUrl;
+      const wrap = document.getElementById("report-photo-preview-wrap");
+      const img = document.getElementById("report-photo-preview");
+      if (img) img.src = dataUrl;
+      if (wrap) wrap.hidden = false;
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+
+  document.getElementById("report-photo-clear")?.addEventListener("click", () => {
+    state.reportPhotoData = null;
+    const input = document.getElementById("report-photo");
+    const wrap = document.getElementById("report-photo-preview-wrap");
+    if (input) input.value = "";
+    if (wrap) wrap.hidden = true;
+  });
+
+  document.getElementById("adopt-pet-photo")?.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await PawNirBridge.compressPhoto(file);
+      state.adoptPhotoData = dataUrl;
+      const wrap = document.getElementById("adopt-photo-preview-wrap");
+      const img = document.getElementById("adopt-photo-preview");
+      if (img) img.src = dataUrl;
+      if (wrap) wrap.hidden = false;
+    } catch (err) {
+      showToast(err.message);
+    }
+  });
+
+  document.getElementById("adopt-photo-clear")?.addEventListener("click", () => {
+    state.adoptPhotoData = null;
+    const input = document.getElementById("adopt-pet-photo");
+    const wrap = document.getElementById("adopt-photo-preview-wrap");
+    if (input) input.value = "";
+    if (wrap) wrap.hidden = true;
+  });
+
+  // Form Submissions
+  document.getElementById("lost-report-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById("lost-report-status");
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const type = e.target.querySelector('input[name="report-type"]:checked')?.value || "lost";
+    const species = document.getElementById("report-species")?.value || "";
+    const area = document.getElementById("report-area")?.value.trim() || "";
+    const city = document.getElementById("report-city")?.value.trim() || "Dhaka";
+    const title = document.getElementById("report-title")?.value.trim() || "";
+    const description = document.getElementById("report-description")?.value.trim() || "";
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = "Publishing nearby alert…";
+    try {
+      await apiFetch("/api/lost-found", {
+        method: "POST",
+        body: JSON.stringify({
+          type,
+          species,
+          area,
+          city,
+          title,
+          description,
+          photoData: state.reportPhotoData
+        })
+      });
+      e.target.reset();
+      state.reportPhotoData = null;
+      const wrap = document.getElementById("report-photo-preview-wrap");
+      if (wrap) wrap.hidden = true;
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("lost-report-dialog"));
+      showToast("Alert published and broadcasted to nearby members!");
+      loadLostReports();
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById("sighting-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById("sighting-submit");
+    const statusEl = document.getElementById("sighting-status");
+    const location = document.getElementById("sighting-location")?.value.trim() || "";
+    const contact = document.getElementById("sighting-contact")?.value.trim() || "";
+    const note = document.getElementById("sighting-note")?.value.trim() || "";
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = "Sending sighting alert…";
+    try {
+      await apiFetch(`/api/lost-found/${encodeURIComponent(state.activeSightingReportId)}/sightings`, {
+        method: "POST",
+        body: JSON.stringify({ location, contact, note })
+      });
+      e.target.reset();
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("sighting-dialog"));
+      showToast("Sighting tip sent directly to the pet owner!");
+      loadLostReports({ silent: true });
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById("donor-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById("donor-status");
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const petName = document.getElementById("donor-pet-name")?.value.trim() || "";
+    const species = document.getElementById("donor-species")?.value || "";
+    const bloodType = document.getElementById("donor-blood-type")?.value || "Unknown";
+    const weightKg = Number(document.getElementById("donor-weight")?.value || 0) || null;
+    const area = document.getElementById("donor-area")?.value.trim() || "";
+    const city = document.getElementById("donor-city")?.value.trim() || "Dhaka";
+    const lastDonationAt = document.getElementById("donor-last-donation")?.value || null;
+    const vaccinated = Boolean(document.getElementById("donor-vaccinated")?.checked);
+    const consent = Boolean(document.getElementById("donor-consent")?.checked);
+    const eligibilityAcknowledged = Boolean(document.getElementById("donor-eligible")?.checked);
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = "Registering donor…";
+    try {
+      await apiFetch("/api/donors", {
+        method: "POST",
+        body: JSON.stringify({
+          petName,
+          species,
+          bloodType,
+          weightKg,
+          area,
+          city,
+          lastDonationAt,
+          vaccinated,
+          consent,
+          eligibilityAcknowledged
+        })
+      });
+      e.target.reset();
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("donor-dialog"));
+      showToast("Donor registered in the emergency blood network!");
+      loadDonors();
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById("donor-request-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById("donor-request-submit");
+    const statusEl = document.getElementById("donor-request-status");
+    const clinic = document.getElementById("donor-request-clinic")?.value.trim() || "";
+    const contactPhone = document.getElementById("donor-request-phone")?.value.trim() || "";
+    const reason = document.getElementById("donor-request-reason")?.value.trim() || "";
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = "Sending urgent request…";
+    try {
+      await apiFetch(`/api/donors/${encodeURIComponent(state.activeDonorId)}/requests`, {
+        method: "POST",
+        body: JSON.stringify({ clinic, contactPhone, reason })
+      });
+      e.target.reset();
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("donor-request-dialog"));
+      showToast("Urgent blood request sent to donor guardian!");
+      loadDonors({ silent: true });
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById("add-foster-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById("add-foster-submit");
+    const statusEl = document.getElementById("add-foster-status");
+    const name = document.getElementById("new-foster-name")?.value.trim() || "";
+    const area = document.getElementById("new-foster-area")?.value.trim() || "";
+    const city = document.getElementById("new-foster-city")?.value || "Dhaka";
+    const mapQuery = document.getElementById("new-foster-map-query")?.value.trim() || "";
+    const phone = document.getElementById("new-foster-phone")?.value.trim() || "";
+    const species = document.getElementById("new-foster-species")?.value || "cat,dog";
+    const capacity = document.getElementById("new-foster-capacity")?.value.trim() || "";
+    const description = document.getElementById("new-foster-description")?.value.trim() || "";
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = "Adding foster to Google Maps directory…";
+    try {
+      const created = await apiFetch("/api/fosters", {
+        method: "POST",
+        body: JSON.stringify({ name, area, city, mapQuery, phone, species, capacity, description })
+      });
+      e.target.reset();
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("add-foster-dialog"));
+      showToast("Foster pinned to the Google Maps directory!");
+      await loadFosters();
+      if (created && created.id) selectFosterOnMap(created);
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById("foster-request-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById("foster-request-status");
+    const reason = document.getElementById("foster-request-reason")?.value.trim() || "";
+    try {
+      await apiFetch(`/api/fosters/${encodeURIComponent(state.activeFosterId)}/requests`, {
+        method: "POST",
+        body: JSON.stringify({ reason })
+      });
+      e.target.reset();
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("foster-request-dialog"));
+      showToast("Foster care request sent!");
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    }
+  });
+
+  document.getElementById("foster-review-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!state.user) {
+      showToast("Please sign in to publish a review.");
+      openDialog(document.getElementById("auth-dialog"));
       return;
     }
     const submitBtn = document.getElementById("foster-review-submit");
-    const status = document.getElementById("foster-review-status");
-    submitBtn.disabled = true;
-    const response = await fetch(`/api/fosters/${encodeURIComponent(selectedFoster.id)}/reviews`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-      body: JSON.stringify({
-        rating: Number(document.getElementById("foster-review-rating").value),
-        comment: document.getElementById("foster-review-comment").value.trim()
-      })
-    });
-    const result = await response.json();
-    submitBtn.disabled = false;
-    status.textContent = response.ok
-      ? (result.updated ? "Your review has been updated!" : "Thank you! Your review is now live.")
-      : (result.error || "Unable to submit review.");
-    status.classList.toggle("is-success", response.ok);
-    if (response.ok) {
+    const statusEl = document.getElementById("foster-review-status");
+    const rating = Number(document.getElementById("foster-review-rating")?.value || 5);
+    const petSpecies = document.getElementById("foster-review-species")?.value || "cat";
+    const comment = document.getElementById("foster-review-comment")?.value.trim() || "";
+
+    if (submitBtn) submitBtn.disabled = true;
+    try {
+      const res = await apiFetch(`/api/fosters/${encodeURIComponent(state.activeFosterId)}/reviews`, {
+        method: "POST",
+        body: JSON.stringify({ rating, petSpecies, comment })
+      });
       document.getElementById("foster-review-comment").value = "";
-      await Promise.all([refreshFosterReviewSheet(selectedFoster.id), loadFosters()]);
-      showToast("Community review published!");
+      if (statusEl) statusEl.textContent = "";
+      showToast(res.updated ? "Your review was updated!" : "Verified review published!");
+      openFosterReviewsModal(state.activeFosterId);
+      loadFosters({ silent: true });
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
 
-  // Profile & Pets
-  document.getElementById("profile-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const response = await fetch("/api/auth/me", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("pawnir_token") },
-      body: JSON.stringify({
-        name: document.getElementById("profile-name").value,
-        area: document.getElementById("profile-area").value,
-        bio: document.getElementById("profile-bio").value
-      })
+  document.getElementById("list-adoption-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById("adopt-submit-button");
+    const statusEl = document.getElementById("list-adoption-status");
+    const name = document.getElementById("adopt-pet-name")?.value.trim() || "";
+    const species = document.getElementById("adopt-pet-species")?.value || "";
+    const breed = document.getElementById("adopt-pet-breed")?.value.trim() || "Deshi Mix";
+    const age = document.getElementById("adopt-pet-age")?.value.trim() || "";
+    const gender = document.getElementById("adopt-pet-gender")?.value || "Unknown";
+    const area = document.getElementById("adopt-pet-area")?.value.trim() || "";
+    const vaccinated = Boolean(document.getElementById("adopt-pet-vaccinated")?.checked);
+    const neutered = Boolean(document.getElementById("adopt-pet-neutered")?.checked);
+    const indoorOnly = Boolean(document.getElementById("adopt-pet-indoor")?.checked);
+    const description = document.getElementById("adopt-pet-desc")?.value.trim() || "";
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = "Publishing adoption listing…";
+    try {
+      await apiFetch("/api/adoptions/listings", {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          species,
+          breed,
+          age,
+          gender,
+          area,
+          vaccinated,
+          neutered,
+          indoorOnly,
+          description,
+          photo: state.adoptPhotoData
+        })
+      });
+      e.target.reset();
+      state.adoptPhotoData = null;
+      const wrap = document.getElementById("adopt-photo-preview-wrap");
+      if (wrap) wrap.hidden = true;
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("list-adoption-dialog"));
+      showToast("Pet listed for safe, non-commercial adoption!");
+      loadAdoptions();
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  document.getElementById("adoption-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById("adoption-status");
+    const pdfLink = document.getElementById("adoption-pdf-link");
+    const housing = document.getElementById("adopt-housing")?.value.trim() || "";
+    const experience = document.getElementById("adopt-experience")?.value.trim() || "";
+    const household = document.getElementById("adopt-household")?.value.trim() || "";
+    const vetPlan = document.getElementById("adopt-vet-plan")?.value.trim() || "";
+
+    try {
+      const res = await apiFetch("/api/adoptions", {
+        method: "POST",
+        body: JSON.stringify({
+          listingId: state.activeAdoptionId,
+          housing,
+          experience,
+          household,
+          vetPlan
+        })
+      });
+      if (statusEl) statusEl.textContent = "Application submitted! The pet guardian has been notified.";
+      if (pdfLink && res.applicationId) {
+        pdfLink.href = `/api/adoptions/${encodeURIComponent(res.applicationId)}/pdf`;
+        pdfLink.hidden = false;
+      }
+      showToast("Adoption application submitted!");
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    }
+  });
+
+  // Auth & 2-Step Verification Flows (#auth-dialog)
+  let authMode = "login";
+  function setAuthMode(mode) {
+    authMode = mode === "register" ? "register" : "login";
+    document.querySelectorAll("[data-auth-mode]").forEach((btn) => {
+      const isMatch = btn.getAttribute("data-auth-mode") === authMode;
+      btn.classList.toggle("active", isMatch);
     });
-    const result = await response.json();
-    document.getElementById("profile-status").textContent = response.ok
-      ? "Profile saved."
-      : (result.error || "Unable to save profile.");
-    if (response.ok && result.user) {
-      state.user = result.user;
-      updateAuthUI();
-      showToast("Profile updated!");
-    }
-  });
+    const nameWrap = document.getElementById("auth-name-wrap");
+    const nameInput = document.getElementById("auth-name");
+    const submitBtn = document.getElementById("auth-submit-btn");
+    const titleEl = document.getElementById("auth-title");
+    const subEl = document.getElementById("auth-subtitle");
+    const stepCreds = document.getElementById("auth-step-credentials");
+    const twofaForm = document.getElementById("auth-2fa-form");
+    const statusEl = document.getElementById("auth-status");
 
-  document.getElementById("pet-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const token = localStorage.getItem("pawnir_token");
-    const response = await fetch("/api/pets", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        name: document.getElementById("pet-name").value.trim(),
-        species: document.getElementById("pet-species").value,
-        breed: document.getElementById("pet-breed")?.value.trim() || "",
-        age: document.getElementById("pet-age")?.value.trim() || ""
-      })
+    if (nameWrap) nameWrap.hidden = authMode !== "register";
+    if (nameInput) nameInput.required = authMode === "register";
+    if (submitBtn) {
+      submitBtn.textContent = authMode === "register" ? "Create account & continue →" : "Continue to 2-Step Check →";
+    }
+    if (titleEl) {
+      titleEl.textContent = authMode === "register" ? "Create your PawNir account" : "Welcome to PawNir";
+    }
+    if (subEl) {
+      subEl.textContent =
+        authMode === "register"
+          ? "Join Bangladesh's verified pet rescue, blood donor, and foster network."
+          : "Sign in to manage pet profiles, publish alerts, and track care.";
+    }
+    if (stepCreds) stepCreds.hidden = false;
+    if (twofaForm) twofaForm.hidden = true;
+    if (statusEl) statusEl.textContent = "";
+  }
+
+  document.querySelectorAll("[data-auth-mode]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setAuthMode(btn.getAttribute("data-auth-mode"));
     });
-    const result = await response.json();
-    const statusEl = document.getElementById("pet-status");
-    if (statusEl) statusEl.textContent = response.ok ? `${result.name} added to your care space.` : result.error;
-    if (response.ok) {
-      event.target.reset();
-      event.target.hidden = true;
-      await Promise.all([loadPets(), loadDashboard()]);
-      showToast(`${result.name} added to Pet Passports!`);
+  });
+
+  document.getElementById("toggle-password-btn")?.addEventListener("click", () => {
+    const pwInput = document.getElementById("auth-password");
+    const toggleBtn = document.getElementById("toggle-password-btn");
+    if (!pwInput || !toggleBtn) return;
+    const isHidden = pwInput.type === "password";
+    pwInput.type = isHidden ? "text" : "password";
+    toggleBtn.textContent = isHidden ? "Hide" : "Show";
+  });
+
+  function show2faStep(pendingToken, challenge) {
+    state.pending2faToken = pendingToken;
+    state.challengeToken = challenge.challengeToken;
+    setCounterText("auth-2fa-question", challenge.question);
+    const stepCreds = document.getElementById("auth-step-credentials");
+    const twofaForm = document.getElementById("auth-2fa-form");
+    if (stepCreds) stepCreds.hidden = true;
+    if (twofaForm) twofaForm.hidden = false;
+    const ansInput = document.getElementById("auth-2fa-answer");
+    if (ansInput) {
+      ansInput.value = "";
+      ansInput.focus();
+    }
+  }
+
+  document.getElementById("auth-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById("auth-status");
+    const submitBtn = document.getElementById("auth-submit-btn");
+    const name = document.getElementById("auth-name")?.value.trim() || "";
+    const email = document.getElementById("auth-email")?.value.trim() || "";
+    const password = document.getElementById("auth-password")?.value || "";
+    const endpoint = authMode === "register" ? "/api/auth/register" : "/api/auth/login";
+    const payload = authMode === "register" ? { name, email, password, require2fa: true } : { email, password, require2fa: true };
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = "Verifying credentials…";
+    try {
+      const res = await apiFetch(endpoint, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      if (res.requires2fa) {
+        if (statusEl) {
+          statusEl.textContent =
+            authMode === "register"
+              ? "Account created! Complete the 2FA math check above to finish signing in."
+              : "Step 1 verified. Complete the math security check above.";
+        }
+        show2faStep(res.pendingToken, res.challenge);
+        return;
+      }
+      state.token = res.token;
+      state.user = res.user;
+      localStorage.setItem("pawnir-token", res.token);
+      updateAuthHeaderUI();
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("auth-dialog"));
+      showToast(`Welcome to PawNir, ${res.user.name}!`);
+      loadNotifications();
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
 
-  // Toggle pet registration form
-  document.getElementById("toggle-add-pet-btn")?.addEventListener("click", () => {
-    const pf = document.getElementById("pet-form");
-    if (pf) {
-      pf.hidden = !pf.hidden;
-      if (!pf.hidden) document.getElementById("pet-name")?.focus();
+  document.getElementById("auth-2fa-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById("auth-status");
+    const submitBtn = document.getElementById("auth-2fa-submit");
+    const answer = document.getElementById("auth-2fa-answer")?.value.trim() || "";
+
+    if (submitBtn) submitBtn.disabled = true;
+    try {
+      const res = await apiFetch("/api/auth/verify-2fa", {
+        method: "POST",
+        body: JSON.stringify({
+          pendingToken: state.pending2faToken,
+          challengeToken: state.challengeToken,
+          answer
+        })
+      });
+      state.token = res.token;
+      state.user = res.user;
+      localStorage.setItem("pawnir-token", res.token);
+      updateAuthHeaderUI();
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("auth-dialog"));
+      showToast(`Signed in securely as ${res.user.name}!`);
+      loadNotifications();
+      loadLostReports({ silent: true });
+      loadDonors({ silent: true });
+      loadAdoptions({ silent: true });
+    } catch (err) {
+      if (err.payload?.challenge) {
+        state.challengeToken = err.payload.challenge.challengeToken;
+        setCounterText("auth-2fa-question", err.payload.challenge.question);
+      }
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
-  document.getElementById("cancel-add-pet-btn")?.addEventListener("click", () => {
-    const pf = document.getElementById("pet-form");
-    if (pf) pf.hidden = true;
+
+  document.getElementById("auth-2fa-refresh")?.addEventListener("click", async () => {
+    const ch = await apiFetch("/api/auth/challenge").catch(() => null);
+    if (ch) {
+      state.challengeToken = ch.challengeToken;
+      setCounterText("auth-2fa-question", ch.question);
+    }
   });
 
-  // Modern Dashboard Tabs
+  document.getElementById("auth-2fa-back")?.addEventListener("click", () => {
+    const stepCreds = document.getElementById("auth-step-credentials");
+    const twofaForm = document.getElementById("auth-2fa-form");
+    const statusEl = document.getElementById("auth-status");
+    if (twofaForm) twofaForm.hidden = true;
+    if (stepCreds) stepCreds.hidden = false;
+    if (statusEl) statusEl.textContent = "";
+  });
+
+  // Dashboard Tabs & Actions
   document.querySelectorAll("[data-dash-tab]").forEach((tab) => {
     tab.addEventListener("click", () => {
-      const target = tab.dataset.dashTab;
-      document.querySelectorAll("[data-dash-tab]").forEach((t) => {
-        const isTarget = t === tab;
-        t.classList.toggle("is-active", isTarget);
-        t.setAttribute("aria-selected", String(isTarget));
-      });
+      const target = tab.getAttribute("data-dash-tab");
+      document.querySelectorAll("[data-dash-tab]").forEach((tBtn) => tBtn.classList.toggle("is-active", tBtn === tab));
       document.querySelectorAll(".dash-panel").forEach((panel) => {
         panel.classList.toggle("is-active", panel.id === `dash-panel-${target}`);
       });
     });
   });
 
-  // Step 1 Auth Form -> Step 2 Math 2FA Verification
-  document.getElementById("auth-form").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const status = document.getElementById("auth-status");
-    const submitBtn = document.getElementById("auth-submit-btn");
-    const payload = {
-      email: document.getElementById("auth-email").value.trim(),
-      password: document.getElementById("auth-password").value,
-      name: document.getElementById("auth-name").value.trim(),
-      require2fa: true
-    };
-    submitBtn.disabled = true;
-    let response;
-    if (state.authMode === "register") {
-      response = await fetch("/api/auth/register", {
+  document.getElementById("toggle-add-pet-btn")?.addEventListener("click", () => {
+    const form = document.getElementById("pet-form");
+    if (form) form.hidden = !form.hidden;
+  });
+  document.getElementById("cancel-add-pet-btn")?.addEventListener("click", () => {
+    const form = document.getElementById("pet-form");
+    if (form) form.hidden = true;
+  });
+
+  document.getElementById("pet-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("pet-name")?.value.trim() || "";
+    const species = document.getElementById("pet-species")?.value || "";
+    const breed = document.getElementById("pet-breed")?.value.trim() || "";
+    const age = document.getElementById("pet-age")?.value.trim() || "";
+    try {
+      await apiFetch("/api/pets", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ name, species, breed, age })
       });
-    } else {
-      response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if (response.status === 401 && payload.name) {
-        response = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-      }
-    }
-    const result = await response.json();
-    submitBtn.disabled = false;
-    if (!response.ok) {
-      status.textContent = result.error || "Invalid email or password. New here? Switch to 'Create account'.";
-      return;
-    }
-    if (result.requires2fa && result.pendingToken) {
-      state.pending2faToken = result.pendingToken;
-      showAuthStep("2fa", result.challenge);
-      return;
-    }
-    if (result.token) {
-      localStorage.setItem("pawnir_token", result.token);
-      await syncSession();
-      closeDialog(document.getElementById("auth-dialog"));
-      await Promise.all([loadPets(), loadLostReports(), loadDonors(), loadNotifications(), loadAdoptions()]);
-      if (pendingReviewFoster) {
-        const foster = pendingReviewFoster;
-        pendingReviewFoster = null;
-        openFosterReviews(foster.id, foster.name);
-        showToast(`Welcome! You can now review ${foster.name}.`);
-      } else if (pendingAdoptionAction === "list") {
-        pendingAdoptionAction = null;
-        openDialog(document.getElementById("list-adoption-dialog"));
-      } else {
-        showToast("Signed in!");
-      }
+      e.target.reset();
+      e.target.hidden = true;
+      showToast("Pet passport saved!");
+      loadDashboardData();
+    } catch (err) {
+      showToast(err.message);
     }
   });
 
-  // ── Automated & Swipeable Smartphone Showcase Carousel ──
-  const screensTrack = document.getElementById("phone-screens-track");
-  const sliderDots = document.querySelectorAll("#phone-slider-dots .slider-dot");
-  const phoneFrame = document.getElementById("phone-frame-container");
-  const totalSlides = 4;
-  let currentSlide = 0;
-  let autoSlideTimer = null;
-
-  function goToSlide(index) {
-    currentSlide = (index + totalSlides) % totalSlides;
-    if (screensTrack) {
-      screensTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+  document.getElementById("profile-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("profile-name")?.value.trim() || "";
+    const area = document.getElementById("profile-area")?.value.trim() || "";
+    const bio = document.getElementById("profile-bio")?.value.trim() || "";
+    try {
+      const res = await apiFetch("/api/auth/me", {
+        method: "PATCH",
+        body: JSON.stringify({ name, area, bio })
+      });
+      if (res.user) state.user = res.user;
+      updateAuthHeaderUI();
+      showToast("Profile updated!");
+      loadDashboardData();
+    } catch (err) {
+      showToast(err.message);
     }
-    sliderDots.forEach((dot, idx) => {
-      dot.classList.toggle("is-active", idx === currentSlide);
-      dot.setAttribute("aria-selected", String(idx === currentSlide));
-    });
-  }
+  });
 
-  function startAutoSlide() {
-    stopAutoSlide();
-    autoSlideTimer = setInterval(() => {
-      goToSlide(currentSlide + 1);
-    }, 3200);
-  }
+  document.getElementById("signout-button")?.addEventListener("click", () => {
+    state.token = "";
+    state.user = null;
+    localStorage.removeItem("pawnir-token");
+    updateAuthHeaderUI();
+    closeDialog(document.getElementById("dashboard-dialog"));
+    showToast("Signed out.");
+  });
 
-  function stopAutoSlide() {
-    if (autoSlideTimer) {
-      clearInterval(autoSlideTimer);
-      autoSlideTimer = null;
-    }
-  }
-
-  // Click on indicator dot
-  sliderDots.forEach((dot) => {
-    dot.addEventListener("click", () => {
-      const idx = parseInt(dot.dataset.slideIndex, 10);
-      if (!isNaN(idx)) {
-        goToSlide(idx);
-        startAutoSlide();
-      }
+  // Policy Modal Tabs
+  document.querySelectorAll(".policy-nav-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const target = tab.getAttribute("data-policy-tab");
+      document.querySelectorAll(".policy-nav-tab").forEach((tBtn) => tBtn.classList.toggle("is-active", tBtn === tab));
+      document.querySelectorAll(".policy-article").forEach((art) => {
+        art.classList.toggle("is-active", art.id === `policy-panel-${target}`);
+      });
     });
   });
 
-  // Touch Swipe Gesture Support
-  if (phoneFrame) {
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
+  // Mobile App Showcase Interactive Slider, Touch Swipe & Store/PWA Actions
+  let activeScreenIdx = 0;
+  function setPhoneScreen(idx) {
+    activeScreenIdx = ((idx % 4) + 4) % 4;
+    const track = document.getElementById("phone-screens-track");
+    if (track) {
+      track.style.transform = `translateX(-${activeScreenIdx * 100}%)`;
+    }
+    document.querySelectorAll("[data-slide-index], [data-screen-index]").forEach((btn) => {
+      const raw = btn.getAttribute("data-slide-index") ?? btn.getAttribute("data-screen-index");
+      const bIdx = Number(raw);
+      btn.classList.toggle("is-active", bIdx === activeScreenIdx);
+      btn.setAttribute("aria-selected", String(bIdx === activeScreenIdx));
+    });
+    const navItems = document.querySelectorAll(".mockup-bottom-nav .nav-item");
+    const activeNavIdx = activeScreenIdx < 2 ? activeScreenIdx : activeScreenIdx + 1;
+    navItems.forEach((nav, nIdx) => {
+      nav.classList.toggle("is-active", nIdx === activeNavIdx);
+    });
+  }
 
-    phoneFrame.addEventListener("touchstart", (e) => {
-      stopAutoSlide();
-      touchStartX = e.changedTouches[0].screenX;
-      touchStartY = e.changedTouches[0].screenY;
-    }, { passive: true });
+  document.querySelectorAll("[data-slide-index], [data-screen-index]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const raw = btn.getAttribute("data-slide-index") ?? btn.getAttribute("data-screen-index");
+      setPhoneScreen(Number(raw));
+    });
+  });
 
-    phoneFrame.addEventListener("touchend", (e) => {
-      touchEndX = e.changedTouches[0].screenX;
-      touchEndY = e.changedTouches[0].screenY;
-      const diffX = touchEndX - touchStartX;
-      const diffY = touchEndY - touchStartY;
-      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
-        if (diffX < 0) {
-          goToSlide(currentSlide + 1);
+  document.querySelectorAll(".mockup-bottom-nav .nav-item").forEach((nav, idx) => {
+    nav.style.cursor = "pointer";
+    nav.addEventListener("click", () => {
+      if (idx === 2) {
+        if (!state.user) {
+          openDialog(document.getElementById("auth-dialog"));
         } else {
-          goToSlide(currentSlide - 1);
+          openDialog(document.getElementById("lost-report-dialog"));
         }
+        return;
       }
-      startAutoSlide();
-    }, { passive: true });
-
-    // Pause on mouse hover (desktop)
-    phoneFrame.addEventListener("mouseenter", stopAutoSlide);
-    phoneFrame.addEventListener("mouseleave", startAutoSlide);
-  }
-
-  // Start initial auto-cycle
-  startAutoSlide();
-
-  // ── Hero Style Selector (4 Bangladesh Stray Animal Styles) ──
-  const heroPetImg = document.getElementById("hero-pet-image");
-  const heroStyleChips = document.querySelectorAll(".hero-style-chip");
-  const heroStyleMap = {
-    photo: "/hero-bangladesh-stray-photo.jpg?v=20261031-1",
-    "3d": "/hero-bangladesh-stray-3d.jpg?v=20261031-1",
-    vector: "/hero-bangladesh-stray-vector.jpg?v=20261031-1",
-    painting: "/hero-bangladesh-stray-painting.jpg?v=20261031-1"
-  };
-
-  heroStyleChips.forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const styleKey = chip.dataset.heroStyle;
-      if (!styleKey || !heroStyleMap[styleKey] || !heroPetImg) return;
-      heroStyleChips.forEach((c) => c.classList.toggle("is-active", c === chip));
-      heroPetImg.classList.add("is-fading");
-      setTimeout(() => {
-        heroPetImg.src = heroStyleMap[styleKey];
-        heroPetImg.onload = () => {
-          heroPetImg.classList.remove("is-fading");
-        };
-      }, 150);
+      const targetScreen = idx > 2 ? idx - 1 : idx;
+      setPhoneScreen(targetScreen);
     });
   });
 
-  // App Store & Google Play Download & PWA Install Handlers
+  const phoneTrack = document.getElementById("phone-screens-track");
+  if (phoneTrack) {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    phoneTrack.addEventListener(
+      "touchstart",
+      (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchEndX = touchStartX;
+      },
+      { passive: true }
+    );
+    phoneTrack.addEventListener(
+      "touchmove",
+      (e) => {
+        touchEndX = e.touches[0].clientX;
+      },
+      { passive: true }
+    );
+    phoneTrack.addEventListener(
+      "touchend",
+      () => {
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 40) {
+          setPhoneScreen(diff > 0 ? activeScreenIdx + 1 : activeScreenIdx - 1);
+        }
+      },
+      { passive: true }
+    );
+  }
+
   let deferredInstallPrompt = null;
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredInstallPrompt = e;
   });
 
-  document.getElementById("btn-google-play")?.addEventListener("click", () => {
-    showToast("Google Play release coming soon! Tap 'Web App (PWA)' to install directly on your Android phone.");
-  });
-
-  document.getElementById("btn-app-store")?.addEventListener("click", () => {
-    showToast("iOS App is in TestFlight Beta! On Safari, tap Share ↗ → 'Add to Home Screen' to install right now.");
-  });
-
+  const scrollToWaitlist = (platformLabel) => {
+    showToast(`${platformLabel} build is in beta — join the early-access list below!`);
+    const input = document.getElementById("app-notify-email");
+    input?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => input?.focus(), 350);
+  };
+  document.getElementById("btn-google-play")?.addEventListener("click", () => scrollToWaitlist("PawNir Android APK"));
+  document.getElementById("btn-app-store")?.addEventListener("click", () => scrollToWaitlist("PawNir iOS App"));
   document.getElementById("btn-pwa-install")?.addEventListener("click", async () => {
     if (deferredInstallPrompt) {
       deferredInstallPrompt.prompt();
-      const choice = await deferredInstallPrompt.userChoice;
-      if (choice.outcome === "accepted") {
-        showToast("PawNir is installing to your home screen!");
-      }
+      await deferredInstallPrompt.userChoice.catch(() => {});
       deferredInstallPrompt = null;
     } else {
-      showToast("To install PawNir: on Chrome tap menu ⋮ → 'Install App'; on iPhone Safari tap Share ↗ → 'Add to Home Screen'.");
+      showToast("Tap your browser menu (⋮ or Share) → 'Add to Home Screen' to install PawNir Web App!");
     }
   });
 
-  // Legal Policies & Community Guidelines modal
-  function showPolicyTab(tabKey) {
-    const policyTabs = document.querySelectorAll("[data-policy-tab]");
-    const policyArticles = document.querySelectorAll(".policy-article");
-    policyTabs.forEach((t) => {
-      const isTarget = t.dataset.policyTab === tabKey;
-      t.classList.toggle("is-active", isTarget);
-      t.setAttribute("aria-selected", String(isTarget));
+  // How It Works Stepper
+  let activeStep = 0;
+  function setHowStep(idx) {
+    activeStep = ((idx % 3) + 3) % 3;
+    document.querySelectorAll("[data-step-card]").forEach((card) => {
+      card.classList.toggle("is-active", Number(card.getAttribute("data-step-card")) === activeStep);
     });
-    policyArticles.forEach((article) => {
-      article.classList.toggle("is-active", article.id === `policy-panel-${tabKey}`);
+    document.querySelectorAll("[data-step-dot]").forEach((dot) => {
+      dot.classList.toggle("is-active", Number(dot.getAttribute("data-step-dot")) === activeStep);
     });
   }
-
-  document.querySelectorAll("[data-policy-tab]").forEach((tab) => {
-    tab.addEventListener("click", () => showPolicyTab(tab.dataset.policyTab));
+  document.querySelector("[data-step-prev]")?.addEventListener("click", () => setHowStep(activeStep - 1));
+  document.querySelector("[data-step-next]")?.addEventListener("click", () => setHowStep(activeStep + 1));
+  document.querySelectorAll("[data-step-dot]").forEach((dot) => {
+    dot.addEventListener("click", () => setHowStep(Number(dot.getAttribute("data-step-dot"))));
   });
 
-  document.querySelectorAll("[data-policy]").forEach((btn) => {
-    btn.addEventListener("click", (event) => {
-      const policyKey = btn.dataset.policy || "privacy";
-      showPolicyTab(policyKey);
-      openDialog(document.getElementById("policy-dialog"), event.currentTarget);
-    });
+  // Notify Form in Footer
+  document.getElementById("app-notify-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const status = document.getElementById("app-notify-status");
+    if (status) status.textContent = "✓ You are on the early-access list for the PawNir Android & iOS release!";
+    e.target.reset();
   });
+}
 
-  document.querySelectorAll("[data-close-policy]").forEach((btn) => {
-    btn.addEventListener("click", () => closeDialog(document.getElementById("policy-dialog")));
-  });
+// ============================================================================
+// Bootstrap Application
+// ============================================================================
+async function initApp() {
+  const savedTheme = localStorage.getItem("pawnir-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(savedTheme);
+  document.querySelectorAll(".reveal").forEach((el) => el.classList.add("revealed"));
+  initEventListeners();
+  attachSwipeToDismiss();
 
-  // Initial Data Load & Real-time Updates
-  loadLostReports();
-  const refreshLostFeed = () => {
-    if (!document.hidden) loadLostReports();
-  };
-  lostRefreshTimer = window.setInterval(refreshLostFeed, 12000);
-  document.addEventListener("visibilitychange", refreshLostFeed);
+  await restoreSession();
+  applyLanguage(state.lang);
+
+  if (window.location.hash.startsWith("#google_pending=")) {
+    const params = new URLSearchParams(window.location.hash.slice(1));
+    const pendingToken = params.get("google_pending") || "";
+    if (pendingToken) {
+      const ch = await apiFetch("/api/auth/challenge").catch(() => null);
+      if (ch && ch.challengeToken) {
+        state.pending2faToken = pendingToken;
+        state.challengeToken = ch.challengeToken;
+        setCounterText("auth-2fa-question", ch.question);
+        const stepCreds = document.getElementById("auth-step-credentials");
+        const twofaForm = document.getElementById("auth-2fa-form");
+        if (stepCreds) stepCreds.hidden = true;
+        if (twofaForm) twofaForm.hidden = false;
+        openDialog(document.getElementById("auth-dialog"), false);
+      }
+      history.replaceState(null, "", window.location.pathname);
+    }
+  } else if (window.location.hash.startsWith("#auth_error=") || window.location.search.includes("auth_error=")) {
+    const searchParams = new URLSearchParams(window.location.search);
+    const errParam = searchParams.get("auth_error") || decodeURIComponent(window.location.hash.replace("#auth_error=", ""));
+    showToast(errParam || "Authentication error");
+    history.replaceState(null, "", window.location.pathname);
+  } else if (window.location.hash) {
+    switchView(window.location.hash);
+  }
+
+  await Promise.all([
+    loadLostReports(),
+    loadDonors(),
+    loadFosters(),
+    loadAdoptions(),
+    loadVets({ silent: true }),
+    loadNotifications()
+  ]);
+
   connectRealtimeStream();
-  loadFosters();
-  loadDonors();
-  loadAdoptions();
-});
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}

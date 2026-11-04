@@ -58,9 +58,34 @@ async function readJsonFile(filepath, fallback) {
   }
 }
 
+const writeLocks = new Map();
+
 async function writeJsonFile(filepath, data) {
-  await ensureDir(path.dirname(filepath));
-  await fsp.writeFile(filepath, JSON.stringify(data, null, 2), "utf8");
+  const normalizedPath = path.resolve(filepath);
+  const previous = writeLocks.get(normalizedPath) || Promise.resolve();
+  const next = previous
+    .catch(() => {})
+    .then(async () => {
+      const dir = path.dirname(normalizedPath);
+      await ensureDir(dir);
+      const tmpPath = `${normalizedPath}.tmp-${process.pid}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+      const payload = JSON.stringify(data, null, 2);
+      await fsp.writeFile(tmpPath, payload, "utf8");
+      try {
+        await fsp.rename(tmpPath, normalizedPath);
+      } catch (err) {
+        await fsp.writeFile(normalizedPath, payload, "utf8");
+        await fsp.unlink(tmpPath).catch(() => {});
+      }
+    });
+  writeLocks.set(normalizedPath, next);
+  try {
+    await next;
+  } finally {
+    if (writeLocks.get(normalizedPath) === next) {
+      writeLocks.delete(normalizedPath);
+    }
+  }
 }
 
 class Storage {
@@ -118,35 +143,21 @@ class Storage {
         await fsp.copyFile(legacyInterventions, target.interventions);
       }
     }
-    if (!(await fileExists(target.interventions))) {
-      await writeJsonFile(target.interventions, []);
-    }
-    if (!(await fileExists(target.alerts))) {
-      await writeJsonFile(target.alerts, []);
-    }
-    if (!(await fileExists(target.tasks))) {
-      await writeJsonFile(target.tasks, []);
-    }
-    if (!(await fileExists(target.scenarios))) {
-      await writeJsonFile(target.scenarios, []);
-    }
-    if (!(await fileExists(target.approvals))) {
-      await writeJsonFile(target.approvals, []);
-    }
-    if (!(await fileExists(target.audit))) {
-      await writeJsonFile(target.audit, []);
-    }
-    if (!(await fileExists(target.vets))) {
-      const seedVets = path.join(this.baseDataDir, "portal_vets.json");
-      if (await fileExists(seedVets)) {
-        await fsp.copyFile(seedVets, target.vets);
-      } else {
-        await writeJsonFile(target.vets, []);
+    for (const emptyKey of ["interventions", "alerts", "tasks", "scenarios", "approvals", "audit", "bookings"]) {
+      if (!(await fileExists(target[emptyKey]))) {
+        await writeJsonFile(target[emptyKey], []);
       }
     }
-    if (!(await fileExists(target.bookings))) {
-      await writeJsonFile(target.bookings, []);
+    const seedVets = path.join(this.baseDataDir, "portal_vets.json");
+    if (await fileExists(seedVets)) {
+      const currentVets = (await fileExists(target.vets)) ? await readJsonFile(target.vets, []) : [];
+      if (!Array.isArray(currentVets) || currentVets.length === 0) {
+        await fsp.copyFile(seedVets, target.vets);
+      }
+    } else if (!(await fileExists(target.vets))) {
+      await writeJsonFile(target.vets, []);
     }
+
     const seedMap = {
       fosters: "fosters.json",
       adoptionListings: "adoption_listings.json",
@@ -157,11 +168,37 @@ class Storage {
     for (const key of ["pets", "consultations", "prescriptions", "payments", "notifications", "lostReports", "areaSubscriptions", "fosters", "fosterRequests", "reviews", "donors", "donorRequests", "adoptionListings", "adoptionApplications"]) {
       if (seedMap[key]) {
         const seedPath = path.join(this.baseDataDir, seedMap[key]);
-        const exists = await fileExists(target[key]);
-        const current = exists ? await readJsonFile(target[key], []) : [];
-        const needsSeed = !exists || !Array.isArray(current) || current.length === 0 || (key === "donors" && !current.some((d) => d.verified));
-        if (needsSeed && (await fileExists(seedPath))) {
-          await fsp.copyFile(seedPath, target[key]);
+        if (await fileExists(seedPath)) {
+          const seedItems = await readJsonFile(seedPath, []);
+          const exists = await fileExists(target[key]);
+          const current = exists ? await readJsonFile(target[key], []) : [];
+          if (!exists || !Array.isArray(current) || current.length === 0 || (key === "donors" && !current.some((d) => d.verified))) {
+            await writeJsonFile(target[key], seedItems);
+            continue;
+          }
+          // Merge any missing seed items and refresh existing seed items so tenant data stays in sync
+          const seedById = new Map(seedItems.map((item) => [item.id, item]));
+          const currentIds = new Set(current.map((item) => item.id));
+          let changed = false;
+          const updated = current.map((item) => {
+            if (seedById.has(item.id)) {
+              const s = seedById.get(item.id);
+              if (item.title !== s.title || item.comment !== s.comment || item.breed !== s.breed) {
+                changed = true;
+                return { ...item, ...s };
+              }
+            }
+            return item;
+          });
+          for (const seedItem of seedItems) {
+            if (!currentIds.has(seedItem.id)) {
+              updated.push(seedItem);
+              changed = true;
+            }
+          }
+          if (changed) {
+            await writeJsonFile(target[key], updated);
+          }
           continue;
         }
       }
