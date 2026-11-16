@@ -1,0 +1,8 @@
+{
+  "appId": "com.pawnir.app",
+  "appName": "PawNir",
+  "webDir": "public",
+  "server": {
+    "androidScheme": "https"
+  }
+}

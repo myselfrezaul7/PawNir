@@ -595,8 +595,8 @@
                       <p class="app-pet-meta">⌖ Dhanmondi 10A · 25 mins ago</p>
                       <p class="app-pet-desc">Friendly male, wearing a red collar with bell. Please contact owner or share a live sighting.</p>
                       <div class="app-pet-actions">
-                        <span class="btn-mockup btn-mockup-primary">📍 I spotted this pet</span>
-                        <span class="btn-mockup btn-mockup-outline">📞 Call owner</span>
+                        <span class="btn-mockup btn-mockup-primary" role="button" tabindex="0" data-mockup-action="sighting" data-i18n="mockup.sighting">📍 I spotted this pet</span>
+                        <span class="btn-mockup btn-mockup-outline" role="button" tabindex="0" data-mockup-action="lost" data-i18n="mockup.callOwner">📞 Call owner</span>
                       </div>
                     </div>
                   </div>
@@ -630,7 +630,7 @@
                       <span>✓ Owner Consented: Nafis R.</span>
                     </div>
                     <div class="app-pet-actions">
-                      <span class="btn-mockup btn-mockup-blood">🩸 Request Emergency Blood</span>
+                      <span class="btn-mockup btn-mockup-blood" role="button" tabindex="0" data-mockup-action="donor" data-i18n="mockup.requestDonor">🩸 Request Emergency Blood</span>
                     </div>
                   </div>
                   <div class="app-vet-notice">
@@ -660,8 +660,8 @@
                     </div>
                     <p class="foster-review-quote">“Took caring custody of our rescued street cat for 2 weeks. Clean environment and daily video check-ins!”</p>
                     <div class="app-pet-actions">
-                      <span class="btn-mockup btn-mockup-primary">Book Foster Care</span>
-                      <span class="btn-mockup btn-mockup-outline">Directions ↗</span>
+                      <span class="btn-mockup btn-mockup-primary" role="button" tabindex="0" data-mockup-action="foster" data-i18n="mockup.bookFoster">Book Foster Care</span>
+                      <span class="btn-mockup btn-mockup-outline" role="button" tabindex="0" data-mockup-action="foster-map" data-i18n="mockup.directions">Directions ↗</span>
                     </div>
                   </div>
                 </div>
@@ -769,6 +769,16 @@
             </button>
           </div>
 
+          <form class="app-notify-form" id="app-notify-form">
+            <input id="app-notify-email" type="email" inputmode="email" required placeholder="Enter your email for Google Play &amp; iOS beta invite…" aria-label="Email for mobile app early access" />
+            <select id="app-notify-platform" aria-label="Preferred mobile platform">
+              <option value="android">🤖 Android (Google Play APK/TWA)</option>
+              <option value="ios"> iOS (App Store)</option>
+            </select>
+            <button class="btn btn-primary btn-small" id="app-notify-submit" type="submit" data-i18n="waitlist.submit">Join Beta Waitlist →</button>
+            <p class="dialog-status" id="app-notify-status" role="status" aria-live="polite"></p>
+          </form>
+
           <div class="store-subtext">
             <span>Or <button type="button" class="text-link" id="btn-pwa-install">install instant Web App (PWA)</button> on any smartphone browser</span>
           </div>
@@ -804,6 +814,8 @@
               <button type="button" class="footer-policy-link" data-policy="terms">Terms of Service</button>
               <span class="legal-dot">·</span>
               <button type="button" class="footer-policy-link" data-policy="guidelines">Community Guidelines</button>
+              <span class="legal-dot">·</span>
+              <button type="button" class="footer-policy-link" data-open-delete-account data-i18n="footer.deleteAccount">Delete Account</button>
             </div>
           </div>
         </div>
@@ -940,6 +952,24 @@
               <label>Approx. age
                 <input id="pet-age" placeholder="e.g. 1.5 years" />
               </label>
+              <label><span data-i18n="pet.bloodType">Blood type</span>
+                <select id="pet-blood-type">
+                  <option value="Unknown">Unknown</option>
+                  <option value="Type A">Cat · Type A</option>
+                  <option value="Type B">Cat · Type B</option>
+                  <option value="Type AB">Cat · Type AB</option>
+                  <option value="DEA 1.1-">Dog · DEA 1.1-</option>
+                  <option value="DEA 1.1+">Dog · DEA 1.1+</option>
+                  <option value="DEA 4">Dog · DEA 4</option>
+                </select>
+              </label>
+              <label><span data-i18n="pet.weight">Weight (kg)</span>
+                <input id="pet-weight" type="number" step="0.1" min="0.5" max="90" placeholder="e.g. 4.2" />
+              </label>
+              <label class="check-line pet-vaccinated-check">
+                <input id="pet-vaccinated" type="checkbox" checked />
+                <span data-i18n="pet.vaccinated">Up-to-date on Rabies &amp; core vaccines</span>
+              </label>
             </div>
             <div class="pet-form-actions">
               <button class="btn btn-outline btn-small" id="cancel-add-pet-btn" type="button">Cancel</button>
@@ -960,6 +990,17 @@
               </div>
               <div class="dashboard-activity-list" id="dashboard-my-adoptions">
                 <p class="inline-state">No adoption listings published yet.</p>
+              </div>
+            </div>
+
+            <!-- Adoption Applications (Incoming & Sent) -->
+            <div class="activity-block">
+              <div class="activity-block-head">
+                <strong data-i18n="dash.adoptAppsTitle">Adoption Applications (Incoming &amp; Sent)</strong>
+                <small data-i18n="dash.adoptAppsDesc">Review applicants for your listings or download your application PDF.</small>
+              </div>
+              <div class="dashboard-activity-list" id="dashboard-adoption-applications">
+                <p class="inline-state">No adoption applications yet.</p>
               </div>
             </div>
 
@@ -1030,6 +1071,24 @@
             </div>
             <span class="security-status-badge">✓ Active Protection</span>
           </div>
+
+          <div class="activity-block blocked-users-card" id="blocked-users-card">
+            <div class="activity-block-head">
+              <strong data-i18n="dash.blockedTitle">Blocked Users</strong>
+              <small data-i18n="dash.blockedDesc">Users you block are hidden from your community feeds. Unblock anytime.</small>
+            </div>
+            <div class="dashboard-activity-list" id="dashboard-blocked-list">
+              <p class="inline-state">No blocked users.</p>
+            </div>
+          </div>
+
+          <div class="danger-zone-card" id="delete-account-card">
+            <div class="danger-zone-copy">
+              <strong data-i18n="dash.deleteTitle">Delete Account &amp; Data</strong>
+              <p data-i18n="dash.deleteDesc">Permanently erase your PawNir profile, pet passports, alerts, listings, and personal records.</p>
+            </div>
+            <button class="btn btn-small btn-danger-outline" id="delete-account-btn" type="button" data-i18n="dash.deleteBtn">Delete Account</button>
+          </div>
         </div>
       </section>
     </dialog>
@@ -1044,7 +1103,7 @@
         <p class="dialog-helper">Connect directly with vetted pet lovers across Bangladesh. Strictly non-commercial.</p>
 
         <label>Pet name
-          <input id="adopt-pet-name" placeholder="e.g. Luna, Milo" required />
+          <input id="adopt-pet-name" placeholder="e.g. Mimi, Bagha" required />
         </label>
 
         <div class="field-row">
@@ -1304,7 +1363,7 @@
         <p class="dialog-helper">Your exact home address and phone number are never shown publicly. You control availability and approve each connection.</p>
         <div class="form-two-col">
           <label>Pet's name
-            <input id="donor-pet-name" required maxlength="60" placeholder="e.g. Simba or Bruno" />
+            <input id="donor-pet-name" required maxlength="60" placeholder="e.g. Bagha or Kalu" />
           </label>
           <label>Animal type
             <select id="donor-species" required>
@@ -1391,6 +1450,85 @@
       </form>
     </dialog>
 
+    <dialog class="booking-dialog" id="vet-booking-dialog" aria-labelledby="vet-booking-title">
+      <form class="dialog-card" id="vet-booking-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close vet booking dialog">×</button>
+        <p class="eyebrow" data-i18n="vetBook.eyebrow">Verified Veterinary Care</p>
+        <h2 id="vet-booking-title" data-i18n="vetBook.title">Book Vet Consultation</h2>
+        <p class="dialog-helper" id="vet-booking-clinic-meta">Choose your pet, consultation mode, and an available time slot.</p>
+        <label><span data-i18n="vetBook.selectPet">Select Pet Passport</span>
+          <select id="booking-pet-select">
+            <option value="quick">+ Quick enter pet below</option>
+          </select>
+        </label>
+        <div class="form-two-col" id="booking-quick-pet-wrap">
+          <label><span data-i18n="vetBook.petName">Pet Name</span>
+            <input id="booking-pet-name" maxlength="60" placeholder="e.g. Bagha, Mimi" />
+          </label>
+          <label><span data-i18n="vetBook.petSpecies">Species</span>
+            <select id="booking-pet-species">
+              <option value="cat">🐱 Cat (Deshi Billi)</option>
+              <option value="dog">🐶 Dog (Deshi Kutta)</option>
+              <option value="bird">🦜 Bird</option>
+              <option value="rabbit">🐰 Rabbit</option>
+              <option value="other">🐾 Other</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-two-col">
+          <label><span data-i18n="vetBook.mode">Consultation Mode</span>
+            <select id="booking-mode" required>
+              <option value="clinic">🏥 In-Clinic Visit</option>
+              <option value="online">💻 Online Video</option>
+            </select>
+          </label>
+          <label><span data-i18n="vetBook.date">Preferred Date</span>
+            <input id="booking-date" type="date" required />
+          </label>
+        </div>
+        <div class="booking-slots-field">
+          <span class="slots-field-label" data-i18n="vetBook.slots">Available Time Slots (Asia/Dhaka)</span>
+          <div class="slot-pills-grid" id="booking-slots-grid" role="group" aria-label="Available appointment slots">
+            <p class="inline-state">Select a date to view open slots.</p>
+          </div>
+          <input id="booking-time" type="hidden" />
+        </div>
+        <button class="btn btn-primary" id="booking-submit-btn" type="submit" data-i18n="vetBook.submit">Confirm Booking →</button>
+        <p class="dialog-status" id="vet-booking-status" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+
+    <dialog class="booking-dialog" id="moderation-dialog" aria-labelledby="moderation-dialog-title">
+      <form class="dialog-card" id="moderation-form">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <button class="dialog-close" type="button" aria-label="Close moderation dialog">×</button>
+        <p class="eyebrow" data-i18n="mod.eyebrow">Safety &amp; Welfare Moderation</p>
+        <h2 id="moderation-dialog-title" data-i18n="mod.title">Report Content or User</h2>
+        <p class="dialog-helper" data-i18n="mod.helper">Reports are reviewed for community safety. Commercial animal sales are hidden automatically under Bangladesh Animal Welfare Act 2019.</p>
+        <label><span data-i18n="mod.reason">Reason for report</span>
+          <select id="moderation-reason" required>
+            <option value="commercial_sale">Commercial animal sale / asking for money</option>
+            <option value="spam_fake">Spam, scam, or false emergency alert</option>
+            <option value="harassment_abuse">Harassment, extortion, or abusive behavior</option>
+            <option value="unsafe_location">Exposes private phone or exact home address</option>
+            <option value="other">Other welfare or safety concern</option>
+          </select>
+        </label>
+        <label><span data-i18n="mod.details">Additional details (optional)</span>
+          <textarea id="moderation-details" rows="3" maxlength="500" placeholder="Share helpful context for our moderation team…"></textarea>
+        </label>
+        <div id="moderation-block-wrap">
+          <label class="check-line">
+            <input id="moderation-block-user" type="checkbox" />
+            <span data-i18n="mod.blockUser">Also block this user from all my feeds</span>
+          </label>
+        </div>
+        <button class="btn btn-primary" id="moderation-submit-btn" type="submit" data-i18n="mod.submit">Submit Report</button>
+        <p class="dialog-status" id="moderation-status" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+
     <!-- Legal, Privacy & Community Guidelines Dialog -->
     <dialog class="booking-dialog policy-dialog" id="policy-dialog" aria-labelledby="policy-dialog-title">
       <div class="dialog-card policy-card">
@@ -1444,6 +1582,16 @@
             <section class="policy-section">
               <h4>4. Data Retention &amp; Pet De-identification</h4>
               <p>Once a lost pet is marked as "Reunited / Safe", contact associations on the public feed are archived immediately. Pet parents can update or delete pet profiles and blood donor availability at any time through their account dashboard.</p>
+            </section>
+
+            <section class="policy-section">
+              <h4>5. Google Play Data Safety, UGC Moderation &amp; Account Deletion</h4>
+              <p>In compliance with Google Play User-Generated Content (UGC) and Data Safety standards:</p>
+              <ul>
+                <li><strong>Report &amp; Block Controls:</strong> Members can flag any Lost &amp; Found alert, Blood Donor profile, Foster listing, Foster Review, or Adoption post via the Flag/Report button and block abusive authors from appearing in their feeds. Commercial animal trade listings are automatically hidden.</li>
+                <li><strong>In-App Account Deletion:</strong> Signed-in members can permanently delete their account and cascade-remove all owned pet passports, alerts, donor profiles, listings, applications, bookings, and notifications anytime via <strong>My Care → Settings → Delete Account</strong> or the footer <strong>Delete Account</strong> link.</li>
+                <li><strong>Minimal Permissions:</strong> Approximate GPS is used only when tapping <em>Near Me</em>, and camera/gallery access is requested strictly when attaching a pet photo. PawNir never sells or shares personal data with ad networks.</li>
+              </ul>
             </section>
           </article>
 

@@ -102,6 +102,51 @@ const copy = {
     "card.applyAdopt": "Apply to adopt →",
     "card.markAdopted": "✓ Mark rehomed",
     "card.bookVet": "Book / Call clinic",
+    "card.bookConsultation": "📅 Book Consultation",
+    "card.directionsMaps": "📍 Directions in Maps ↗",
+    "card.reportUgc": "🚩 Report",
+    "card.cancelBooking": "Cancel",
+    "card.approve": "✓ Approve",
+    "card.accept": "✓ Accept",
+    "card.decline": "Decline",
+    "card.downloadPdf": "Download PDF",
+    "card.unblock": "Unblock",
+    "passport.registerDonor": "🩸 Register as Donor",
+    "passport.reportMissing": "🚨 Report Missing",
+    "passport.remove": "🗑 Remove",
+    "mockup.sighting": "📍 I spotted this pet",
+    "mockup.callOwner": "📞 Call owner",
+    "mockup.requestDonor": "🩸 Request Emergency Blood",
+    "mockup.bookFoster": "Book Foster Care",
+    "mockup.directions": "Directions ↗",
+    "waitlist.submit": "Join Beta Waitlist →",
+    "footer.deleteAccount": "Delete Account",
+    "pet.bloodType": "Blood type",
+    "pet.weight": "Weight (kg)",
+    "pet.vaccinated": "Up-to-date on Rabies & core vaccines",
+    "dash.adoptAppsTitle": "Adoption Applications (Incoming & Sent)",
+    "dash.adoptAppsDesc": "Review applicants for your listings or download your application PDF.",
+    "dash.blockedTitle": "Blocked Users",
+    "dash.blockedDesc": "Users you block are hidden from your community feeds. Unblock anytime.",
+    "dash.deleteTitle": "Delete Account & Data",
+    "dash.deleteDesc": "Permanently erase your PawNir profile, pet passports, alerts, listings, and personal records.",
+    "dash.deleteBtn": "Delete Account",
+    "vetBook.eyebrow": "Verified Veterinary Care",
+    "vetBook.title": "Book Vet Consultation",
+    "vetBook.selectPet": "Select Pet Passport",
+    "vetBook.petName": "Pet Name",
+    "vetBook.petSpecies": "Species",
+    "vetBook.mode": "Consultation Mode",
+    "vetBook.date": "Preferred Date",
+    "vetBook.slots": "Available Time Slots (Asia/Dhaka)",
+    "vetBook.submit": "Confirm Booking →",
+    "mod.eyebrow": "Safety & Welfare Moderation",
+    "mod.title": "Report Content or User",
+    "mod.helper": "Reports are reviewed for community safety. Commercial animal sales are hidden automatically under Bangladesh Animal Welfare Act 2019.",
+    "mod.reason": "Reason for report",
+    "mod.details": "Additional details (optional)",
+    "mod.blockUser": "Also block this user from all my feeds",
+    "mod.submit": "Submit Report",
     "empty.lost": "No open lost or found reports match this filter.",
     "empty.donors": "No available blood donors match this filter right now.",
     "empty.fosters": "No verified fosters match your search filter.",
@@ -211,6 +256,51 @@ const copy = {
     "card.applyAdopt": "দত্তক আবেদন করুন →",
     "card.markAdopted": "✓ দত্তক সম্পন্ন",
     "card.bookVet": "ক্লিনিকে যোগাযোগ / বুকিং",
+    "card.bookConsultation": "📅 কনসালটেশন বুক করুন",
+    "card.directionsMaps": "📍 ম্যাপে দিকনির্দেশনা ↗",
+    "card.reportUgc": "🚩 রিপোর্ট",
+    "card.cancelBooking": "বাতিল করুন",
+    "card.approve": "✓ অনুমোদন করুন",
+    "card.accept": "✓ গ্রহণ করুন",
+    "card.decline": "প্রত্যাখ্যান",
+    "card.downloadPdf": "পিডিএফ ডাউনলোড",
+    "card.unblock": "আনব্লক করুন",
+    "passport.registerDonor": "🩸 রক্তদাতা হিসেবে নিবন্ধন",
+    "passport.reportMissing": "🚨 হারানো রিপোর্ট করুন",
+    "passport.remove": "🗑 মুছে ফেলুন",
+    "mockup.sighting": "📍 আমি দেখেছি",
+    "mockup.callOwner": "📞 মালিককে কল করুন",
+    "mockup.requestDonor": "🩸 জরুরি রক্তের অনুরোধ",
+    "mockup.bookFoster": "ফস্টার কেয়ার বুক করুন",
+    "mockup.directions": "দিকনির্দেশনা ↗",
+    "waitlist.submit": "বেটা ওয়েটলিস্টে যোগ দিন →",
+    "footer.deleteAccount": "অ্যাকাউন্ট মুছুন",
+    "pet.bloodType": "রক্তের গ্রুপ",
+    "pet.weight": "ওজন (কেজি)",
+    "pet.vaccinated": "রেবিস ও মূল ভ্যাকসিন আপ-টু-ডেট",
+    "dash.adoptAppsTitle": "দত্তক আবেদনসমূহ (প্রাপ্ত ও প্রেরিত)",
+    "dash.adoptAppsDesc": "আপনার তালিকার আবেদন পর্যালোচনা করুন বা আপনার আবেদনের পিডিএফ ডাউনলোড করুন।",
+    "dash.blockedTitle": "ব্লক করা ব্যবহারকারী",
+    "dash.blockedDesc": "আপনার ব্লক করা ব্যবহারকারীদের পোস্ট কমিউনিটি ফিডে দেখা যাবে না। যেকোনো সময় আনব্লক করুন।",
+    "dash.deleteTitle": "অ্যাকাউন্ট ও তথ্য মুছে ফেলুন",
+    "dash.deleteDesc": "আপনার PawNir প্রোফাইল, পেট পাসপোর্ট, অ্যালার্ট, তালিকা এবং ব্যক্তিগত তথ্য স্থায়ীভাবে মুছে ফেলুন।",
+    "dash.deleteBtn": "অ্যাকাউন্ট মুছুন",
+    "vetBook.eyebrow": "যাচাইকৃত ভেটেরিনারি সেবা",
+    "vetBook.title": "ভেট কনসালটেশন বুক করুন",
+    "vetBook.selectPet": "পেট পাসপোর্ট নির্বাচন করুন",
+    "vetBook.petName": "পোষা প্রাণীর নাম",
+    "vetBook.petSpecies": "প্রাণী",
+    "vetBook.mode": "পরামর্শের মাধ্যম",
+    "vetBook.date": "পছন্দের তারিখ",
+    "vetBook.slots": "ফাঁকা সময়সূচি (বাংলাদেশ সময়)",
+    "vetBook.submit": "বুকিং নিশ্চিত করুন →",
+    "mod.eyebrow": "নিরাপত্তা ও প্রাণিকল্যাণ মডারেশন",
+    "mod.title": "পোস্ট বা ব্যবহারকারী রিপোর্ট করুন",
+    "mod.helper": "কমিউনিটির নিরাপত্তার জন্য রিপোর্ট পর্যালোচনা করা হয়। বাংলাদেশ প্রাণিকল্যাণ আইন ২০১৯ অনুযায়ী বাণিজ্যিক প্রাণী বিক্রয় স্বয়ংক্রিয়ভাবে গোপন করা হয়।",
+    "mod.reason": "রিপোর্টের কারণ",
+    "mod.details": "অতিরিক্ত বিবরণ (ঐচ্ছিক)",
+    "mod.blockUser": "এই ব্যবহারকারীকে আমার সব ফিড থেকে ব্লক করুন",
+    "mod.submit": "রিপোর্ট জমা দিন",
     "empty.lost": "এই ফিল্টারে কোনো হারানো বা পাওয়া প্রাণীর রিপোর্ট পাওয়া যায়নি।",
     "empty.donors": "এই মুহূর্তে আপনার ফিল্টারের সাথে মিলে এমন কোনো রক্তদাতা নেই।",
     "empty.fosters": "আপনার অনুসন্ধানের সাথে মিলে এমন কোনো ফস্টার পাওয়া যায়নি।",
@@ -229,6 +319,13 @@ const state = {
   activeDonorId: null,
   activeFosterId: null,
   activeAdoptionId: null,
+  activeBookingVetId: null,
+  activeBookingVetModes: ["clinic", "online"],
+  activeModerationTarget: null,
+  blockedUserIds: [],
+  blockedUsers: [],
+  petsCache: [],
+  pendingPostAuthAction: null,
   reportPhotoData: null,
   adoptPhotoData: null,
   lostSpecies: "",
@@ -691,8 +788,91 @@ function ensureFosterMapLoaded() {
 
 const DEDICATED_VIEWS = new Set(["lost-found", "blood-donors", "foster-care", "adoption", "find-care"]);
 
+function isUserBlocked(userId) {
+  return Boolean(userId && Array.isArray(state.blockedUserIds) && state.blockedUserIds.includes(userId));
+}
+
+function reportFlagButtonHtml({ type, id, ownerId = "", title = "" }) {
+  return `<button class="btn btn-outline btn-small report-flag-btn" type="button" data-report-ugc data-target-type="${escapeHtml(type)}" data-target-id="${escapeHtml(id)}" data-target-owner="${escapeHtml(ownerId)}" data-target-title="${escapeHtml(title)}">${escapeHtml(t("card.reportUgc"))}</button>`;
+}
+
+function todayInBangladesh() {
+  return new Date(Date.now() + 6 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+function activateDashboardTab(target) {
+  const safeTarget = target || "pets";
+  document.querySelectorAll("[data-dash-tab]").forEach((tBtn) => {
+    const isMatch = tBtn.getAttribute("data-dash-tab") === safeTarget;
+    tBtn.classList.toggle("is-active", isMatch);
+    tBtn.setAttribute("aria-selected", String(isMatch));
+  });
+  document.querySelectorAll(".dash-panel").forEach((panel) => {
+    panel.classList.toggle("is-active", panel.id === `dash-panel-${safeTarget}`);
+  });
+}
+
+function openDeleteAccountSection() {
+  if (!state.user) {
+    state.pendingPostAuthAction = "delete-account";
+    showToast(state.lang === "bn" ? "অ্যাকাউন্ট মুছতে অনুগ্রহ করে সাইন ইন করুন।" : "Please sign in to manage or delete your account.");
+    openDialog(document.getElementById("auth-dialog"));
+    return;
+  }
+  loadDashboardData();
+  activateDashboardTab("settings");
+  openDialog(document.getElementById("dashboard-dialog"));
+  setTimeout(() => {
+    const deleteCard = document.getElementById("delete-account-card") || document.getElementById("delete-account-btn");
+    deleteCard?.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById("delete-account-btn")?.focus();
+  }, 120);
+}
+
+async function loadBlockedUsers() {
+  if (!state.user) {
+    state.blockedUserIds = [];
+    state.blockedUsers = [];
+    return [];
+  }
+  try {
+    const data = await apiFetch("/api/moderation/blocks");
+    const blocks = Array.isArray(data) ? data : Array.isArray(data?.blocks) ? data.blocks : [];
+    state.blockedUsers = blocks;
+    state.blockedUserIds = Array.isArray(data?.blockedUserIds)
+      ? data.blockedUserIds.filter(Boolean)
+      : blocks.map((b) => b.blockedUserId || b.id).filter(Boolean);
+    return blocks;
+  } catch (_err) {
+    return state.blockedUsers;
+  }
+}
+
+async function downloadAuthorizedPdf(url, fallbackName = "pawnir-adoption.pdf") {
+  try {
+    const headers = state.token ? { Authorization: `Bearer ${state.token}` } : {};
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new Error("Could not download PDF");
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = fallbackName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+  } catch (err) {
+    showToast(err.message || "Could not download PDF");
+  }
+}
+
 function switchView(hashOrView) {
   const cleaned = String(hashOrView || "").replace(/^#/, "").trim();
+  if (cleaned === "delete-account") {
+    openDeleteAccountSection();
+    return;
+  }
   const nextView = DEDICATED_VIEWS.has(cleaned) ? cleaned : "home";
   state.activeView = nextView;
   document.body.setAttribute("data-view", nextView);
@@ -760,11 +940,12 @@ function renderLostReports(reports = [], mine = [], totalOpenCount = null) {
   const myWrap = document.getElementById("my-lost-reports");
   const myList = document.getElementById("my-lost-report-list");
 
-  const globalCount = typeof totalOpenCount === "number" ? totalOpenCount : reports.length;
+  const visibleReports = reports.filter((item) => !isUserBlocked(item.ownerId));
+  const globalCount = typeof totalOpenCount === "number" ? totalOpenCount : visibleReports.length;
   setHomeBadgeCount("home-count-lost", globalCount, "live alerts", "লাইভ অ্যালার্ট");
 
-  if (reports.length > 0) {
-    const latest = reports[0];
+  if (visibleReports.length > 0) {
+    const latest = visibleReports[0];
     setCounterText("snapshot-lost-area", `${latest.area} · ${formatRelativeTime(latest.createdAt)}`);
     setCounterText("snapshot-lost-time", formatRelativeTime(latest.createdAt));
     setCounterText("snapshot-lost-title", latest.title);
@@ -772,14 +953,14 @@ function renderLostReports(reports = [], mine = [], totalOpenCount = null) {
   }
 
   if (grid) {
-    if (!reports.length) {
+    if (!visibleReports.length) {
       grid.innerHTML = `
         <div class="empty-state-box">
           <p>${escapeHtml(t("empty.lost"))}</p>
           <button type="button" class="btn btn-outline btn-small" data-reset-filter="lost">${escapeHtml(t("common.resetFilters"))}</button>
         </div>`;
     } else {
-      grid.innerHTML = reports
+      grid.innerHTML = visibleReports
         .map((item) => {
           const isLost = item.type === "lost";
           const badgeClass = isLost ? "badge-lost" : "badge-found";
@@ -788,17 +969,29 @@ function renderLostReports(reports = [], mine = [], totalOpenCount = null) {
           const photoHtml = item.photoData || item.photoUrl
             ? `<div class="report-card-photo"><img src="${escapeHtml(item.photoData || item.photoUrl)}" alt="${escapeHtml(item.title)}" loading="lazy" /></div>`
             : "";
+          const sightingsSummaryLabel = state.lang === "bn"
+            ? `📍 ${sightings.length}টি লাইভ দেখার তথ্য — টাইমলাইন দেখুন`
+            : `📍 ${sightings.length} live sighting${sightings.length > 1 ? "s" : ""} — View timeline`;
           const sightingsHtml = sightings.length
-            ? `<div class="sightings-box">
-                <strong>📍 ${sightings.length} community sighting${sightings.length > 1 ? "s" : ""}:</strong>
-                ${sightings
-                  .slice(0, 2)
-                  .map(
-                    (s) =>
-                      `<div class="sighting-item"><small><strong>${escapeHtml(s.reporterName)}</strong> near ${escapeHtml(s.location)} (${formatRelativeTime(s.createdAt)}):</small><p>"${escapeHtml(s.note)}"</p></div>`
-                  )
-                  .join("")}
-              </div>`
+            ? `<details class="sightings-timeline">
+                <summary>${escapeHtml(sightingsSummaryLabel)}</summary>
+                <div class="sightings-timeline-list">
+                  ${sightings
+                    .map(
+                      (s) =>
+                        `<div class="sighting-item">
+                          <div class="sighting-item-head">
+                            <strong>${escapeHtml(s.reporterName || "Neighbour")}</strong>
+                            <small>${escapeHtml(formatRelativeTime(s.createdAt))}</small>
+                          </div>
+                          <small class="sighting-location">⌖ ${escapeHtml(s.location)}</small>
+                          <p>"${escapeHtml(s.note)}"</p>
+                          ${item.isOwner && s.contact ? `<div class="sighting-contact">📞 ${escapeHtml(s.contact)}</div>` : ""}
+                        </div>`
+                    )
+                    .join("")}
+                </div>
+              </details>`
             : "";
 
           return `
@@ -818,7 +1011,7 @@ function renderLostReports(reports = [], mine = [], totalOpenCount = null) {
                 ${
                   item.isOwner
                     ? `<button class="btn btn-outline btn-small" type="button" data-resolve-lost="${escapeHtml(item.id)}">${escapeHtml(t("card.reunitedBtn"))}</button>`
-                    : ""
+                    : reportFlagButtonHtml({ type: "lost_report", id: item.id, ownerId: item.ownerId, title: item.title })
                 }
               </div>
             </article>`;
@@ -960,7 +1153,8 @@ function renderMyDonorPanel(myDonors = [], incomingRequests = [], mySentRequests
 }
 
 function renderDonors(payload) {
-  const donors = Array.isArray(payload) ? payload : payload.donors || [];
+  const rawDonors = Array.isArray(payload) ? payload : payload.donors || [];
+  const donors = rawDonors.filter((d) => !isUserBlocked(d.ownerId));
   const totalVerifiedCount = typeof payload.totalVerifiedCount === "number" ? payload.totalVerifiedCount : donors.length;
   setHomeBadgeCount("home-count-donors", totalVerifiedCount, "verified donors", "যাচাইকৃত রক্তদাতা");
 
@@ -1010,6 +1204,11 @@ function renderDonors(payload) {
               <div class="card-actions">
                 <button class="btn btn-primary btn-small" type="button" data-request-donor="${escapeHtml(d.id)}" data-donor-name="${escapeHtml(d.petName)}" data-donor-blood="${escapeHtml(d.bloodType)}">${escapeHtml(t("card.requestDonor"))}</button>
                 <button class="btn btn-outline btn-small" type="button" data-share-title="${escapeHtml(`${d.petName} (${d.bloodType}) Blood Donor`)}" data-share-text="${escapeHtml(`Verified ${d.species} blood donor (${d.bloodType}) in ${d.area}, ${d.city}`)}">${escapeHtml(t("common.share"))}</button>
+                ${
+                  state.user && d.ownerId && d.ownerId === state.user.id
+                    ? ""
+                    : reportFlagButtonHtml({ type: "donor", id: d.id, ownerId: d.ownerId || "", title: `${d.petName} (${d.bloodType})` })
+                }
               </div>
             </article>`;
         })
@@ -1077,7 +1276,8 @@ function selectFosterOnMap(foster) {
   });
 }
 
-function renderFosters(fosters = []) {
+function renderFosters(rawFosters = []) {
+  const fosters = rawFosters.filter((f) => !isUserBlocked(f.ownerId));
   const totalVerified = fosters[0]?.totalVerifiedCount || fosters.length;
   setHomeBadgeCount("home-count-fosters", totalVerified, "verified fosters", "যাচাইকৃত ফস্টার");
 
@@ -1112,6 +1312,7 @@ function renderFosters(fosters = []) {
       grid.innerHTML = fosters
         .map((f) => {
           const reviewsPreview = (f.recentReviews || [])
+            .filter((r) => !isUserBlocked(r.userId))
             .slice(0, 1)
             .map(
               (r) =>
@@ -1139,6 +1340,11 @@ function renderFosters(fosters = []) {
                 <button class="btn btn-outline btn-small" type="button" data-focus-map="${escapeHtml(f.id)}">${escapeHtml(t("card.previewMap"))}</button>
                 <button class="btn btn-outline btn-small" type="button" data-open-reviews="${escapeHtml(f.id)}" data-foster-name="${escapeHtml(f.name)}">${escapeHtml(t("card.reviewsBtn"))} (${escapeHtml(f.reviewCount || 0)})</button>
                 <button class="btn btn-primary btn-small" type="button" data-request-foster="${escapeHtml(f.id)}" data-foster-name="${escapeHtml(f.name)}">${escapeHtml(t("card.requestFoster"))}</button>
+                ${
+                  f.isOwner
+                    ? ""
+                    : reportFlagButtonHtml({ type: "foster", id: f.id, ownerId: f.ownerId || "", title: f.name })
+                }
               </div>
             </article>`;
         })
@@ -1192,7 +1398,7 @@ async function openFosterReviewsModal(fosterId, fosterName) {
   try {
     const data = await apiFetch(`/api/fosters/${encodeURIComponent(fosterId)}`);
     const foster = data.foster || data;
-    const reviews = Array.isArray(data.reviews) ? data.reviews : [];
+    const reviews = (Array.isArray(data.reviews) ? data.reviews : []).filter((r) => !isUserBlocked(r.userId));
 
     setCounterText("review-summary-avg", foster.averageRating ? Number(foster.averageRating).toFixed(1) : "5.0");
     const rounded = Math.round(Number(foster.averageRating || 5));
@@ -1229,9 +1435,16 @@ async function openFosterReviewsModal(fosterId, fosterName) {
               <p>${escapeHtml(r.comment)}</p>
               <div class="review-item-foot">
                 <small>Cared for: ${escapeHtml(r.petSpecies || "pet")} · ${escapeHtml(formatRelativeTime(r.createdAt))}</small>
-                <button type="button" class="btn btn-outline btn-small ${r.voted ? "is-voted" : ""}" data-helpful-review="${escapeHtml(r.id)}" data-helpful-foster="${escapeHtml(fosterId)}">
-                  👍 Helpful (${Number(r.helpfulCount || 0)})
-                </button>
+                <div class="row-actions">
+                  <button type="button" class="btn btn-outline btn-small ${r.voted ? "is-voted" : ""}" data-helpful-review="${escapeHtml(r.id)}" data-helpful-foster="${escapeHtml(fosterId)}">
+                    👍 Helpful (${Number(r.helpfulCount || 0)})
+                  </button>
+                  ${
+                    state.user && r.userId && r.userId === state.user.id
+                      ? ""
+                      : reportFlagButtonHtml({ type: "review", id: r.id, ownerId: r.userId || "", title: `Review by ${r.authorName || "Member"}` })
+                  }
+                </div>
               </div>
             </article>`
           )
@@ -1246,7 +1459,8 @@ async function openFosterReviewsModal(fosterId, fosterName) {
 // ============================================================================
 // 4. Responsible Adoption Module
 // ============================================================================
-function renderAdoptions(listings = [], totalOpenCount = null) {
+function renderAdoptions(rawListings = [], totalOpenCount = null) {
+  const listings = rawListings.filter((item) => !isUserBlocked(item.ownerId));
   const globalCount = typeof totalOpenCount === "number" ? totalOpenCount : listings.length;
   setHomeBadgeCount("home-count-adopt", globalCount, "pets waiting", "পোষা প্রাণী অপেক্ষায়");
 
@@ -1288,7 +1502,7 @@ function renderAdoptions(listings = [], totalOpenCount = null) {
             ${
               item.isOwner
                 ? `<button class="btn btn-outline btn-small" type="button" data-mark-adopted="${escapeHtml(item.id)}">${escapeHtml(t("card.markAdopted"))}</button>`
-                : ""
+                : reportFlagButtonHtml({ type: "adoption", id: item.id, ownerId: item.ownerId || "", title: item.name })
             }
           </div>
         </article>`;
@@ -1360,15 +1574,130 @@ function renderVets(vets = []) {
         <div class="foster-tags">
           <span class="tag-chip">Fee: ৳${escapeHtml(vet.fee || 800)}</span>
           <span class="tag-chip">Modes: ${escapeHtml((vet.modes || ["clinic"]).join(", "))}</span>
-          <span class="tag-chip">Next: ${escapeHtml(vet.nextSlot || "Open daily")}</span>
+          <span class="tag-chip">Next: ${escapeHtml(vet.nextSlot || vet.available || "Open daily")}</span>
         </div>
         <div class="card-actions">
-          <a class="btn btn-primary btn-small" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${vet.clinic} ${vet.city} Bangladesh`)}" target="_blank" rel="noopener noreferrer">📍 Directions in Maps ↗</a>
+          <button class="btn btn-primary btn-small" type="button" data-book-vet="${escapeHtml(vet.id)}" data-vet-name="${escapeHtml(vet.name)}" data-vet-clinic="${escapeHtml(vet.clinic)}" data-vet-fee="${escapeHtml(vet.fee || 800)}" data-vet-modes="${escapeHtml((vet.modes || ["clinic"]).join(","))}">${escapeHtml(t("card.bookConsultation"))}</button>
+          <a class="btn btn-outline btn-small" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${vet.clinic} ${vet.city} Bangladesh`)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("card.directionsMaps"))}</a>
           <button class="btn btn-outline btn-small" type="button" data-share-title="${escapeHtml(`${vet.name} — ${vet.clinic}`)}" data-share-text="${escapeHtml(`${vet.name} (${vet.specialty}) at ${vet.clinic}, ${vet.city}`)}" >${escapeHtml(t("common.share"))}</button>
         </div>
       </article>`
     )
     .join("");
+}
+
+async function loadVetBookingSlots() {
+  const vetId = state.activeBookingVetId;
+  const dateInput = document.getElementById("booking-date");
+  const modeSelect = document.getElementById("booking-mode");
+  const slotsGrid = document.getElementById("booking-slots-grid");
+  const timeInput = document.getElementById("booking-time");
+  if (!vetId || !slotsGrid) return;
+
+  const date = dateInput?.value || todayInBangladesh();
+  const mode = modeSelect?.value || "clinic";
+  if (timeInput) timeInput.value = "";
+  slotsGrid.innerHTML = `<p class="inline-state">${escapeHtml(state.lang === "bn" ? "ফাঁকা সময়সূচি লোড হচ্ছে…" : "Checking available slots…")}</p>`;
+
+  try {
+    const params = new URLSearchParams({ date, mode });
+    const data = await apiFetch(`/api/vets/${encodeURIComponent(vetId)}/availability?${params.toString()}`);
+    const slots = Array.isArray(data?.slots) ? data.slots : [];
+    if (!slots.length) {
+      slotsGrid.innerHTML = `<p class="inline-state">${escapeHtml(state.lang === "bn" ? "এই তারিখে কোনো স্লট খালি নেই। অন্য তারিখ বা মোড নির্বাচন করুন।" : "No slots available on this date. Try another date or consultation mode.")}</p>`;
+      return;
+    }
+    slotsGrid.innerHTML = slots
+      .map(
+        (slot, idx) =>
+          `<button type="button" class="slot-pill${idx === 0 ? " is-selected" : ""}" aria-pressed="${idx === 0 ? "true" : "false"}" data-slot-time="${escapeHtml(slot)}">${escapeHtml(slot)}</button>`
+      )
+      .join("");
+    if (timeInput) timeInput.value = slots[0];
+  } catch (err) {
+    slotsGrid.innerHTML = `<p class="inline-state">${escapeHtml(err.message)}</p>`;
+  }
+}
+
+function toggleBookingQuickPetFields() {
+  const petSelect = document.getElementById("booking-pet-select");
+  const quickWrap = document.getElementById("booking-quick-pet-wrap");
+  const quickName = document.getElementById("booking-pet-name");
+  if (!petSelect || !quickWrap) return;
+  const isQuick = petSelect.value === "quick";
+  quickWrap.hidden = !isQuick;
+  if (quickName) quickName.required = isQuick;
+}
+
+async function openVetBookingDialog(btn) {
+  if (!state.user) {
+    showToast(state.lang === "bn" ? "ভেট কনসালটেশন বুক করতে অনুগ্রহ করে সাইন ইন করুন।" : "Please sign in to book a veterinary consultation.");
+    openDialog(document.getElementById("auth-dialog"));
+    return;
+  }
+
+  const vetId = btn.getAttribute("data-book-vet") || "";
+  const vetName = btn.getAttribute("data-vet-name") || "Veterinarian";
+  const vetClinic = btn.getAttribute("data-vet-clinic") || "Clinic";
+  const vetFee = btn.getAttribute("data-vet-fee") || "800";
+  const vetModes = (btn.getAttribute("data-vet-modes") || "clinic")
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean);
+
+  state.activeBookingVetId = vetId;
+  state.activeBookingVetModes = vetModes.length ? vetModes : ["clinic"];
+
+  setCounterText("vet-booking-title", state.lang === "bn" ? `${vetName} · অ্যাপয়েন্টমেন্ট` : `Book ${vetName}`);
+  setCounterText("vet-booking-clinic-meta", `🏥 ${vetClinic} · Fee: ৳${vetFee} · Modes: ${state.activeBookingVetModes.join(", ")}`);
+
+  const modeSelect = document.getElementById("booking-mode");
+  if (modeSelect) {
+    Array.from(modeSelect.options).forEach((opt) => {
+      const allowed = state.activeBookingVetModes.includes(opt.value);
+      opt.hidden = !allowed;
+      opt.disabled = !allowed;
+    });
+    if (!state.activeBookingVetModes.includes(modeSelect.value)) {
+      modeSelect.value = state.activeBookingVetModes[0];
+    }
+  }
+
+  const dateInput = document.getElementById("booking-date");
+  const today = todayInBangladesh();
+  if (dateInput) {
+    dateInput.min = today;
+    dateInput.value = today;
+  }
+
+  const statusEl = document.getElementById("vet-booking-status");
+  if (statusEl) statusEl.textContent = "";
+  const timeInput = document.getElementById("booking-time");
+  if (timeInput) timeInput.value = "";
+
+  const petSelect = document.getElementById("booking-pet-select");
+  if (petSelect) {
+    petSelect.innerHTML = `<option value="quick">${escapeHtml(state.lang === "bn" ? "+ নিচে দ্রুত পোষা প্রাণীর তথ্য দিন" : "+ Quick enter pet below")}</option>`;
+  }
+  toggleBookingQuickPetFields();
+
+  openDialog(document.getElementById("vet-booking-dialog"));
+
+  try {
+    const pets = await apiFetch("/api/pets").catch(() => []);
+    state.petsCache = Array.isArray(pets) ? pets : [];
+    if (petSelect) {
+      const petOptions = state.petsCache
+        .map((p) => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)} (${escapeHtml(p.species)})</option>`)
+        .join("");
+      const quickLabel = state.lang === "bn" ? "+ নিচে দ্রুত পোষা প্রাণীর তথ্য দিন" : "+ Quick enter pet below";
+      petSelect.innerHTML = `${petOptions}<option value="quick">${escapeHtml(quickLabel)}</option>`;
+      petSelect.value = state.petsCache.length ? state.petsCache[0].id : "quick";
+      toggleBookingQuickPetFields();
+    }
+  } catch (_e) {}
+
+  await loadVetBookingSlots();
 }
 
 async function loadVets({ silent = false } = {}) {
@@ -1449,7 +1778,7 @@ async function loadNotifications() {
         listEl.innerHTML = items
           .map(
             (n) => `
-            <div class="notification-item ${n.read ? "" : "is-unread"}">
+            <div class="notification-item ${n.read ? "" : "is-unread"}" data-notif-id="${escapeHtml(n.id)}" data-notif-type="${escapeHtml(n.type || "general")}" role="button" tabindex="0">
               <div>
                 <strong>${escapeHtml(n.title)}</strong>
                 <p>${escapeHtml(n.message)}</p>
@@ -1485,33 +1814,57 @@ async function loadDashboardData() {
   if (bioInput) bioInput.value = state.user.bio || "";
 
   try {
-    const [pets, adoptData, lostData, fosterReqs, bookings] = await Promise.all([
+    const [pets, adoptData, adoptApps, lostData, fosterReqs, bookings, blockedList] = await Promise.all([
       apiFetch("/api/pets").catch(() => []),
       apiFetch("/api/adoptions?includeMine=1").catch(() => ({ myListings: [] })),
+      apiFetch("/api/adoptions/applications").catch(() => ({ incoming: [], submitted: [] })),
       apiFetch("/api/lost-found").catch(() => ({ mine: [] })),
       apiFetch("/api/foster-requests").catch(() => []),
-      apiFetch("/api/bookings").catch(() => [])
+      apiFetch("/api/bookings").catch(() => []),
+      loadBlockedUsers()
     ]);
 
+    state.petsCache = Array.isArray(pets) ? pets : [];
     const myLost = Array.isArray(lostData.mine) ? lostData.mine : [];
     const myAdoptions = Array.isArray(adoptData.myListings) ? adoptData.myListings : [];
+    const incomingApps = Array.isArray(adoptApps?.incoming) ? adoptApps.incoming : [];
+    const submittedApps = Array.isArray(adoptApps?.submitted) ? adoptApps.submitted : [];
+    const fosterReqList = Array.isArray(fosterReqs)
+      ? fosterReqs
+      : [...(fosterReqs?.incomingRequests || []), ...(fosterReqs?.myRequests || [])];
 
-    setCounterText("dash-stat-pets", pets.length);
+    setCounterText("dash-stat-pets", state.petsCache.length);
     setCounterText("dash-stat-adoptions", myAdoptions.length);
     setCounterText("dash-stat-alerts", myLost.length);
-    setCounterText("dash-stat-fosters", fosterReqs.length);
+    setCounterText("dash-stat-fosters", fosterReqList.length);
 
     const petsEl = document.getElementById("dashboard-pets");
     if (petsEl) {
-      petsEl.innerHTML = pets.length
-        ? pets
-            .map(
-              (p) => `
-            <div class="pet-passport-card">
-              <strong>${escapeHtml(p.name)}</strong>
-              <span>${escapeHtml(p.species)} · ${escapeHtml(p.breed || "Deshi")} · ${escapeHtml(p.age || "Age N/A")}</span>
-            </div>`
-            )
+      petsEl.innerHTML = state.petsCache.length
+        ? state.petsCache
+            .map((p) => {
+              const isVax = p.vaccinated !== false;
+              return `
+              <article class="pet-passport-card passport-card-rich" data-pet-id="${escapeHtml(p.id)}">
+                <div class="passport-card-head">
+                  <div>
+                    <strong>${escapeHtml(p.name)}</strong>
+                    <small>${escapeHtml(p.species)} · ${escapeHtml(p.breed || "Deshi")} · ${escapeHtml(p.age || "Age N/A")}</small>
+                  </div>
+                  <span class="passport-id-badge">${escapeHtml(p.passportId || `#BD-${String(p.id || "").slice(-5) || "10001"}`)}</span>
+                </div>
+                <div class="passport-meta-row">
+                  <span class="tag-chip">🩸 ${escapeHtml(p.bloodType || "Unknown")}</span>
+                  <span class="tag-chip">⚖ ${p.weightKg ? `${escapeHtml(p.weightKg)} kg` : "Weight N/A"}</span>
+                  <span class="tag-chip ${isVax ? "is-vax" : ""}">${isVax ? "✓ Vaccinated" : "Vaccine pending"}</span>
+                </div>
+                <div class="passport-actions">
+                  <button class="btn btn-outline btn-small" type="button" data-passport-to-donor="${escapeHtml(p.id)}">${escapeHtml(t("passport.registerDonor"))}</button>
+                  <button class="btn btn-outline btn-small" type="button" data-passport-to-lost="${escapeHtml(p.id)}">${escapeHtml(t("passport.reportMissing"))}</button>
+                  <button class="btn btn-danger-outline btn-small" type="button" data-delete-pet="${escapeHtml(p.id)}">${escapeHtml(t("passport.remove"))}</button>
+                </div>
+              </article>`;
+            })
             .join("")
         : `<p class="inline-state">No pet passports registered yet. Tap "+ Register pet" above.</p>`;
     }
@@ -1535,6 +1888,47 @@ async function loadDashboardData() {
         : `<p class="inline-state">No adoption listings published yet.</p>`;
     }
 
+    const adoptAppsEl = document.getElementById("dashboard-adoption-applications");
+    if (adoptAppsEl) {
+      const incomingHtml = incomingApps
+        .map((app) => {
+          const canReview = ["submitted", "screening", "pending"].includes(app.status);
+          const ans = app.answers || {};
+          return `
+            <div class="my-report-row">
+              <div>
+                <strong>Incoming: ${escapeHtml(app.listingName || "Pet")} (${escapeHtml(app.listingSpecies || "")}) · <span class="badge-inline">${escapeHtml(String(app.status || "submitted").toUpperCase())}</span></strong>
+                <small>Applicant: ${escapeHtml(app.applicantName || "Member")} · ${escapeHtml(app.listingArea || "")} · ${escapeHtml(formatRelativeTime(app.createdAt))}</small>
+                ${ans.housing ? `<p class="req-reason">Housing: ${escapeHtml(ans.housing)}${ans.vetPlan ? ` · Vet plan: ${escapeHtml(ans.vetPlan)}` : ""}</p>` : ""}
+              </div>
+              ${
+                canReview
+                  ? `<div class="row-actions">
+                      <button class="btn btn-primary btn-small" type="button" data-adopt-app-action="approved" data-adopt-app-id="${escapeHtml(app.id)}">${escapeHtml(t("card.approve"))}</button>
+                      <button class="btn btn-outline btn-small" type="button" data-adopt-app-action="declined" data-adopt-app-id="${escapeHtml(app.id)}">${escapeHtml(t("card.decline"))}</button>
+                    </div>`
+                  : ""
+              }
+            </div>`;
+        })
+        .join("");
+      const submittedHtml = submittedApps
+        .map(
+          (app) => `
+          <div class="my-report-row">
+            <div>
+              <strong>Sent: ${escapeHtml(app.listingName || "Pet")} (${escapeHtml(app.listingSpecies || "")}) · <span class="badge-inline">${escapeHtml(String(app.status || "submitted").toUpperCase())}</span></strong>
+              <small>${escapeHtml(app.listingArea || "")} · ${escapeHtml(formatRelativeTime(app.createdAt))}</small>
+            </div>
+            <div class="row-actions">
+              <a class="btn btn-outline btn-small" href="/api/adoptions/${escapeHtml(app.id)}/pdf" data-adoption-pdf="${escapeHtml(app.id)}" target="_blank" rel="noopener noreferrer">${escapeHtml(t("card.downloadPdf"))}</a>
+            </div>
+          </div>`
+        )
+        .join("");
+      adoptAppsEl.innerHTML = incomingHtml + submittedHtml || `<p class="inline-state">No adoption applications yet.</p>`;
+    }
+
     const myLostEl = document.getElementById("dashboard-my-lost");
     if (myLostEl) {
       myLostEl.innerHTML = myLost.length
@@ -1556,14 +1950,26 @@ async function loadDashboardData() {
 
     const fosterReqsEl = document.getElementById("dashboard-foster-requests");
     if (fosterReqsEl) {
-      fosterReqsEl.innerHTML = fosterReqs.length
-        ? fosterReqs
-            .map(
-              (req) => `
-            <div class="my-report-row">
-              <div><strong>${escapeHtml(req.fosterName || "Foster")}</strong> <small>Status: ${escapeHtml(req.status)}</small></div>
-            </div>`
-            )
+      fosterReqsEl.innerHTML = fosterReqList.length
+        ? fosterReqList
+            .map((req) => {
+              const canHostAct = Boolean(req.isHost) && ["requested", "pending"].includes(req.status);
+              return `
+              <div class="my-report-row">
+                <div>
+                  <strong>${escapeHtml(req.fosterName || "Foster")}${req.isHost && req.requesterName ? ` · From ${escapeHtml(req.requesterName)}` : ""}</strong>
+                  <small>Status: ${escapeHtml(req.status)}${req.reason ? ` · "${escapeHtml(req.reason)}"` : ""}</small>
+                </div>
+                ${
+                  canHostAct
+                    ? `<div class="row-actions">
+                        <button class="btn btn-primary btn-small" type="button" data-foster-req-action="accepted" data-foster-req-id="${escapeHtml(req.id)}">${escapeHtml(t("card.accept"))}</button>
+                        <button class="btn btn-outline btn-small" type="button" data-foster-req-action="declined" data-foster-req-id="${escapeHtml(req.id)}">${escapeHtml(t("card.decline"))}</button>
+                      </div>`
+                    : ""
+                }
+              </div>`;
+            })
             .join("")
         : `<p class="inline-state">No pending foster requests.</p>`;
     }
@@ -1575,11 +1981,38 @@ async function loadDashboardData() {
             .map(
               (b) => `
             <div class="my-report-row">
-              <div><strong>${escapeHtml(b.vetName)}</strong> <small>${escapeHtml(b.date)} ${escapeHtml(b.time)} (${escapeHtml(b.mode)})</small></div>
+              <div>
+                <strong>${escapeHtml(b.vetName)}${b.petName ? ` · ${escapeHtml(b.petName)}` : ""}</strong>
+                <small>${escapeHtml(b.date)} ${escapeHtml(b.time)} (${escapeHtml(b.mode)}) · Status: <em>${escapeHtml(b.status || "pending")}</em></small>
+              </div>
+              ${
+                b.status === "pending"
+                  ? `<button class="btn btn-outline btn-small" type="button" data-cancel-booking="${escapeHtml(b.id)}">${escapeHtml(t("card.cancelBooking"))}</button>`
+                  : ""
+              }
             </div>`
             )
             .join("")
         : `<p class="inline-state">No upcoming clinic visits.</p>`;
+    }
+
+    const blockedEl = document.getElementById("dashboard-blocked-list");
+    if (blockedEl) {
+      blockedEl.innerHTML = blockedList.length
+        ? blockedList
+            .map((b) => {
+              const targetId = b.blockedUserId || b.id;
+              return `
+              <div class="my-report-row">
+                <div>
+                  <strong>${escapeHtml(b.blockedUserName || b.blockedEmail || targetId)}</strong>
+                  <small>${escapeHtml(b.reason || "Blocked by user")}${b.createdAt ? ` · ${escapeHtml(formatRelativeTime(b.createdAt))}` : ""}</small>
+                </div>
+                <button class="btn btn-outline btn-small" type="button" data-unblock-user="${escapeHtml(targetId)}">${escapeHtml(t("card.unblock"))}</button>
+              </div>`;
+            })
+            .join("")
+        : `<p class="inline-state">No blocked users.</p>`;
     }
   } catch (_err) {
     // ignore
@@ -1588,6 +2021,8 @@ async function loadDashboardData() {
 
 async function restoreSession() {
   if (!state.token) {
+    state.blockedUserIds = [];
+    state.blockedUsers = [];
     updateAuthHeaderUI();
     return;
   }
@@ -1595,8 +2030,11 @@ async function restoreSession() {
     const res = await apiFetch("/api/auth/me");
     if (res && res.user) {
       state.user = res.user;
+      await loadBlockedUsers();
     } else {
       state.token = "";
+      state.blockedUserIds = [];
+      state.blockedUsers = [];
       localStorage.removeItem("pawnir-token");
     }
   } catch (_err) {
@@ -1678,6 +2116,16 @@ function connectRealtimeStream() {
   es.addEventListener("adoption_update", () => {
     loadAdoptions({ silent: true });
     loadNotifications();
+    if (document.getElementById("dashboard-dialog")?.open) {
+      loadDashboardData();
+    }
+  });
+
+  es.addEventListener("community_stats", (ev) => {
+    try {
+      const counts = JSON.parse(ev.data || "{}");
+      updateGlobalCommunityCounts(counts);
+    } catch (_e) {}
   });
 
   es.addEventListener("notification_update", (ev) => {
@@ -2235,6 +2683,295 @@ function initEventListeners() {
       } finally {
         markAdoptedBtn.disabled = false;
       }
+      return;
+    }
+
+    // Book Vet Consultation
+    const bookVetBtn = e.target.closest("[data-book-vet]");
+    if (bookVetBtn) {
+      openVetBookingDialog(bookVetBtn);
+      return;
+    }
+
+    // Vet Booking Slot Pill Selection
+    const slotPill = e.target.closest("#booking-slots-grid .slot-pill");
+    if (slotPill) {
+      const timeVal = slotPill.getAttribute("data-slot-time") || "";
+      document.querySelectorAll("#booking-slots-grid .slot-pill").forEach((pill) => {
+        const selected = pill === slotPill;
+        pill.classList.toggle("is-selected", selected);
+        pill.setAttribute("aria-pressed", String(selected));
+      });
+      const timeInput = document.getElementById("booking-time");
+      if (timeInput) timeInput.value = timeVal;
+      return;
+    }
+
+    // Cancel Pending Vet Booking
+    const cancelBookingBtn = e.target.closest("[data-cancel-booking]");
+    if (cancelBookingBtn) {
+      const bookingId = cancelBookingBtn.getAttribute("data-cancel-booking");
+      cancelBookingBtn.disabled = true;
+      try {
+        await apiFetch(`/api/bookings/${encodeURIComponent(bookingId)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: "cancelled" })
+        });
+        showToast(state.lang === "bn" ? "বুকিং বাতিল করা হয়েছে।" : "Consultation booking cancelled.");
+        loadDashboardData();
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        cancelBookingBtn.disabled = false;
+      }
+      return;
+    }
+
+    // Approve / Decline Incoming Adoption Application
+    const adoptAppActionBtn = e.target.closest("[data-adopt-app-action]");
+    if (adoptAppActionBtn) {
+      const action = adoptAppActionBtn.getAttribute("data-adopt-app-action");
+      const appId = adoptAppActionBtn.getAttribute("data-adopt-app-id");
+      if (!appId || !action) return;
+      adoptAppActionBtn.disabled = true;
+      try {
+        await apiFetch(`/api/adoptions/applications/${encodeURIComponent(appId)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: action })
+        });
+        showToast(action === "approved" ? "Adoption application approved!" : "Adoption application declined.");
+        loadDashboardData();
+        loadAdoptions({ silent: true });
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        adoptAppActionBtn.disabled = false;
+      }
+      return;
+    }
+
+    // Download Authorized Adoption Application PDF
+    const adoptPdfBtn = e.target.closest("[data-adoption-pdf], #adoption-pdf-link");
+    if (adoptPdfBtn) {
+      e.preventDefault();
+      const href = adoptPdfBtn.getAttribute("href");
+      const appId = adoptPdfBtn.getAttribute("data-adoption-pdf") || "application";
+      if (href) {
+        downloadAuthorizedPdf(href, `pawnir-adoption-${appId}.pdf`);
+      }
+      return;
+    }
+
+    // Accept / Decline Incoming Foster Request (Host)
+    const fosterReqActionBtn = e.target.closest("[data-foster-req-action]");
+    if (fosterReqActionBtn) {
+      const action = fosterReqActionBtn.getAttribute("data-foster-req-action");
+      const reqId = fosterReqActionBtn.getAttribute("data-foster-req-id");
+      if (!reqId || !action) return;
+      fosterReqActionBtn.disabled = true;
+      try {
+        await apiFetch(`/api/foster-requests/${encodeURIComponent(reqId)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: action })
+        });
+        showToast(`Foster request ${action}!`);
+        loadDashboardData();
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        fosterReqActionBtn.disabled = false;
+      }
+      return;
+    }
+
+    // Pet Passport Quick Action: Register as Blood Donor
+    const passportDonorBtn = e.target.closest("[data-passport-to-donor]");
+    if (passportDonorBtn) {
+      const petId = passportDonorBtn.getAttribute("data-passport-to-donor");
+      const pet = state.petsCache.find((p) => p.id === petId);
+      if (!pet) return;
+      if (!["cat", "dog"].includes(pet.species)) {
+        showToast(state.lang === "bn" ? "রক্তদানের জন্য শুধুমাত্র বিড়াল বা কুকুর নিবন্ধন করা যায়।" : "Only cats and dogs can register as blood donors.");
+        return;
+      }
+      closeDialog(document.getElementById("dashboard-dialog"));
+      const nameEl = document.getElementById("donor-pet-name");
+      const spEl = document.getElementById("donor-species");
+      const bloodEl = document.getElementById("donor-blood-type");
+      const weightEl = document.getElementById("donor-weight");
+      const vaxEl = document.getElementById("donor-vaccinated");
+      const areaEl = document.getElementById("donor-area");
+      if (nameEl) nameEl.value = pet.name || "";
+      if (spEl) spEl.value = pet.species;
+      if (bloodEl && pet.bloodType) {
+        const matchOpt = Array.from(bloodEl.options).find(
+          (o) => o.value === pet.bloodType || o.value.startsWith(pet.bloodType)
+        );
+        if (matchOpt) bloodEl.value = matchOpt.value;
+      }
+      if (weightEl) weightEl.value = pet.weightKg || "";
+      if (vaxEl) vaxEl.checked = pet.vaccinated !== false;
+      if (areaEl && !areaEl.value && state.user?.area) areaEl.value = state.user.area;
+      openDialog(document.getElementById("donor-dialog"));
+      return;
+    }
+
+    // Pet Passport Quick Action: Report Missing
+    const passportLostBtn = e.target.closest("[data-passport-to-lost]");
+    if (passportLostBtn) {
+      const petId = passportLostBtn.getAttribute("data-passport-to-lost");
+      const pet = state.petsCache.find((p) => p.id === petId);
+      if (!pet) return;
+      closeDialog(document.getElementById("dashboard-dialog"));
+      const lostRadio = document.querySelector('#lost-report-form input[name="report-type"][value="lost"]');
+      const spEl = document.getElementById("report-species");
+      const areaEl = document.getElementById("report-area");
+      const titleEl = document.getElementById("report-title");
+      const descEl = document.getElementById("report-description");
+      if (lostRadio) lostRadio.checked = true;
+      if (spEl && pet.species) spEl.value = pet.species;
+      if (areaEl && !areaEl.value && state.user?.area) areaEl.value = state.user.area;
+      if (titleEl) titleEl.value = `${pet.name}${pet.breed ? ` (${pet.breed})` : ""} missing`;
+      if (descEl && !descEl.value) {
+        descEl.value = `Missing ${pet.breed || pet.species} named ${pet.name}${pet.age ? `, age ${pet.age}` : ""}. Please share a sighting if spotted.`;
+      }
+      openDialog(document.getElementById("lost-report-dialog"));
+      return;
+    }
+
+    // Pet Passport Quick Action: Remove Pet
+    const deletePetBtn = e.target.closest("[data-delete-pet]");
+    if (deletePetBtn) {
+      const petId = deletePetBtn.getAttribute("data-delete-pet");
+      deletePetBtn.disabled = true;
+      try {
+        await apiFetch(`/api/pets/${encodeURIComponent(petId)}`, { method: "DELETE" });
+        showToast(state.lang === "bn" ? "পেট পাসপোর্ট মুছে ফেলা হয়েছে।" : "Pet passport removed.");
+        loadDashboardData();
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        deletePetBtn.disabled = false;
+      }
+      return;
+    }
+
+    // Actionable Deep-Linking Notification Click
+    const notifItem = e.target.closest(".notification-item[data-notif-id]");
+    if (notifItem) {
+      const notifId = notifItem.getAttribute("data-notif-id");
+      const notifType = (notifItem.getAttribute("data-notif-type") || "").toLowerCase();
+      notifItem.classList.remove("is-unread");
+      apiFetch(`/api/notifications/${encodeURIComponent(notifId)}/read`, { method: "PATCH" })
+        .then(() => loadNotifications())
+        .catch(() => {});
+      closeDialog(document.getElementById("notifications-dialog"));
+      if (notifType.includes("lost") || notifType.includes("sighting")) {
+        window.location.hash = "#lost-found";
+        switchView("lost-found");
+      } else if (notifType.includes("donor") || notifType.includes("blood")) {
+        window.location.hash = "#blood-donors";
+        switchView("blood-donors");
+      } else if (notifType.includes("foster_request") || notifType.includes("adoption_application") || notifType.includes("booking")) {
+        loadDashboardData();
+        activateDashboardTab("activity");
+        openDialog(document.getElementById("dashboard-dialog"));
+      } else if (notifType.includes("foster")) {
+        window.location.hash = "#foster-care";
+        switchView("foster-care");
+      } else if (notifType.includes("adoption")) {
+        window.location.hash = "#adoption";
+        switchView("adoption");
+      } else {
+        loadDashboardData();
+        openDialog(document.getElementById("dashboard-dialog"));
+      }
+      return;
+    }
+
+    // Google Play UGC Moderation: Open Report/Block Modal
+    const reportUgcBtn = e.target.closest("[data-report-ugc]");
+    if (reportUgcBtn) {
+      const targetType = reportUgcBtn.getAttribute("data-target-type") || "";
+      const targetId = reportUgcBtn.getAttribute("data-target-id") || "";
+      const targetOwnerId = reportUgcBtn.getAttribute("data-target-owner") || "";
+      const targetTitle = reportUgcBtn.getAttribute("data-target-title") || "Content";
+      state.activeModerationTarget = { targetType, targetId, targetOwnerId, targetTitle };
+      setCounterText(
+        "moderation-dialog-title",
+        state.lang === "bn" ? `রিপোর্ট: ${targetTitle}` : `Report: ${targetTitle}`
+      );
+      const form = document.getElementById("moderation-form");
+      if (form) form.reset();
+      const statusEl = document.getElementById("moderation-status");
+      if (statusEl) statusEl.textContent = "";
+      const blockWrap = document.getElementById("moderation-block-wrap");
+      const blockCheck = document.getElementById("moderation-block-user");
+      const canBlock = Boolean(state.user && targetOwnerId && targetOwnerId !== state.user.id);
+      if (blockWrap) blockWrap.hidden = !canBlock;
+      if (blockCheck) blockCheck.checked = false;
+      openDialog(document.getElementById("moderation-dialog"));
+      return;
+    }
+
+    // Unblock User
+    const unblockBtn = e.target.closest("[data-unblock-user]");
+    if (unblockBtn) {
+      const blockedId = unblockBtn.getAttribute("data-unblock-user");
+      unblockBtn.disabled = true;
+      try {
+        await apiFetch(`/api/moderation/block/${encodeURIComponent(blockedId)}`, { method: "DELETE" });
+        state.blockedUserIds = state.blockedUserIds.filter((id) => id !== blockedId);
+        showToast(state.lang === "bn" ? "ব্যবহারকারীকে আনব্লক করা হয়েছে।" : "User unblocked.");
+        loadDashboardData();
+        loadLostReports({ silent: true });
+        loadDonors({ silent: true });
+        loadFosters({ silent: true });
+        loadAdoptions({ silent: true });
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        unblockBtn.disabled = false;
+      }
+      return;
+    }
+
+    // Footer Delete Account Trigger
+    const openDeleteBtn = e.target.closest("[data-open-delete-account]");
+    if (openDeleteBtn) {
+      openDeleteAccountSection();
+      return;
+    }
+
+    // Phone Showcase Interactive Action Buttons
+    const mockupBtn = e.target.closest("[data-mockup-action]");
+    if (mockupBtn) {
+      const action = mockupBtn.getAttribute("data-mockup-action");
+      if (action === "sighting" || action === "lost") {
+        window.location.hash = "#lost-found";
+        switchView("lost-found");
+      } else if (action === "donor") {
+        window.location.hash = "#blood-donors";
+        switchView("blood-donors");
+      } else if (action === "foster" || action === "foster-map") {
+        window.location.hash = "#foster-care";
+        switchView("foster-care");
+        if (action === "foster-map") {
+          setTimeout(() => {
+            document.querySelector(".foster-map-explorer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 120);
+        }
+      }
+    }
+  });
+
+  // Keyboard activation for accessible [role="button"] notification items & mockup actions
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const interactiveEl = e.target.closest(".notification-item[data-notif-id], [data-mockup-action]");
+    if (interactiveEl) {
+      e.preventDefault();
+      interactiveEl.click();
     }
   });
 
@@ -2711,11 +3448,123 @@ function initEventListeners() {
       if (statusEl) statusEl.textContent = "Application submitted! The pet guardian has been notified.";
       if (pdfLink && res.applicationId) {
         pdfLink.href = `/api/adoptions/${encodeURIComponent(res.applicationId)}/pdf`;
+        pdfLink.setAttribute("data-adoption-pdf", res.applicationId);
         pdfLink.hidden = false;
       }
       showToast("Adoption application submitted!");
     } catch (err) {
       if (statusEl) statusEl.textContent = err.message;
+    }
+  });
+
+  // Vet Consultation Booking Form & Dynamic Slot Reload
+  document.getElementById("booking-pet-select")?.addEventListener("change", toggleBookingQuickPetFields);
+  document.getElementById("booking-date")?.addEventListener("change", loadVetBookingSlots);
+  document.getElementById("booking-mode")?.addEventListener("change", loadVetBookingSlots);
+
+  document.getElementById("vet-booking-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const submitBtn = document.getElementById("booking-submit-btn");
+    const statusEl = document.getElementById("vet-booking-status");
+    const petId = document.getElementById("booking-pet-select")?.value || "quick";
+    const petName = document.getElementById("booking-pet-name")?.value.trim() || "";
+    const petSpecies = document.getElementById("booking-pet-species")?.value || "cat";
+    const mode = document.getElementById("booking-mode")?.value || "clinic";
+    const date = document.getElementById("booking-date")?.value || "";
+    const time = document.getElementById("booking-time")?.value || "";
+
+    if (!time) {
+      if (statusEl) {
+        statusEl.textContent = state.lang === "bn" ? "অনুগ্রহ করে একটি খালি সময় নির্বাচন করুন।" : "Please select an available time slot.";
+      }
+      return;
+    }
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = state.lang === "bn" ? "বুকিং নিশ্চিত করা হচ্ছে…" : "Confirming consultation booking…";
+    try {
+      const payload = {
+        vetId: state.activeBookingVetId,
+        petId,
+        mode,
+        date,
+        time,
+        ...(petId === "quick" ? { petName, petSpecies } : {})
+      };
+      await apiFetch("/api/bookings", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("vet-booking-dialog"));
+      showToast(state.lang === "bn" ? "ভেট কনসালটেশন বুকিং সম্পন্ন হয়েছে!" : "Vet consultation booked! Check My Care for details.");
+      loadDashboardData();
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  // Google Play UGC Moderation Form Submit
+  document.getElementById("moderation-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const target = state.activeModerationTarget;
+    if (!target) return;
+    const submitBtn = document.getElementById("moderation-submit-btn");
+    const statusEl = document.getElementById("moderation-status");
+    const reason = document.getElementById("moderation-reason")?.value || "other";
+    const details = document.getElementById("moderation-details")?.value.trim() || "";
+    const shouldBlock = Boolean(document.getElementById("moderation-block-user")?.checked);
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) statusEl.textContent = state.lang === "bn" ? "রিপোর্ট পাঠানো হচ্ছে…" : "Submitting safety report…";
+    try {
+      const res = await apiFetch("/api/moderation/report", {
+        method: "POST",
+        body: JSON.stringify({
+          targetType: target.targetType,
+          targetId: target.targetId,
+          targetOwnerId: target.targetOwnerId,
+          reason,
+          details
+        })
+      });
+
+      if (shouldBlock && state.user && target.targetOwnerId && target.targetOwnerId !== state.user.id) {
+        await apiFetch("/api/moderation/block", {
+          method: "POST",
+          body: JSON.stringify({ blockedUserId: target.targetOwnerId, reason })
+        }).catch(() => {});
+        if (!state.blockedUserIds.includes(target.targetOwnerId)) {
+          state.blockedUserIds.push(target.targetOwnerId);
+        }
+        loadBlockedUsers();
+      }
+
+      e.target.reset();
+      if (statusEl) statusEl.textContent = "";
+      closeDialog(document.getElementById("moderation-dialog"));
+      showToast(
+        res?.autoHidden
+          ? state.lang === "bn"
+            ? "রিপোর্ট জমা হয়েছে — কনটেন্টটি পর্যালোচনার জন্য লুকানো হয়েছে।"
+            : "Report submitted — content flagged and hidden for review."
+          : state.lang === "bn"
+          ? "রিপোর্ট জমা হয়েছে। কমিউনিটি নিরাপদ রাখার জন্য ধন্যবাদ!"
+          : "Report submitted. Thank you for keeping PawNir safe."
+      );
+      loadLostReports({ silent: true });
+      loadDonors({ silent: true });
+      loadFosters({ silent: true });
+      loadAdoptions({ silent: true });
+      if (document.getElementById("foster-review-dialog")?.open && state.activeFosterId) {
+        openFosterReviewsModal(state.activeFosterId);
+      }
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
 
@@ -2819,7 +3668,16 @@ function initEventListeners() {
       if (statusEl) statusEl.textContent = "";
       closeDialog(document.getElementById("auth-dialog"));
       showToast(`Welcome to PawNir, ${res.user.name}!`);
+      await loadBlockedUsers();
       loadNotifications();
+      loadLostReports({ silent: true });
+      loadDonors({ silent: true });
+      loadFosters({ silent: true });
+      loadAdoptions({ silent: true });
+      if (state.pendingPostAuthAction === "delete-account") {
+        state.pendingPostAuthAction = null;
+        openDeleteAccountSection();
+      }
     } catch (err) {
       if (statusEl) statusEl.textContent = err.message;
     } finally {
@@ -2850,10 +3708,16 @@ function initEventListeners() {
       if (statusEl) statusEl.textContent = "";
       closeDialog(document.getElementById("auth-dialog"));
       showToast(`Signed in securely as ${res.user.name}!`);
+      await loadBlockedUsers();
       loadNotifications();
       loadLostReports({ silent: true });
       loadDonors({ silent: true });
+      loadFosters({ silent: true });
       loadAdoptions({ silent: true });
+      if (state.pendingPostAuthAction === "delete-account") {
+        state.pendingPostAuthAction = null;
+        openDeleteAccountSection();
+      }
     } catch (err) {
       if (err.payload?.challenge) {
         state.challengeToken = err.payload.challenge.challengeToken;
@@ -2885,11 +3749,7 @@ function initEventListeners() {
   // Dashboard Tabs & Actions
   document.querySelectorAll("[data-dash-tab]").forEach((tab) => {
     tab.addEventListener("click", () => {
-      const target = tab.getAttribute("data-dash-tab");
-      document.querySelectorAll("[data-dash-tab]").forEach((tBtn) => tBtn.classList.toggle("is-active", tBtn === tab));
-      document.querySelectorAll(".dash-panel").forEach((panel) => {
-        panel.classList.toggle("is-active", panel.id === `dash-panel-${target}`);
-      });
+      activateDashboardTab(tab.getAttribute("data-dash-tab"));
     });
   });
 
@@ -2908,10 +3768,13 @@ function initEventListeners() {
     const species = document.getElementById("pet-species")?.value || "";
     const breed = document.getElementById("pet-breed")?.value.trim() || "";
     const age = document.getElementById("pet-age")?.value.trim() || "";
+    const bloodType = document.getElementById("pet-blood-type")?.value || "Unknown";
+    const weightKg = Number(document.getElementById("pet-weight")?.value || 0) || null;
+    const vaccinated = Boolean(document.getElementById("pet-vaccinated")?.checked);
     try {
       await apiFetch("/api/pets", {
         method: "POST",
-        body: JSON.stringify({ name, species, breed, age })
+        body: JSON.stringify({ name, species, breed, age, bloodType, weightKg, vaccinated })
       });
       e.target.reset();
       e.target.hidden = true;
@@ -2944,10 +3807,65 @@ function initEventListeners() {
   document.getElementById("signout-button")?.addEventListener("click", () => {
     state.token = "";
     state.user = null;
+    state.blockedUserIds = [];
+    state.blockedUsers = [];
+    state.petsCache = [];
     localStorage.removeItem("pawnir-token");
     updateAuthHeaderUI();
     closeDialog(document.getElementById("dashboard-dialog"));
     showToast("Signed out.");
+    loadLostReports({ silent: true });
+    loadDonors({ silent: true });
+    loadFosters({ silent: true });
+    loadAdoptions({ silent: true });
+    loadNotifications();
+  });
+
+  document.getElementById("delete-account-btn")?.addEventListener("click", async () => {
+    if (!state.user) {
+      openDialog(document.getElementById("auth-dialog"));
+      return;
+    }
+    const confirmMsg =
+      state.lang === "bn"
+        ? "আপনি কি নিশ্চিতভাবে আপনার PawNir অ্যাকাউন্ট এবং সমস্ত পেট পাসপোর্ট, অ্যালার্ট ও বুকিং স্থায়ীভাবে মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা যাবে না।"
+        : "Permanently delete your PawNir account and all associated pet passports, alerts, donor profiles, listings, and bookings? This cannot be undone.";
+    if (!window.confirm(confirmMsg)) return;
+
+    const btn = document.getElementById("delete-account-btn");
+    if (btn) btn.disabled = true;
+    try {
+      await apiFetch("/api/auth/account", { method: "DELETE" });
+      state.token = "";
+      state.user = null;
+      state.blockedUserIds = [];
+      state.blockedUsers = [];
+      state.petsCache = [];
+      localStorage.removeItem("pawnir-token");
+      updateAuthHeaderUI();
+      document.querySelectorAll("dialog.booking-dialog").forEach((dlg) => {
+        if (dlg.open) closeDialog(dlg);
+      });
+      if (window.location.hash === "#delete-account") {
+        history.replaceState(null, "", window.location.pathname);
+      }
+      showToast(
+        state.lang === "bn"
+          ? "আপনার অ্যাকাউন্ট এবং সমস্ত তথ্য স্থায়ীভাবে মুছে ফেলা হয়েছে।"
+          : "Your account and all associated data have been permanently deleted."
+      );
+      await Promise.all([
+        loadLostReports(),
+        loadDonors(),
+        loadFosters(),
+        loadAdoptions(),
+        loadNotifications()
+      ]);
+    } catch (err) {
+      showToast(err.message);
+    } finally {
+      if (btn) btn.disabled = false;
+    }
   });
 
   // Policy Modal Tabs
@@ -3009,9 +3927,29 @@ function initEventListeners() {
   if (phoneTrack) {
     let touchStartX = 0;
     let touchEndX = 0;
+    let phoneAutoPaused = false;
+    let phoneAutoTimer = null;
+
+    const startPhoneAutoAdvance = () => {
+      clearInterval(phoneAutoTimer);
+      phoneAutoTimer = setInterval(() => {
+        if (!phoneAutoPaused && !hasAnyOpenDialog()) {
+          setPhoneScreen(activeScreenIdx + 1);
+        }
+      }, 3200);
+    };
+
+    phoneTrack.addEventListener("mouseenter", () => {
+      phoneAutoPaused = true;
+    });
+    phoneTrack.addEventListener("mouseleave", () => {
+      phoneAutoPaused = false;
+    });
+
     phoneTrack.addEventListener(
       "touchstart",
       (e) => {
+        phoneAutoPaused = true;
         touchStartX = e.touches[0].clientX;
         touchEndX = touchStartX;
       },
@@ -3027,13 +3965,17 @@ function initEventListeners() {
     phoneTrack.addEventListener(
       "touchend",
       () => {
+        phoneAutoPaused = false;
         const diff = touchStartX - touchEndX;
         if (Math.abs(diff) > 40) {
           setPhoneScreen(diff > 0 ? activeScreenIdx + 1 : activeScreenIdx - 1);
+          startPhoneAutoAdvance();
         }
       },
       { passive: true }
     );
+
+    startPhoneAutoAdvance();
   }
 
   let deferredInstallPrompt = null;
@@ -3077,12 +4019,37 @@ function initEventListeners() {
     dot.addEventListener("click", () => setHowStep(Number(dot.getAttribute("data-step-dot"))));
   });
 
-  // Notify Form in Footer
-  document.getElementById("app-notify-form")?.addEventListener("submit", (e) => {
+  // Notify Form in Footer (Play Store / App Store Beta Waitlist)
+  document.getElementById("app-notify-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const status = document.getElementById("app-notify-status");
-    if (status) status.textContent = "✓ You are on the early-access list for the PawNir Android & iOS release!";
-    e.target.reset();
+    const statusEl = document.getElementById("app-notify-status");
+    const submitBtn = document.getElementById("app-notify-submit");
+    const email = document.getElementById("app-notify-email")?.value.trim() || "";
+    const platform = document.getElementById("app-notify-platform")?.value || "android";
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (statusEl) {
+      statusEl.textContent = state.lang === "bn" ? "ওয়েটলিস্টে নিবন্ধন হচ্ছে…" : "Joining early-access waitlist…";
+    }
+    try {
+      const res = await apiFetch("/api/waitlist", {
+        method: "POST",
+        body: JSON.stringify({ email, platform })
+      });
+      const countNote = typeof res?.count === "number" ? ` (#${res.count} in queue)` : "";
+      const msg =
+        state.lang === "bn"
+          ? `✓ আপনি PawNir Android ও iOS বেটা ওয়েটলিস্টে যুক্ত হয়েছেন!${countNote}`
+          : `✓ You are on the early-access list for the PawNir Android & iOS release!${countNote}`;
+      if (statusEl) statusEl.textContent = msg;
+      showToast(msg);
+      e.target.reset();
+    } catch (err) {
+      if (statusEl) statusEl.textContent = err.message;
+      showToast(err.message);
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
   });
 }
 

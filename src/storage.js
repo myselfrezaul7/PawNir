@@ -38,6 +38,9 @@ function buildPaths(baseDataDir, tenantId) {
     donorRequests: path.join(dir, "donor_requests.json"),
     adoptionListings: path.join(dir, "adoption_listings.json"),
     adoptionApplications: path.join(dir, "adoption_applications.json"),
+    moderationReports: path.join(dir, "moderation_reports.json"),
+    userBlocks: path.join(dir, "user_blocks.json"),
+    waitlist: path.join(dir, "waitlist.json"),
     interventions: path.join(dir, "interventions.json"),
     alerts: path.join(dir, "alerts.json"),
     tasks: path.join(dir, "tasks.json"),
@@ -165,7 +168,7 @@ class Storage {
       donors: "donors.json",
       reviews: "reviews.json"
     };
-    for (const key of ["pets", "consultations", "prescriptions", "payments", "notifications", "lostReports", "areaSubscriptions", "fosters", "fosterRequests", "reviews", "donors", "donorRequests", "adoptionListings", "adoptionApplications"]) {
+    for (const key of ["pets", "consultations", "prescriptions", "payments", "notifications", "lostReports", "areaSubscriptions", "fosters", "fosterRequests", "reviews", "donors", "donorRequests", "adoptionListings", "adoptionApplications", "moderationReports", "userBlocks", "waitlist"]) {
       if (seedMap[key]) {
         const seedPath = path.join(this.baseDataDir, seedMap[key]);
         if (await fileExists(seedPath)) {

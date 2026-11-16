@@ -330,8 +330,18 @@ function areaKey(value) {
   return cleanText(value, 80).toLowerCase().replace(/[^a-z0-9\u0980-\u09ff]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function publicLostReport(report, userId = null) {
-  const sightings = Array.isArray(report.sightings) ? report.sightings : [];
+async function getBlockedUserIds(tenantId, user) {
+  if (!user || !user.sub) return new Set();
+  const blocks = await appState.storage.readCollection(tenantId, "userBlocks");
+  return new Set(blocks.filter((b) => b.userId === user.sub).map((b) => b.blockedUserId));
+}
+
+function publicLostReport(report, userId = null, blockedIds = null) {
+  const allSightings = Array.isArray(report.sightings) ? report.sightings : [];
+  const sightings = blockedIds && blockedIds.size
+    ? allSightings.filter((s) => !s.reporterId || !blockedIds.has(s.reporterId))
+    : allSightings;
+  const isOwner = Boolean(userId && report.ownerId === userId);
   const mapQuery = `${report.area || ""}, ${report.city || "Bangladesh"}`.trim();
   return {
     id: report.id,
@@ -347,11 +357,18 @@ function publicLostReport(report, userId = null) {
     expiresAt: report.expiresAt,
     ownerId: report.ownerId || null,
     ownerName: report.ownerName,
-    isOwner: Boolean(userId && report.ownerId === userId),
+    isOwner,
     photoUrl: report.photoUrl || null,
     photoData: report.photoData || null,
     sightingsCount: sightings.length,
-    sightings: sightings.slice(0, 10),
+    sightings: sightings.slice(0, 10).map((s) => ({
+      id: s.id,
+      reporterName: s.reporterName,
+      location: s.location,
+      note: s.note,
+      createdAt: s.createdAt,
+      contact: isOwner ? (s.contact || null) : null
+    })),
     mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`
   };
 }
@@ -371,6 +388,7 @@ function publicReview(review, userId = null) {
   return {
     id: review.id,
     fosterId: review.fosterId,
+    userId: review.userId || null,
     rating: review.rating,
     comment: review.comment,
     authorName: displayName,
@@ -384,9 +402,13 @@ function publicReview(review, userId = null) {
   };
 }
 
-function publicFoster(foster, reviews, userId = null, totalVerifiedCount = null) {
+function publicFoster(foster, reviews, userId = null, totalVerifiedCount = null, blockedIds = null) {
   const items = reviews
-    .filter((review) => review.fosterId === foster.id && review.status === "published")
+    .filter((review) => (
+      review.fosterId === foster.id &&
+      review.status === "published" &&
+      !(blockedIds && blockedIds.size && review.userId && blockedIds.has(review.userId))
+    ))
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const average = items.length ? Math.round((items.reduce((sum, item) => sum + item.rating, 0) / items.length) * 10) / 10 : null;
   const ratingBreakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
@@ -399,6 +421,7 @@ function publicFoster(foster, reviews, userId = null, totalVerifiedCount = null)
   const embedMapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(query)}&t=&z=14&ie=UTF8&iwloc=&output=embed`;
   return {
     ...foster,
+    ownerId: foster.ownerId || null,
     isOwner: Boolean(userId && foster.ownerId === userId),
     reviewCount: items.length,
     rating: average,
@@ -510,6 +533,7 @@ function publicDonor(donor, compatibility = null) {
   const compat = compatibility || checkBloodCompatibility(donor.bloodType, "", donor.species);
   return {
     id: donor.id,
+    ownerId: donor.ownerId || null,
     petName: donor.petName || (donor.species === "cat" ? "Cat Donor" : "Dog Donor"),
     ownerName: donor.ownerName || "PawNir Member",
     species: donor.species,
@@ -594,7 +618,7 @@ function vetSlotsForDate(vet, date) {
 
 function availableVetSlots(vet, date, mode, bookings) {
   if (mode && !Array.isArray(vet.modes) || mode && !vet.modes.includes(mode)) return [];
-  const booked = new Set(bookings.filter((booking) => booking.vetId === vet.id && booking.date === date && ["pending", "confirmed"].includes(booking.status)).map((booking) => booking.time));
+  const booked = new Set(bookings.filter((booking) => booking.vetId === vet.id && booking.date === date && booking.status !== "cancelled" && booking.status !== "declined").map((booking) => booking.time));
   return vetSlotsForDate(vet, date).filter((slot) => !booked.has(slot));
 }
 
@@ -701,20 +725,48 @@ async function saveAndPushNotifications(tenantId, newItems) {
 
 async function getCommunityCounts(tenantId) {
   const now = Date.now();
-  const [lostReports, donors, fosters, adoptions, vets] = await Promise.all([
+  const [lostReports, donors, fosters, adoptions, vets, waitlist] = await Promise.all([
     appState.storage.readCollection(tenantId, "lostReports"),
     appState.storage.readCollection(tenantId, "donors"),
     appState.storage.readCollection(tenantId, "fosters"),
     appState.storage.readCollection(tenantId, "adoptionListings"),
-    appState.storage.readVets(tenantId)
+    appState.storage.readVets(tenantId),
+    appState.storage.readCollection(tenantId, "waitlist")
   ]);
   return {
     openLostCount: lostReports.filter((r) => r.status === "open" && (!r.expiresAt || new Date(r.expiresAt).getTime() > now)).length,
     verifiedDonorCount: donors.filter((d) => d.verified && d.consent && d.available).length,
     verifiedFosterCount: fosters.filter((f) => f.verified).length,
     openAdoptionCount: adoptions.filter((a) => a.status === "open" && a.verified).length,
-    verifiedVetCount: vets.filter((v) => v.verified).length
+    verifiedVetCount: vets.filter((v) => v.verified).length,
+    waitlistCount: waitlist.length
   };
+}
+
+const MODERATION_TARGET_CONFIG = {
+  lost_report: { collection: "lostReports", field: "status", value: "flagged", sseEvent: "lost_found_update" },
+  adoption: { collection: "adoptionListings", field: "status", value: "flagged", sseEvent: "adoption_update" },
+  review: { collection: "reviews", field: "status", value: "flagged", sseEvent: "foster_update" },
+  donor: { collection: "donors", field: "verified", value: false, sseEvent: "donor_update" },
+  foster: { collection: "fosters", field: "verified", value: false, sseEvent: "foster_update" }
+};
+
+async function resolveAndModerateTarget(tenantId, targetType, targetId, shouldAutoHide) {
+  const cfg = MODERATION_TARGET_CONFIG[targetType];
+  if (!cfg) return { ownerId: null, updated: false };
+  const items = await appState.storage.readCollection(tenantId, cfg.collection);
+  const idx = items.findIndex((item) => item.id === targetId);
+  if (idx < 0) return { ownerId: null, updated: false };
+  const ownerId = items[idx].ownerId || items[idx].userId || null;
+  if (!shouldAutoHide) return { ownerId, updated: false };
+  items[idx] = {
+    ...items[idx],
+    [cfg.field]: cfg.value,
+    updatedAt: new Date().toISOString()
+  };
+  await appState.storage.writeCollection(tenantId, cfg.collection, items);
+  pushSse(tenantId, cfg.sseEvent, { action: "moderated", targetType, targetId });
+  return { ownerId, updated: true };
 }
 
 async function appendAudit(tenantId, actor, action, detail = {}) {
@@ -1154,17 +1206,8 @@ function startRealtimeBroadcast() {
       const clients = sseSet(tenantId);
       if (!clients.size) continue;
       try {
-        const [report, community] = await Promise.all([
-          getReport(tenantId),
-          getCommunityCounts(tenantId)
-        ]);
-        const payload = {
-          live: buildLiveSnapshot(report),
-          pipeline: getPipelineStatus(tenantId),
-          anomalyCount: detectAnomalies(report).length,
-          community
-        };
-        pushSse(tenantId, "snapshot", payload);
+        const community = await getCommunityCounts(tenantId);
+        pushSse(tenantId, "community_stats", community);
       } catch (err) {
         // keep loop resilient
       }
@@ -1193,6 +1236,51 @@ async function routeApi(req, res, urlObj, tenantId, user) {
   if (pathname === "/api/community-stats" && req.method === "GET") {
     const community = await getCommunityCounts(tenantId);
     sendJson(res, 200, community);
+    return;
+  }
+
+  if (pathname === "/api/waitlist/count" && req.method === "GET") {
+    const waitlist = await appState.storage.readCollection(tenantId, "waitlist");
+    sendJson(res, 200, { count: waitlist.length });
+    return;
+  }
+
+  if (pathname === "/api/waitlist" && req.method === "POST") {
+    const body = await readBodyJson(req);
+    const email = String(body.email || "").trim().toLowerCase().slice(0, 160);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      sendJson(res, 400, { error: "Please enter a valid email address" });
+      return;
+    }
+    const platform = ["android", "ios"].includes(String(body.platform || "").toLowerCase())
+      ? String(body.platform).toLowerCase()
+      : "android";
+    const area = cleanText(body.area, 80) || null;
+    const waitlist = await appState.storage.readCollection(tenantId, "waitlist");
+    const existingIdx = waitlist.findIndex((item) => String(item.email || "").toLowerCase() === email);
+    let nextWaitlist;
+    if (existingIdx >= 0) {
+      nextWaitlist = waitlist.map((item, idx) => (
+        idx === existingIdx
+          ? { ...item, platform, area: area || item.area || null, updatedAt: new Date().toISOString() }
+          : item
+      ));
+    } else {
+      const entry = {
+        id: `waitlist-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        email,
+        platform,
+        area,
+        userId: user ? user.sub : null,
+        createdAt: new Date().toISOString()
+      };
+      nextWaitlist = [entry, ...waitlist];
+    }
+    await appState.storage.writeCollection(tenantId, "waitlist", nextWaitlist);
+    await appendAudit(tenantId, user ? user.email : "waitlist", "waitlist.joined", { platform });
+    const community = await getCommunityCounts(tenantId);
+    pushSse(tenantId, "community_stats", community);
+    sendJson(res, 201, { ok: true, count: nextWaitlist.length });
     return;
   }
 
@@ -1359,18 +1447,203 @@ async function routeApi(req, res, urlObj, tenantId, user) {
     return;
   }
 
+  if (pathname === "/api/auth/account" && req.method === "DELETE") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to delete your account" });
+    const [
+      users,
+      pets,
+      lostReports,
+      donors,
+      donorRequests,
+      fosters,
+      fosterRequests,
+      reviews,
+      adoptionListings,
+      adoptionApplications,
+      areaSubscriptions,
+      notifications,
+      bookings,
+      userBlocks,
+      waitlist
+    ] = await Promise.all([
+      appState.storage.readUsers(tenantId),
+      appState.storage.readCollection(tenantId, "pets"),
+      appState.storage.readCollection(tenantId, "lostReports"),
+      appState.storage.readCollection(tenantId, "donors"),
+      appState.storage.readCollection(tenantId, "donorRequests"),
+      appState.storage.readCollection(tenantId, "fosters"),
+      appState.storage.readCollection(tenantId, "fosterRequests"),
+      appState.storage.readCollection(tenantId, "reviews"),
+      appState.storage.readCollection(tenantId, "adoptionListings"),
+      appState.storage.readCollection(tenantId, "adoptionApplications"),
+      appState.storage.readCollection(tenantId, "areaSubscriptions"),
+      appState.storage.readCollection(tenantId, "notifications"),
+      appState.storage.readBookings(tenantId),
+      appState.storage.readCollection(tenantId, "userBlocks"),
+      appState.storage.readCollection(tenantId, "waitlist")
+    ]);
+
+    const ownedFosterIds = new Set(fosters.filter((f) => f.ownerId === user.sub).map((f) => f.id));
+    const ownedListingIds = new Set(adoptionListings.filter((a) => a.ownerId === user.sub).map((a) => a.id));
+    const userEmailLower = String(user.email || "").toLowerCase();
+
+    const cleanedLostReports = lostReports
+      .filter((r) => r.ownerId !== user.sub)
+      .map((r) => (
+        Array.isArray(r.sightings)
+          ? { ...r, sightings: r.sightings.filter((s) => s.reporterId !== user.sub) }
+          : r
+      ));
+
+    await Promise.all([
+      appState.storage.writeUsers(tenantId, users.filter((u) => u.id !== user.sub)),
+      appState.storage.writeCollection(tenantId, "pets", pets.filter((p) => p.ownerId !== user.sub)),
+      appState.storage.writeCollection(tenantId, "lostReports", cleanedLostReports),
+      appState.storage.writeCollection(tenantId, "donors", donors.filter((d) => d.ownerId !== user.sub)),
+      appState.storage.writeCollection(tenantId, "donorRequests", donorRequests.filter((r) => r.requesterId !== user.sub && r.donorOwnerId !== user.sub)),
+      appState.storage.writeCollection(tenantId, "fosters", fosters.filter((f) => f.ownerId !== user.sub)),
+      appState.storage.writeCollection(tenantId, "fosterRequests", fosterRequests.filter((r) => r.userId !== user.sub && !ownedFosterIds.has(r.fosterId))),
+      appState.storage.writeCollection(tenantId, "reviews", reviews.filter((r) => r.userId !== user.sub && !ownedFosterIds.has(r.fosterId))),
+      appState.storage.writeCollection(tenantId, "adoptionListings", adoptionListings.filter((a) => a.ownerId !== user.sub)),
+      appState.storage.writeCollection(tenantId, "adoptionApplications", adoptionApplications.filter((a) => a.applicantId !== user.sub && !ownedListingIds.has(a.listingId))),
+      appState.storage.writeCollection(tenantId, "areaSubscriptions", areaSubscriptions.filter((s) => s.userId !== user.sub)),
+      appState.storage.writeCollection(tenantId, "notifications", notifications.filter((n) => n.userId !== user.sub)),
+      appState.storage.writeBookings(tenantId, bookings.filter((b) => b.ownerId !== user.sub)),
+      appState.storage.writeCollection(tenantId, "userBlocks", userBlocks.filter((b) => b.userId !== user.sub && b.blockedUserId !== user.sub)),
+      appState.storage.writeCollection(tenantId, "waitlist", waitlist.filter((w) => w.userId !== user.sub && (!userEmailLower || String(w.email || "").toLowerCase() !== userEmailLower)))
+    ]);
+
+    await appendAudit(tenantId, "anonymized", "account.deleted", { reason: "user_requested" });
+    pushSse(tenantId, "lost_found_update", { action: "account_deleted" });
+    pushSse(tenantId, "donor_update", { action: "account_deleted" });
+    pushSse(tenantId, "adoption_update", { action: "account_deleted" });
+    pushSse(tenantId, "foster_update", { action: "account_deleted" });
+    pushSse(tenantId, "care_update", { action: "account_deleted" });
+    pushSse(tenantId, "community_stats", await getCommunityCounts(tenantId));
+    sendJson(res, 200, { ok: true, deleted: true });
+    return;
+  }
+
+  if (pathname === "/api/moderation/report" && req.method === "POST") {
+    const body = await readBodyJson(req);
+    const targetType = cleanText(body.targetType, 40);
+    const targetId = cleanText(body.targetId, 120);
+    const reason = cleanText(body.reason, 40);
+    const details = cleanText(body.details, 600);
+    const allowedTypes = ["lost_report", "donor", "foster", "review", "adoption"];
+    const allowedReasons = ["commercial_sale", "spam_fake", "harassment_abuse", "unsafe_location", "other"];
+    if (!allowedTypes.includes(targetType) || !targetId || !allowedReasons.includes(reason)) {
+      return sendJson(res, 400, { error: "Valid targetType, targetId, and moderation reason are required" });
+    }
+    const existingReports = await appState.storage.readCollection(tenantId, "moderationReports");
+    const totalForTarget = existingReports.filter((r) => r.targetId === targetId && r.targetType === targetType).length + 1;
+    const autoHidden = reason === "commercial_sale" || totalForTarget >= 3;
+    const { ownerId: inferredOwnerId } = await resolveAndModerateTarget(tenantId, targetType, targetId, autoHidden);
+    const report = {
+      id: `mod-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      targetType,
+      targetId,
+      targetOwnerId: cleanText(body.targetOwnerId, 120) || inferredOwnerId || null,
+      reporterId: user ? user.sub : null,
+      reason,
+      details,
+      autoHidden,
+      createdAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "moderationReports", [report, ...existingReports].slice(0, 2000));
+    await appendAudit(tenantId, user ? user.email : "anonymous", "moderation.report.created", {
+      reportId: report.id,
+      targetType,
+      targetId,
+      reason,
+      autoHidden
+    });
+    if (autoHidden) {
+      pushSse(tenantId, "community_stats", await getCommunityCounts(tenantId));
+    }
+    sendJson(res, 201, { ok: true, reportId: report.id, autoHidden });
+    return;
+  }
+
+  if (pathname === "/api/moderation/blocks" && req.method === "GET") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to view blocked users" });
+    const blocks = await appState.storage.readCollection(tenantId, "userBlocks");
+    const mine = blocks.filter((b) => b.userId === user.sub);
+    sendJson(res, 200, {
+      blocks: mine,
+      blockedUserIds: mine.map((b) => b.blockedUserId)
+    });
+    return;
+  }
+
+  if (pathname === "/api/moderation/block" && req.method === "POST") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to block a user" });
+    const body = await readBodyJson(req);
+    const blockedUserId = cleanText(body.blockedUserId, 120);
+    const reason = cleanText(body.reason, 240) || "User requested block";
+    if (!blockedUserId) return sendJson(res, 400, { error: "blockedUserId is required" });
+    if (blockedUserId === user.sub) return sendJson(res, 400, { error: "You cannot block yourself" });
+    const [blocks, users] = await Promise.all([
+      appState.storage.readCollection(tenantId, "userBlocks"),
+      appState.storage.readUsers(tenantId)
+    ]);
+    const targetUser = users.find((u) => u.id === blockedUserId);
+    const blockedUserName = cleanText(body.blockedUserName || (targetUser && targetUser.name) || "Community Member", 80);
+    const existingIdx = blocks.findIndex((b) => b.userId === user.sub && b.blockedUserId === blockedUserId);
+    let blockRecord;
+    let nextBlocks;
+    if (existingIdx >= 0) {
+      blockRecord = { ...blocks[existingIdx], reason, blockedUserName, updatedAt: new Date().toISOString() };
+      nextBlocks = blocks.map((b, idx) => (idx === existingIdx ? blockRecord : b));
+    } else {
+      blockRecord = {
+        id: `block-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        userId: user.sub,
+        blockedUserId,
+        blockedUserName,
+        reason,
+        createdAt: new Date().toISOString()
+      };
+      nextBlocks = [blockRecord, ...blocks];
+    }
+    await appState.storage.writeCollection(tenantId, "userBlocks", nextBlocks);
+    await appendAudit(tenantId, user.email, "moderation.user.blocked", { blockedUserId });
+    const mine = nextBlocks.filter((b) => b.userId === user.sub);
+    sendJson(res, 201, { ok: true, block: blockRecord, blockedUserIds: mine.map((b) => b.blockedUserId) });
+    return;
+  }
+
+  const moderationUnblockMatch = pathname.match(/^\/api\/moderation\/block\/([^/]+)$/);
+  if (moderationUnblockMatch && req.method === "DELETE") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to unblock a user" });
+    const targetParam = decodeURIComponent(moderationUnblockMatch[1]);
+    const blocks = await appState.storage.readCollection(tenantId, "userBlocks");
+    const exists = blocks.some((b) => b.userId === user.sub && (b.blockedUserId === targetParam || b.id === targetParam));
+    if (!exists) return sendJson(res, 404, { error: "Blocked user entry not found" });
+    const nextBlocks = blocks.filter((b) => !(b.userId === user.sub && (b.blockedUserId === targetParam || b.id === targetParam)));
+    await appState.storage.writeCollection(tenantId, "userBlocks", nextBlocks);
+    await appendAudit(tenantId, user.email, "moderation.user.unblocked", { blockedUserId: targetParam });
+    const mine = nextBlocks.filter((b) => b.userId === user.sub);
+    sendJson(res, 200, { ok: true, unblocked: true, blockedUserIds: mine.map((b) => b.blockedUserId) });
+    return;
+  }
+
   if (pathname === "/api/lost-found" && req.method === "GET") {
     const rawArea = cleanText(urlObj.searchParams.get("area") || "", 80).toLowerCase();
     const requestedAreaKey = areaKey(rawArea);
     const requestedType = urlObj.searchParams.get("type") || "all";
     const requestedSpecies = cleanText(urlObj.searchParams.get("species") || "", 20).toLowerCase();
-    const reports = await appState.storage.readCollection(tenantId, "lostReports");
+    const [reports, blockedIds] = await Promise.all([
+      appState.storage.readCollection(tenantId, "lostReports"),
+      getBlockedUserIds(tenantId, user)
+    ]);
     const now = Date.now();
     const openReports = reports.filter(
       (report) => report.status === "open" && (!report.expiresAt || new Date(report.expiresAt).getTime() > now)
     );
     const totalOpenCount = openReports.length;
     const visible = openReports.filter((report) => {
+      if (report.ownerId && blockedIds.has(report.ownerId)) return false;
       if (requestedType !== "all" && report.type !== requestedType) return false;
       if (requestedSpecies && requestedSpecies !== "all" && report.species !== requestedSpecies) return false;
       if (rawArea) {
@@ -1381,8 +1654,8 @@ async function routeApi(req, res, urlObj, tenantId, user) {
     }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const mine = user ? reports.filter((report) => report.ownerId === user.sub).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : [];
     sendJson(res, 200, {
-      reports: visible.slice(0, 100).map((r) => publicLostReport(r, user?.sub)),
-      mine: mine.slice(0, 50).map((r) => publicLostReport(r, user?.sub)),
+      reports: visible.slice(0, 100).map((r) => publicLostReport(r, user?.sub, blockedIds)),
+      mine: mine.slice(0, 50).map((r) => publicLostReport(r, user?.sub, blockedIds)),
       totalOpenCount
     });
     return;
@@ -1541,19 +1814,34 @@ async function routeApi(req, res, urlObj, tenantId, user) {
     return;
   }
 
+  const notifSingleReadMatch = pathname.match(/^\/api\/notifications\/([^/]+)\/read$/);
+  if (notifSingleReadMatch && req.method === "PATCH") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to update notifications" });
+    const notifId = decodeURIComponent(notifSingleReadMatch[1]);
+    const notifications = await appState.storage.readCollection(tenantId, "notifications");
+    const idx = notifications.findIndex((item) => item.id === notifId && item.userId === user.sub);
+    if (idx < 0) return sendJson(res, 404, { error: "Notification not found" });
+    notifications[idx] = { ...notifications[idx], read: true, readAt: new Date().toISOString() };
+    await appState.storage.writeCollection(tenantId, "notifications", notifications);
+    sendJson(res, 200, notifications[idx]);
+    return;
+  }
+
   if (pathname === "/api/donors" && req.method === "GET") {
     const area = cleanText(urlObj.searchParams.get("area"), 80).toLowerCase();
     const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
     const bloodType = cleanText(urlObj.searchParams.get("bloodType"), 30);
     const includeMine = urlObj.searchParams.get("includeMine") === "1";
-    const [donors, donorRequests] = await Promise.all([
+    const [donors, donorRequests, blockedIds] = await Promise.all([
       appState.storage.readCollection(tenantId, "donors"),
-      includeMine && user ? appState.storage.readCollection(tenantId, "donorRequests") : Promise.resolve([])
+      includeMine && user ? appState.storage.readCollection(tenantId, "donorRequests") : Promise.resolve([]),
+      getBlockedUserIds(tenantId, user)
     ]);
     const activeVerifiedDonors = donors.filter((donor) => donor.verified && donor.consent && donor.available);
     const totalVerifiedCount = activeVerifiedDonors.length;
     const matched = [];
     for (const donor of activeVerifiedDonors) {
+      if (donor.ownerId && blockedIds.has(donor.ownerId)) continue;
       if (species && donor.species !== species) continue;
       if (area) {
         const hay = `${donor.area || ""} ${donor.city || ""} ${donor.petName || ""} ${donor.bloodType || ""}`.toLowerCase();
@@ -1724,18 +2012,133 @@ async function routeApi(req, res, urlObj, tenantId, user) {
     const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
     const area = cleanText(urlObj.searchParams.get("area"), 60).toLowerCase();
     const includeMine = urlObj.searchParams.get("includeMine") === "1";
-    const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
+    const [listings, blockedIds] = await Promise.all([
+      appState.storage.readCollection(tenantId, "adoptionListings"),
+      getBlockedUserIds(tenantId, user)
+    ]);
     const allOpenVerified = listings.filter((item) => item.status === "open" && item.verified);
     const totalOpenCount = allOpenVerified.length;
     const openListings = allOpenVerified.filter((item) => {
+      if (item.ownerId && blockedIds.has(item.ownerId)) return false;
       if (species && (item.species || "").toLowerCase() !== species) return false;
       if (area && !((item.area || "").toLowerCase().includes(area) || (item.name || "").toLowerCase().includes(area) || (item.breed || "").toLowerCase().includes(area))) return false;
       return true;
-    }).map((item) => ({ ...item, isOwner: Boolean(user && item.ownerId === user.sub) }));
+    }).map((item) => ({ ...item, ownerId: item.ownerId || null, isOwner: Boolean(user && item.ownerId === user.sub) }));
     const myListings = (user && includeMine)
-      ? listings.filter((item) => item.ownerId === user.sub).map((item) => ({ ...item, isOwner: true }))
+      ? listings.filter((item) => item.ownerId === user.sub).map((item) => ({ ...item, ownerId: item.ownerId || null, isOwner: true }))
       : [];
     sendJson(res, 200, includeMine ? { listings: openListings, myListings, totalOpenCount } : openListings);
+    return;
+  }
+
+  if (pathname === "/api/adoptions/applications" && req.method === "GET") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to view adoption applications" });
+    const [applications, listings] = await Promise.all([
+      appState.storage.readCollection(tenantId, "adoptionApplications"),
+      appState.storage.readCollection(tenantId, "adoptionListings")
+    ]);
+    const listingMap = new Map(listings.map((item) => [item.id, item]));
+    const isAdminOrOps = ["admin", "ops", "ceo"].includes(user.role);
+    const enrich = (app) => {
+      const listing = listingMap.get(app.listingId);
+      return {
+        ...app,
+        listingName: listing ? listing.name : "Adoption Listing",
+        listingSpecies: listing ? listing.species : null,
+        listingArea: listing ? listing.area : null,
+        listingStatus: listing ? listing.status : null
+      };
+    };
+    const submitted = applications.filter((app) => app.applicantId === user.sub).map(enrich);
+    const incoming = applications
+      .filter((app) => {
+        const listing = listingMap.get(app.listingId);
+        if (!listing) return false;
+        return listing.ownerId === user.sub || (isAdminOrOps && app.applicantId !== user.sub);
+      })
+      .map(enrich);
+    sendJson(res, 200, { incoming, submitted });
+    return;
+  }
+
+  const adoptionApplicationMatch = pathname.match(/^\/api\/adoptions\/applications\/([^/]+)$/);
+  if (adoptionApplicationMatch && req.method === "PATCH") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to review adoption applications" });
+    const applicationId = decodeURIComponent(adoptionApplicationMatch[1]);
+    const body = await readBodyJson(req);
+    if (!["approved", "declined"].includes(body.status)) {
+      return sendJson(res, 400, { error: "Status must be approved or declined" });
+    }
+    const [applications, listings] = await Promise.all([
+      appState.storage.readCollection(tenantId, "adoptionApplications"),
+      appState.storage.readCollection(tenantId, "adoptionListings")
+    ]);
+    const appIdx = applications.findIndex((item) => item.id === applicationId);
+    if (appIdx < 0) return sendJson(res, 404, { error: "Adoption application not found" });
+    const application = applications[appIdx];
+    const listingIdx = listings.findIndex((item) => item.id === application.listingId);
+    const listing = listingIdx >= 0 ? listings[listingIdx] : null;
+    const isOwner = Boolean(listing && listing.ownerId === user.sub);
+    const isAdminOrOps = ["admin", "ops", "ceo"].includes(user.role);
+    if (!isOwner && !isAdminOrOps) {
+      return sendJson(res, 403, { error: "Only the listing guardian or an operator can review this application" });
+    }
+    const updatedApplication = {
+      ...application,
+      status: body.status,
+      reviewNote: cleanText(body.reviewNote, 240) || null,
+      reviewedBy: user.sub,
+      updatedAt: new Date().toISOString()
+    };
+    applications[appIdx] = updatedApplication;
+    await appState.storage.writeCollection(tenantId, "adoptionApplications", applications);
+
+    if (body.status === "approved" && body.markAdopted !== false && listingIdx >= 0) {
+      listings[listingIdx] = {
+        ...listings[listingIdx],
+        status: "adopted",
+        updatedAt: new Date().toISOString()
+      };
+      await appState.storage.writeCollection(tenantId, "adoptionListings", listings);
+    }
+
+    if (application.applicantId && application.applicantId !== user.sub) {
+      await saveAndPushNotifications(tenantId, {
+        id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        userId: application.applicantId,
+        type: "adoption_application_status",
+        listingId: application.listingId,
+        applicationId: application.id,
+        title: `Adoption application ${body.status}: ${listing ? listing.name : "Pet"}`,
+        message: body.status === "approved"
+          ? `Great news! Your application for ${listing ? listing.name : "this pet"} was approved.`
+          : `Your adoption application for ${listing ? listing.name : "this pet"} was declined.`,
+        read: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    await appendAudit(tenantId, user.email, "adoption.application.updated", {
+      applicationId: application.id,
+      listingId: application.listingId,
+      status: body.status
+    });
+    pushSse(tenantId, "adoption_update", {
+      action: "application_updated",
+      applicationId: application.id,
+      listingId: application.listingId,
+      status: body.status
+    });
+    if (body.status === "approved") {
+      pushSse(tenantId, "community_stats", await getCommunityCounts(tenantId));
+    }
+    sendJson(res, 200, {
+      ...updatedApplication,
+      listingName: listing ? listing.name : "Adoption Listing",
+      listingSpecies: listing ? listing.species : null,
+      listingArea: listing ? listing.area : null,
+      listingStatus: listingIdx >= 0 ? listings[listingIdx].status : null
+    });
     return;
   }
   if (pathname === "/api/adoptions/listings" && req.method === "POST") {
@@ -1853,14 +2256,20 @@ async function routeApi(req, res, urlObj, tenantId, user) {
   if (adoptionPdfMatch && req.method === "GET") {
     if (!user) return sendJson(res, 401, { error: "Sign in is required to download an adoption form" });
     const applicationId = decodeURIComponent(adoptionPdfMatch[1]);
-    const applications = await appState.storage.readCollection(tenantId, "adoptionApplications");
-    const application = applications.find((item) => item.id === applicationId && item.applicantId === user.sub);
+    const [applications, listings] = await Promise.all([
+      appState.storage.readCollection(tenantId, "adoptionApplications"),
+      appState.storage.readCollection(tenantId, "adoptionListings")
+    ]);
+    const application = applications.find((item) => item.id === applicationId);
     if (!application) return sendJson(res, 404, { error: "Adoption application not found" });
-    const listings = await appState.storage.readCollection(tenantId, "adoptionListings");
     const listing = listings.find((item) => item.id === application.listingId);
+    const canDownload = application.applicantId === user.sub ||
+      (listing && listing.ownerId === user.sub) ||
+      ["admin", "ops", "ceo"].includes(user.role);
+    if (!canDownload) return sendJson(res, 404, { error: "Adoption application not found" });
     const users = await appState.storage.readUsers(tenantId);
-    const applicant = users.find((item) => item.id === user.sub);
-    const pdf = buildAdoptionPdf(application, listing, applicant || user);
+    const applicant = users.find((item) => item.id === application.applicantId);
+    const pdf = buildAdoptionPdf(application, listing, applicant || { name: application.applicantName, email: "", area: "Bangladesh" });
     res.writeHead(200, { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="pawnir-adoption-${application.id}.pdf"`, "Cache-Control": "no-store" });
     res.end(pdf);
     await appendAudit(tenantId, user.email, "adoption.application.pdf_downloaded", { applicationId });
@@ -1871,13 +2280,15 @@ async function routeApi(req, res, urlObj, tenantId, user) {
     const city = cleanText(urlObj.searchParams.get("city"), 60).toLowerCase();
     const species = cleanText(urlObj.searchParams.get("species"), 20).toLowerCase();
     const q = cleanText(urlObj.searchParams.get("q"), 80).toLowerCase();
-    const [fosters, reviews] = await Promise.all([
+    const [fosters, reviews, blockedIds] = await Promise.all([
       appState.storage.readCollection(tenantId, "fosters"),
-      appState.storage.readCollection(tenantId, "reviews")
+      appState.storage.readCollection(tenantId, "reviews"),
+      getBlockedUserIds(tenantId, user)
     ]);
     const verifiedFosters = fosters.filter((foster) => foster.verified);
     const totalVerifiedCount = verifiedFosters.length;
     const visible = verifiedFosters.filter((foster) => {
+      if (foster.ownerId && blockedIds.has(foster.ownerId)) return false;
       if (city && foster.city.toLowerCase() !== city) return false;
       if (species && (!Array.isArray(foster.species) || !foster.species.includes(species))) return false;
       if (q) {
@@ -1886,7 +2297,7 @@ async function routeApi(req, res, urlObj, tenantId, user) {
       }
       return true;
     });
-    sendJson(res, 200, visible.map((foster) => publicFoster(foster, reviews, user?.sub, totalVerifiedCount)));
+    sendJson(res, 200, visible.map((foster) => publicFoster(foster, reviews, user?.sub, totalVerifiedCount, blockedIds)));
     return;
   }
 
@@ -1935,18 +2346,25 @@ async function routeApi(req, res, urlObj, tenantId, user) {
   const fosterMatch = pathname.match(/^\/api\/fosters\/([^/]+)$/);
   if (fosterMatch && req.method === "GET") {
     const fosterId = decodeURIComponent(fosterMatch[1]);
-    const [fosters, reviews] = await Promise.all([
+    const [fosters, reviews, blockedIds] = await Promise.all([
       appState.storage.readCollection(tenantId, "fosters"),
-      appState.storage.readCollection(tenantId, "reviews")
+      appState.storage.readCollection(tenantId, "reviews"),
+      getBlockedUserIds(tenantId, user)
     ]);
     const foster = fosters.find((item) => item.id === fosterId && item.verified);
-    if (!foster) return sendJson(res, 404, { error: "Verified foster care not found" });
+    if (!foster || (foster.ownerId && blockedIds.has(foster.ownerId))) {
+      return sendJson(res, 404, { error: "Verified foster care not found" });
+    }
     const published = reviews
-      .filter((review) => review.fosterId === foster.id && review.status === "published")
+      .filter((review) => (
+        review.fosterId === foster.id &&
+        review.status === "published" &&
+        !(review.userId && blockedIds.has(review.userId))
+      ))
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map((r) => publicReview(r, user?.sub));
     const totalVerifiedCount = fosters.filter((f) => f.verified).length;
-    const fosterData = publicFoster(foster, reviews, user?.sub, totalVerifiedCount);
+    const fosterData = publicFoster(foster, reviews, user?.sub, totalVerifiedCount, blockedIds);
     sendJson(res, 200, { ...fosterData, foster: fosterData, reviews: published });
     return;
   }
@@ -2011,8 +2429,11 @@ async function routeApi(req, res, urlObj, tenantId, user) {
   const fosterReviewMatch = pathname.match(/^\/api\/fosters\/([^/]+)\/reviews$/);
   if (fosterReviewMatch && req.method === "GET") {
     const fosterId = decodeURIComponent(fosterReviewMatch[1]);
-    const reviews = await appState.storage.readCollection(tenantId, "reviews");
-    sendJson(res, 200, reviews.filter((review) => review.fosterId === fosterId && review.status === "published").sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((r) => publicReview(r, user?.sub)));
+    const [reviews, blockedIds] = await Promise.all([
+      appState.storage.readCollection(tenantId, "reviews"),
+      getBlockedUserIds(tenantId, user)
+    ]);
+    sendJson(res, 200, reviews.filter((review) => review.fosterId === fosterId && review.status === "published" && !(review.userId && blockedIds.has(review.userId))).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map((r) => publicReview(r, user?.sub)));
     return;
   }
   if (fosterReviewMatch && req.method === "POST") {
@@ -2073,8 +2494,37 @@ async function routeApi(req, res, urlObj, tenantId, user) {
 
   if (pathname === "/api/foster-requests" && req.method === "GET") {
     if (!user) return sendJson(res, 401, { error: "Sign in is required to view foster requests" });
-    const requests = await appState.storage.readCollection(tenantId, "fosterRequests");
-    sendJson(res, 200, requests.filter((item) => item.userId === user.sub || ["ops", "ceo"].includes(user.role)));
+    const [requests, fosters] = await Promise.all([
+      appState.storage.readCollection(tenantId, "fosterRequests"),
+      appState.storage.readCollection(tenantId, "fosters")
+    ]);
+    const fosterMap = new Map(fosters.map((f) => [f.id, f]));
+    const isOperator = ["ops", "ceo"].includes(user.role);
+    const enrichReq = (item) => {
+      const foster = fosterMap.get(item.fosterId);
+      const isHost = Boolean((foster && foster.ownerId === user.sub) || isOperator);
+      return {
+        ...item,
+        fosterArea: foster ? foster.area : null,
+        isHost,
+        isMine: item.userId === user.sub
+      };
+    };
+    const myRequests = requests.filter((item) => item.userId === user.sub).map(enrichReq);
+    const incomingRequests = requests.filter((item) => {
+      const foster = fosterMap.get(item.fosterId);
+      return Boolean((foster && foster.ownerId === user.sub) || isOperator);
+    }).map(enrichReq);
+
+    if (urlObj.searchParams.get("grouped") === "1") {
+      sendJson(res, 200, { myRequests, incomingRequests });
+      return;
+    }
+
+    const combined = requests
+      .map(enrichReq)
+      .filter((item) => item.isMine || item.isHost);
+    sendJson(res, 200, combined);
     return;
   }
 
@@ -2138,8 +2588,42 @@ async function routeApi(req, res, urlObj, tenantId, user) {
       sendJson(res, 409, { error: "That slot is unavailable. Please choose another available time." });
       return;
     }
-    const pets = await appState.storage.readCollection(tenantId, "pets");
-    const pet = pets.find((item) => item.id === body.petId && item.ownerId === user.sub);
+    let pets = await appState.storage.readCollection(tenantId, "pets");
+    let pet = body.petId && body.petId !== "quick"
+      ? pets.find((item) => item.id === body.petId && item.ownerId === user.sub)
+      : null;
+
+    if (!pet && (body.petId === "quick" || (!body.petId && body.petName))) {
+      const quickName = cleanText(body.petName, 60);
+      const rawSpecies = String(body.petSpecies || body.species || "cat").toLowerCase();
+      const quickSpecies = ["dog", "cat", "bird", "rabbit", "other"].includes(rawSpecies) ? rawSpecies : "cat";
+      if (!quickName) {
+        sendJson(res, 400, { error: "Enter a pet name for quick booking" });
+        return;
+      }
+      pet = pets.find((item) => item.ownerId === user.sub && String(item.name || "").toLowerCase() === quickName.toLowerCase() && item.species === quickSpecies);
+      if (!pet) {
+        const passportCode = String(crypto.randomInt(10000, 99999));
+        pet = {
+          id: `pet-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          ownerId: user.sub,
+          name: quickName,
+          species: quickSpecies,
+          breed: cleanText(body.petBreed || "", 60),
+          age: cleanText(body.petAge || "", 40),
+          notes: "Created via quick vet booking",
+          passportId: `#BD-${passportCode}`,
+          vaccinated: true,
+          bloodType: "Unknown",
+          weightKg: null,
+          microchip: "Available",
+          createdAt: new Date().toISOString()
+        };
+        pets = [pet, ...pets];
+        await appState.storage.writeCollection(tenantId, "pets", pets);
+      }
+    }
+
     if (!pet) {
       sendJson(res, 400, { error: "Select one of your pet profiles before booking" });
       return;
@@ -2160,16 +2644,62 @@ async function routeApi(req, res, urlObj, tenantId, user) {
       createdAt: new Date().toISOString()
     };
     await appState.storage.writeBookings(tenantId, [booking, ...bookings]);
+    await saveAndPushNotifications(tenantId, {
+      id: `notification-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      userId: user.sub,
+      type: "vet_booking",
+      bookingId: booking.id,
+      vetId: vet.id,
+      title: `Vet booking scheduled: ${vet.name}`,
+      message: `${pet.name} · ${booking.date} at ${booking.time} (${booking.mode === "online" ? "Online" : "Clinic"})`,
+      read: false,
+      createdAt: new Date().toISOString()
+    });
     await appendAudit(tenantId, user.email, "booking.created", { bookingId: booking.id, vetId: vet.id });
     pushSse(tenantId, "care_update", { action: "booking_created", bookingId: booking.id, userId: user.sub });
     sendJson(res, 201, booking);
     return;
   }
 
+  const bookingUpdateMatch = pathname.match(/^\/api\/bookings\/([^/]+)$/);
+  if (bookingUpdateMatch && req.method === "PATCH") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to update a booking" });
+    const bookingId = decodeURIComponent(bookingUpdateMatch[1]);
+    const body = await readBodyJson(req);
+    const bookings = await appState.storage.readBookings(tenantId);
+    const idx = bookings.findIndex((item) => item.id === bookingId);
+    if (idx < 0) return sendJson(res, 404, { error: "Booking not found" });
+    const isOwner = bookings[idx].ownerId === user.sub;
+    const isOpsOrVet = user.role === "ops" || (user.role === "vet" && bookings[idx].vetId === user.sub);
+    if (!isOwner && !isOpsOrVet) {
+      return sendJson(res, 403, { error: "You can only update your own bookings" });
+    }
+    const allowedStatuses = isOpsOrVet ? ["pending", "confirmed", "completed", "cancelled"] : ["cancelled"];
+    if (!allowedStatuses.includes(body.status)) {
+      return sendJson(res, 400, { error: "Invalid booking status update" });
+    }
+    bookings[idx] = { ...bookings[idx], status: body.status, updatedAt: new Date().toISOString() };
+    await appState.storage.writeBookings(tenantId, bookings);
+    await appendAudit(tenantId, user.email, "booking.updated", { bookingId, status: body.status });
+    pushSse(tenantId, "care_update", { action: "booking_updated", bookingId, status: body.status, userId: bookings[idx].ownerId });
+    sendJson(res, 200, bookings[idx]);
+    return;
+  }
+
   if (pathname === "/api/pets" && req.method === "GET") {
     if (!user) return sendJson(res, 401, { error: "Sign in is required to view pets" });
     const pets = await appState.storage.readCollection(tenantId, "pets");
-    return sendJson(res, 200, pets.filter((pet) => pet.ownerId === user.sub));
+    const myPets = pets
+      .filter((pet) => pet.ownerId === user.sub)
+      .map((pet) => ({
+        ...pet,
+        passportId: pet.passportId || `#BD-${String(pet.id).replace(/\D/g, "").slice(-5).padStart(5, "0")}`,
+        vaccinated: pet.vaccinated !== false,
+        bloodType: pet.bloodType || "Unknown",
+        weightKg: pet.weightKg ?? null,
+        microchip: pet.microchip || "Available"
+      }));
+    return sendJson(res, 200, myPets);
   }
 
   if (pathname === "/api/pets" && req.method === "POST") {
@@ -2179,11 +2709,74 @@ async function routeApi(req, res, urlObj, tenantId, user) {
       return sendJson(res, 400, { error: "Pet name and supported species are required" });
     }
     const pets = await appState.storage.readCollection(tenantId, "pets");
-    const pet = { id: `pet-${Date.now()}`, ownerId: user.sub, name: String(body.name).trim(), species: body.species, breed: String(body.breed || "").trim(), age: String(body.age || "").trim(), notes: String(body.notes || "").trim(), createdAt: new Date().toISOString() };
+    const passportCode = String(crypto.randomInt(10000, 99999));
+    const parsedWeight = Number(body.weightKg);
+    const pet = {
+      id: `pet-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      ownerId: user.sub,
+      name: cleanText(body.name, 60),
+      species: body.species,
+      breed: cleanText(body.breed || "", 60),
+      age: cleanText(body.age || "", 40),
+      notes: cleanText(body.notes || "", 400),
+      passportId: cleanText(body.passportId, 20) || `#BD-${passportCode}`,
+      vaccinated: body.vaccinated !== false,
+      bloodType: cleanText(body.bloodType, 30) || "Unknown",
+      weightKg: Number.isFinite(parsedWeight) && parsedWeight > 0 ? Math.min(90, Math.round(parsedWeight * 10) / 10) : null,
+      microchip: cleanText(body.microchip, 40) || "Available",
+      createdAt: new Date().toISOString()
+    };
     await appState.storage.writeCollection(tenantId, "pets", [pet, ...pets]);
     await appendAudit(tenantId, user.email, "pet.created", { petId: pet.id });
     pushSse(tenantId, "care_update", { action: "pet_created", petId: pet.id, userId: user.sub });
     return sendJson(res, 201, pet);
+  }
+
+  const petItemMatch = pathname.match(/^\/api\/pets\/([^/]+)$/);
+  if (petItemMatch && req.method === "PATCH") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to update a pet profile" });
+    const petId = decodeURIComponent(petItemMatch[1]);
+    const body = await readBodyJson(req);
+    const pets = await appState.storage.readCollection(tenantId, "pets");
+    const idx = pets.findIndex((item) => item.id === petId && item.ownerId === user.sub);
+    if (idx < 0) return sendJson(res, 404, { error: "Pet profile not found" });
+    if (body.species !== undefined && !["dog", "cat", "bird", "rabbit", "other"].includes(body.species)) {
+      return sendJson(res, 400, { error: "Supported species is required" });
+    }
+    const nextName = body.name !== undefined ? cleanText(body.name, 60) : pets[idx].name;
+    if (!nextName) return sendJson(res, 400, { error: "Pet name cannot be empty" });
+    const parsedWeight = body.weightKg !== undefined ? Number(body.weightKg) : pets[idx].weightKg;
+    pets[idx] = {
+      ...pets[idx],
+      name: nextName,
+      species: body.species !== undefined ? body.species : pets[idx].species,
+      breed: body.breed !== undefined ? cleanText(body.breed, 60) : pets[idx].breed,
+      age: body.age !== undefined ? cleanText(body.age, 40) : pets[idx].age,
+      notes: body.notes !== undefined ? cleanText(body.notes, 400) : pets[idx].notes,
+      vaccinated: body.vaccinated !== undefined ? body.vaccinated !== false : (pets[idx].vaccinated !== false),
+      bloodType: body.bloodType !== undefined ? (cleanText(body.bloodType, 30) || "Unknown") : (pets[idx].bloodType || "Unknown"),
+      weightKg: body.weightKg !== undefined
+        ? (Number.isFinite(parsedWeight) && parsedWeight > 0 ? Math.min(90, Math.round(parsedWeight * 10) / 10) : null)
+        : (pets[idx].weightKg ?? null),
+      microchip: body.microchip !== undefined ? (cleanText(body.microchip, 40) || "Available") : (pets[idx].microchip || "Available"),
+      updatedAt: new Date().toISOString()
+    };
+    await appState.storage.writeCollection(tenantId, "pets", pets);
+    await appendAudit(tenantId, user.email, "pet.updated", { petId });
+    pushSse(tenantId, "care_update", { action: "pet_updated", petId, userId: user.sub });
+    return sendJson(res, 200, pets[idx]);
+  }
+
+  if (petItemMatch && req.method === "DELETE") {
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to delete a pet profile" });
+    const petId = decodeURIComponent(petItemMatch[1]);
+    const pets = await appState.storage.readCollection(tenantId, "pets");
+    const exists = pets.some((item) => item.id === petId && item.ownerId === user.sub);
+    if (!exists) return sendJson(res, 404, { error: "Pet profile not found" });
+    await appState.storage.writeCollection(tenantId, "pets", pets.filter((item) => !(item.id === petId && item.ownerId === user.sub)));
+    await appendAudit(tenantId, user.email, "pet.deleted", { petId });
+    pushSse(tenantId, "care_update", { action: "pet_deleted", petId, userId: user.sub });
+    return sendJson(res, 200, { ok: true, deleted: true, id: petId });
   }
 
   if (pathname === "/api/payments" && req.method === "POST") {
@@ -2279,12 +2872,21 @@ async function routeApi(req, res, urlObj, tenantId, user) {
 
   const fosterRequestUpdate = pathname.match(/^\/api\/foster-requests\/([^/]+)$/);
   if (fosterRequestUpdate && req.method === "PATCH") {
-    if (!user || !["ops", "ceo"].includes(user.role)) return sendJson(res, 403, { error: "Only an authorized operator can verify foster interactions" });
+    if (!user) return sendJson(res, 401, { error: "Sign in is required to update foster requests" });
     const body = await readBodyJson(req);
     if (!["accepted", "completed", "declined"].includes(body.status)) return sendJson(res, 400, { error: "Invalid foster request status" });
-    const requests = await appState.storage.readCollection(tenantId, "fosterRequests");
+    const [requests, fosters] = await Promise.all([
+      appState.storage.readCollection(tenantId, "fosterRequests"),
+      appState.storage.readCollection(tenantId, "fosters")
+    ]);
     const index = requests.findIndex((item) => item.id === decodeURIComponent(fosterRequestUpdate[1]));
     if (index < 0) return sendJson(res, 404, { error: "Foster request not found" });
+    const foster = fosters.find((f) => f.id === requests[index].fosterId);
+    const isHost = Boolean(foster && foster.ownerId === user.sub);
+    const isOperator = ["ops", "ceo"].includes(user.role);
+    if (!isHost && !isOperator) {
+      return sendJson(res, 403, { error: "Only the foster host or an authorized operator can update foster requests" });
+    }
     requests[index] = { ...requests[index], status: body.status, updatedAt: new Date().toISOString(), verifiedBy: user.sub };
     await appState.storage.writeCollection(tenantId, "fosterRequests", requests);
     if (requests[index].userId && requests[index].userId !== user.sub) {
@@ -2759,6 +3361,28 @@ async function requestHandler(req, res) {
 
     if (pathname === "/auth/google/start" || pathname === "/auth/google/callback") {
       await routeApi(req, res, urlObj, tenantId, user);
+      return;
+    }
+
+    if (pathname === "/.well-known/assetlinks.json" && req.method === "GET") {
+      const packageName = process.env.ANDROID_PACKAGE_NAME || "com.pawnir.app";
+      const fingerprintRaw = process.env.ANDROID_SHA256_CERT_FINGERPRINT || "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C";
+      const fingerprints = fingerprintRaw.split(",").map((s) => s.trim()).filter(Boolean);
+      const assetLinks = [
+        {
+          relation: ["delegate_permission/common.handle_all_urls"],
+          target: {
+            namespace: "android_app",
+            package_name: packageName,
+            sha256_cert_fingerprints: fingerprints
+          }
+        }
+      ];
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "public, max-age=3600"
+      });
+      res.end(JSON.stringify(assetLinks, null, 2));
       return;
     }
 

@@ -2397,3 +2397,641 @@ body.modal-open {
   border-color: #2e3b66 !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Play Store Waitlist, Interactive Showcase, Vet Slots, Passports, UGC & Compliance
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#booking-quick-pet-wrap[hidden],
+#moderation-block-wrap[hidden] {
+  display: none !important;
+}
+
+/* Play Store Waitlist Form inside #download-app */
+.app-notify-form {
+  width: min(100%, 660px);
+  margin: 1.4rem auto 0;
+  display: grid;
+  grid-template-columns: 1.45fr 1fr auto;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.app-notify-form input,
+.app-notify-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 1rem;
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 13.5px "IBM Plex Sans", "IBM Plex Sans Bengali", sans-serif;
+  outline: none;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.app-notify-form input:focus,
+.app-notify-form select:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(9, 9, 11, 0.08);
+}
+
+.app-notify-form #app-notify-submit {
+  min-height: 44px;
+  padding: 0 1.3rem;
+  white-space: nowrap;
+}
+
+.app-notify-form #app-notify-status {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+:root[data-theme=dark] .app-notify-form input:focus,
+:root[data-theme=dark] .app-notify-form select:focus {
+  border-color: #fafafa !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 720px) {
+  .app-notify-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Interactive Phone Showcase Buttons */
+.btn-mockup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  font: 700 10.5px "IBM Plex Sans", "IBM Plex Sans Bengali", sans-serif;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+  user-select: none;
+}
+
+.btn-mockup:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(9, 9, 11, 0.14);
+}
+
+.btn-mockup:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.btn-mockup:active {
+  transform: scale(0.97);
+}
+
+.btn-mockup-primary {
+  background: #09090b;
+  color: #ffffff;
+  border: 1px solid #09090b;
+}
+
+.btn-mockup-primary:hover {
+  background: #27272a;
+  border-color: #27272a;
+}
+
+.btn-mockup-outline {
+  background: #ffffff;
+  border: 1px solid #d4d4d8;
+  color: #09090b;
+}
+
+.btn-mockup-outline:hover {
+  background: #f4f4f6;
+  border-color: #09090b;
+}
+
+.btn-mockup-blood {
+  background: #b91c1c;
+  color: #ffffff;
+  border: 1px solid #b91c1c;
+}
+
+.btn-mockup-blood:hover {
+  background: #991b1b;
+  border-color: #991b1b;
+}
+
+:root[data-theme=dark] .btn-mockup:focus-visible {
+  outline-color: #fafafa;
+}
+
+:root[data-theme=dark] .btn-mockup-primary:hover {
+  background: #e4e4e7 !important;
+  border-color: #e4e4e7 !important;
+  color: #09090b !important;
+}
+
+:root[data-theme=dark] .btn-mockup-outline {
+  background: #18181b;
+  border-color: #3f3f46;
+  color: #f4f4f5;
+}
+
+:root[data-theme=dark] .btn-mockup-outline:hover {
+  background: #27272a;
+  border-color: #fafafa;
+  color: #ffffff;
+}
+
+:root[data-theme=dark] .btn-mockup-blood:hover {
+  background: #4c1d1d !important;
+  border-color: #f87171 !important;
+}
+
+/* Dashboard Pet Form Checkbox & Rich Pet Passports */
+.pet-form-grid .pet-vaccinated-check {
+  grid-column: 1 / -1;
+  align-items: center;
+  margin-top: 0.15rem;
+}
+
+.pet-form-grid .pet-vaccinated-check input,
+#moderation-block-wrap .check-line input {
+  margin-top: 0;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: #09090b;
+}
+
+:root[data-theme=dark] .pet-form-grid .pet-vaccinated-check input,
+:root[data-theme=dark] #moderation-block-wrap .check-line input {
+  accent-color: #fafafa;
+}
+
+.passport-card-rich {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  box-shadow: 0 4px 14px var(--shadow-color);
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.passport-card-rich:hover {
+  border-color: var(--ink);
+}
+
+.passport-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.passport-card-head strong {
+  font: 800 15px "Manrope", "IBM Plex Sans Bengali", sans-serif;
+  color: var(--ink);
+}
+
+.passport-id-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font: 800 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.passport-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.passport-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--line);
+}
+
+.passport-actions .btn {
+  flex: 1 1 auto;
+  font-size: 12px;
+  padding: 0.45rem 0.7rem;
+}
+
+:root[data-theme=dark] .passport-card-rich {
+  background: #121215 !important;
+  border-color: #27272a !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .passport-card-rich:hover {
+  border-color: #52525b !important;
+}
+
+:root[data-theme=dark] .passport-id-badge {
+  background: #18181b !important;
+  border-color: #3f3f46 !important;
+  color: #fafafa !important;
+}
+
+/* Vet Booking Time Slots Grid */
+.booking-slots-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.slots-field-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.slot-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 0.5rem;
+}
+
+.slot-pills-grid .inline-state {
+  grid-column: 1 / -1;
+  padding: 0.85rem;
+  margin: 0;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  font-size: 12.5px;
+}
+
+.slot-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.45rem 0.7rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 12.5px "IBM Plex Sans", sans-serif;
+  cursor: pointer;
+  transition: transform 0.14s ease, border-color 0.16s ease, background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.slot-pill:hover {
+  border-color: var(--ink);
+  background: var(--surface-soft);
+  transform: translateY(-1px);
+}
+
+.slot-pill.is-selected,
+.slot-pill[aria-pressed="true"] {
+  background: #09090b;
+  color: #ffffff;
+  border-color: #09090b;
+  box-shadow: 0 4px 12px rgba(9, 9, 11, 0.2);
+}
+
+.slot-pill:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+:root[data-theme=dark] .slot-pill {
+  background: #18181b;
+  border-color: #27272a;
+  color: #f4f4f5;
+}
+
+:root[data-theme=dark] .slot-pill:hover {
+  background: #27272a;
+  border-color: #a1a1aa;
+}
+
+:root[data-theme=dark] .slot-pill.is-selected,
+:root[data-theme=dark] .slot-pill[aria-pressed="true"] {
+  background: #fafafa !important;
+  color: #09090b !important;
+  border-color: #fafafa !important;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.18);
+}
+
+/* Expandable Lost & Found Sightings Timeline */
+.sightings-timeline {
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.55rem 0.85rem;
+  font-size: 12.5px;
+}
+
+.sightings-timeline summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font: 700 12px "Manrope", "IBM Plex Sans Bengali", sans-serif;
+  color: var(--ink);
+  min-height: 36px;
+  user-select: none;
+}
+
+.sightings-timeline summary::-webkit-details-marker {
+  display: none;
+}
+
+.sightings-timeline summary::after {
+  content: "▾";
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform 0.18s ease;
+}
+
+.sightings-timeline[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.sightings-timeline-list {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--line);
+}
+
+.sightings-timeline .sighting-item {
+  position: relative;
+  padding: 0.3rem 0 0.35rem 0.85rem;
+  border-top: 0;
+  border-left: 2px solid #d4d4d8;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.sightings-timeline > .sighting-item {
+  margin-top: 0.45rem;
+}
+
+.sightings-timeline .sighting-item::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 0.58rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.sighting-item strong {
+  color: var(--ink);
+}
+
+.sighting-item small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 0.12rem;
+}
+
+:root[data-theme=dark] .sightings-timeline {
+  background: #18181b;
+  border-color: #27272a;
+}
+
+:root[data-theme=dark] .sightings-timeline summary {
+  color: #f4f4f5;
+}
+
+:root[data-theme=dark] .sightings-timeline-list {
+  border-top-color: #27272a;
+}
+
+:root[data-theme=dark] .sightings-timeline .sighting-item {
+  border-left-color: #3f3f46;
+  color: #e4e4e7;
+}
+
+:root[data-theme=dark] .sightings-timeline .sighting-item::before {
+  background: #fafafa;
+}
+
+/* Google Play Compliance: Blocked Users, Danger Zone Account Deletion & Flag Buttons */
+.blocked-users-card {
+  margin-top: 1.2rem;
+}
+
+.danger-zone-card {
+  margin-top: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: 16px;
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.danger-zone-copy {
+  flex: 1 1 240px;
+}
+
+.danger-zone-card strong {
+  display: block;
+  font: 800 14px "Manrope", "IBM Plex Sans Bengali", sans-serif;
+  color: #991b1b;
+}
+
+.danger-zone-card p {
+  margin: 0.25rem 0 0;
+  font-size: 12px;
+  color: #7f1d1d;
+  line-height: 1.45;
+}
+
+.btn-danger-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid #dc2626;
+  background: transparent;
+  color: #b91c1c;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font: 700 12.5px "IBM Plex Sans", "IBM Plex Sans Bengali", sans-serif;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+  min-height: 40px;
+}
+
+.btn-danger-outline:hover,
+.btn-danger-outline:focus-visible {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.24);
+}
+
+:root[data-theme=dark] .blocked-users-card {
+  background: #18181b !important;
+  border-color: #27272a !important;
+}
+
+:root[data-theme=dark] .danger-zone-card {
+  background: #1c1012 !important;
+  border-color: #5c2525 !important;
+}
+
+:root[data-theme=dark] .danger-zone-card strong {
+  color: #fca5a5 !important;
+}
+
+:root[data-theme=dark] .danger-zone-card p {
+  color: #fecaca !important;
+}
+
+:root[data-theme=dark] .btn-danger-outline {
+  border-color: #ef4444 !important;
+  color: #fca5a5 !important;
+  background: transparent !important;
+}
+
+:root[data-theme=dark] .btn-danger-outline:hover,
+:root[data-theme=dark] .btn-danger-outline:focus-visible {
+  background: #ef4444 !important;
+  color: #09090b !important;
+  border-color: #ef4444 !important;
+}
+
+.report-flag-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.68rem;
+  font: 600 11.5px "IBM Plex Sans", "IBM Plex Sans Bengali", sans-serif;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  min-height: 36px;
+}
+
+.report-flag-btn:hover,
+.report-flag-btn:focus-visible {
+  border-color: #dc2626;
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+:root[data-theme=dark] .report-flag-btn {
+  border-color: #27272a;
+  color: #a1a1aa;
+  background: transparent;
+}
+
+:root[data-theme=dark] .report-flag-btn:hover,
+:root[data-theme=dark] .report-flag-btn:focus-visible {
+  border-color: #ef4444;
+  color: #fca5a5;
+  background: #2d1515;
+}
+
+/* Actionable Deep-Linking Notifications */
+.notification-item[data-notif-id] {
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+  min-height: 48px;
+}
+
+.notification-item[data-notif-id]:hover,
+.notification-item[data-notif-id]:focus-visible {
+  border-color: var(--ink);
+  background: var(--surface-soft);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme=dark] .notification-item {
+  background: #121215 !important;
+  border-color: #27272a !important;
+  color: #f4f4f5 !important;
+}
+
+:root[data-theme=dark] .notification-item.is-unread {
+  background: #18181b !important;
+  border-color: #fafafa !important;
+}
+
+:root[data-theme=dark] .notification-item[data-notif-id]:hover,
+:root[data-theme=dark] .notification-item[data-notif-id]:focus-visible {
+  background: #1f1f24 !important;
+  border-color: #ffffff !important;
+}
+
+/* Mobile >= 48px Touch Targets Across New Controls */
+@media (max-width: 768px) {
+  .app-notify-form input,
+  .app-notify-form select,
+  .app-notify-form button,
+  .slot-pill,
+  .btn-danger-outline,
+  .report-flag-btn,
+  .notification-item[data-notif-id],
+  .btn-mockup,
+  .sightings-timeline summary,
+  .passport-card-rich button,
+  .passport-card-rich a,
+  #vet-booking-dialog input:not([type="hidden"]),
+  #vet-booking-dialog select,
+  #vet-booking-dialog button,
+  #moderation-dialog select,
+  #moderation-dialog button,
+  .check-line {
+    min-height: 48px;
+  }
+
+  .report-flag-btn {
+    min-width: 48px;
+  }
+
+  .btn-danger-outline {
+    width: 100%;
+  }
+
+  .check-line {
+    align-items: center;
+  }
+
+  .footer-policy-link {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 6px;
+  }
+}
+

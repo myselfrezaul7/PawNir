@@ -1,5 +1,5 @@
-const CACHE_NAME = "pawnir-shell-v8";
-const API_CACHE_NAME = "pawnir-api-v8";
+const CACHE_NAME = "pawnir-shell-v9";
+const API_CACHE_NAME = "pawnir-api-v9";
 
 const SHELL_ASSETS = [
   "/",
@@ -51,12 +51,21 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
 
-  if (url.pathname === "/api/stream" || url.pathname.startsWith("/auth/")) {
+  if (
+    url.pathname === "/api/stream" ||
+    url.pathname.startsWith("/auth/") ||
+    url.pathname.startsWith("/.well-known/")
+  ) {
     return;
   }
 
   if (url.pathname.startsWith("/api/")) {
-    const isCacheableApi = CACHEABLE_API_PREFIXES.some((prefix) => url.pathname.startsWith(prefix));
+    const isNonCacheableSubroute =
+      url.pathname.startsWith("/api/adoptions/applications") ||
+      url.pathname.endsWith("/availability") ||
+      url.pathname.endsWith("/pdf");
+    const isCacheableApi =
+      !isNonCacheableSubroute && CACHEABLE_API_PREFIXES.some((prefix) => url.pathname.startsWith(prefix));
     if (!isCacheableApi) return;
 
     event.respondWith(
@@ -98,7 +107,7 @@ self.addEventListener("fetch", (event) => {
       .catch(async () => {
         const cached = await caches.match(request, { ignoreSearch: true });
         if (cached) return cached;
-        if (request.mode === "navigate") {
+        if (request.mode === "navigate" && !url.pathname.startsWith("/.well-known/")) {
           const shell = (await caches.match("/")) || (await caches.match("/index.html"));
           if (shell) return shell;
         }

@@ -1,0 +1,19 @@
+{
+  "packageId": "com.pawnir.app",
+  "host": "pawnir.com",
+  "name": "PawNir",
+  "launcherName": "PawNir",
+  "display": "standalone",
+  "themeColor": "#09090b",
+  "navigationColor": "#09090b",
+  "backgroundColor": "#09090b",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://pawnir.com/favicon-512x512.png",
+  "maskableIconUrl": "https://pawnir.com/favicon-512x512.png",
+  "webManifestUrl": "https://pawnir.com/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "orientation": "portrait-primary",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1
+}
