@@ -1,5 +1,5 @@
-const CACHE_NAME = "pawnir-shell-v9";
-const API_CACHE_NAME = "pawnir-api-v9";
+const CACHE_NAME = "pawnir-shell-v12";
+const API_CACHE_NAME = "pawnir-api-v12";
 
 const SHELL_ASSETS = [
   "/",
